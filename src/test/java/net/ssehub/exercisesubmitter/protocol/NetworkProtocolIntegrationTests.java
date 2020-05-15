@@ -15,12 +15,13 @@ import io.swagger.client.model.CourseDto;
 import io.swagger.client.model.GroupDto;
 
 /**
- * This class declares unit tests for the {@link NetworkProtocol} class.
+ * This class declares <b>integration</b> tests for the {@link NetworkProtocol} class.
+ * These tests communicates with the REST test server.
  * 
  * @author Kunold
  *
  */
-public class NetworkProtocolTest {
+public class NetworkProtocolIntegrationTests {
     /**
      * The test data.
      */

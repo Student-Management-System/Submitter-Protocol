@@ -28,7 +28,7 @@ public class NetworkProtocol {
     /**
      * The ApiClient enables to set a BasePath for the other API`s.
      */
-    protected ApiClient apiClient;
+    private ApiClient apiClient;
     
 	/**
 	 * The API of the user informations.
@@ -88,7 +88,7 @@ public class NetworkProtocol {
 	private List<AssessmentDto> assessments = new ArrayList<>();
 	
 	/**
-	 * The constructor of the class.
+	 * The default constructor of the class to be used by the submitters / reviewer.
 	 * @param basePath The REST URL of the student management server.
 	 * @param courseName The course that is associated with the exercise submitter.
 	 */
@@ -101,6 +101,35 @@ public class NetworkProtocol {
         semester = SemesterUtils.getSemester();
 		this.courseName = courseName;
 		this.basePath = basePath;
+	}
+	
+	/**
+	 * Constructor intended for testing (Inversion of Control allows setting of Mocks).
+	 * @param basePath The REST URL of the student management server.
+     * @param courseName The course that is associated with the exercise submitter.
+	 * @param apiUser The API to query <b>user</b> related information.
+	 * @param apiCourse The API to query <b>course</b> related information.
+	 * @param apiAssignments The API to query <b>assignment</b> related information.
+	 */
+	NetworkProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
+	    AssignmentsApi apiAssignments) {
+	    
+        this.apiUser = apiUser;
+        this.apiCourse = apiCourse;
+        this.apiAssignments = apiAssignments;
+        this.courseName = courseName;
+        this.basePath = basePath;
+        
+        // API client not needed during tests
+        apiClient = null;
+	}
+	
+	/**
+	 * Allows subclasses to use the {@link ApiClient}, which serves as connection to the REST-server.
+	 * @return The used {@link ApiClient}.
+	 */
+	protected ApiClient getApiClient() {
+	    return apiClient;
 	}
 	
 	/**

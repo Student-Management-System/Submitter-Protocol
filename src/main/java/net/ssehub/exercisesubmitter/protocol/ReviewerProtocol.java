@@ -33,7 +33,7 @@ public class ReviewerProtocol extends NetworkProtocol {
     
     public ReviewerProtocol(String basePath, String courseName) {
         super(basePath, courseName);
-        apiAssessments = new AssessmentsApi(apiClient);
+        apiAssessments = new AssessmentsApi(getApiClient());
     }
     
     /**
