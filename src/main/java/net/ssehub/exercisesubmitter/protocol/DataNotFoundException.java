@@ -19,7 +19,8 @@ public class DataNotFoundException extends NetworkException {
         COURSE_NOT_FOUND,
         GROUP_NOT_FOUND,
         ASSIGNMENTS_NOT_FOUND,
-        ASSESSMENTS_NOT_FOUND;
+        ASSESSMENTS_NOT_FOUND,
+        ASSESSMENT_BODY_NOT_FOUND;
     }
 
     /**
