@@ -68,26 +68,6 @@ public class NetworkProtocol {
 	private String courseId;
 	
 	/**
-	 * A list of the courses.
-	 */
-	private List<CourseDto> courses = new ArrayList<>();
-	
-	/**
-	 * A list of the groups.
-	 */
-	private List<GroupDto> groups = new ArrayList<>();
-	
-	/**
-	 * A list of the assignments.
-	 */
-	private List<AssignmentDto> assignments = new ArrayList<>();
-	
-	/**
-	 * A list of all assessments.
-	 */
-	private List<AssessmentDto> assessments = new ArrayList<>();
-	
-	/**
 	 * The default constructor of the class to be used by the submitters / reviewer.
 	 * @param basePath The REST URL of the student management server.
 	 * @param courseName The course that is associated with the exercise submitter.
@@ -176,7 +156,8 @@ public class NetworkProtocol {
 	 * @throws NetworkException when network problems occur.
 	 */
 	public List<CourseDto> getCourses(String userId) throws NetworkException {
-		try {
+	    List<CourseDto> courses = null;
+	    try {
             courses = apiUser.getCoursesOfUser(userId);
 		} catch (IllegalArgumentException e) {
 		    throw new ServerNotFoundException(e.getMessage(), basePath);
@@ -198,6 +179,7 @@ public class NetworkProtocol {
 	 * @throws NetworkException when network problems occur.
 	 */
 	public List<GroupDto> getGroups(String userId) throws NetworkException {
+	    List<GroupDto> groups = null;
 	    try {
             groups = apiUser.getGroupsOfUserForCourse(userId, getCourseID());
         } catch (IllegalArgumentException e) {
@@ -216,6 +198,7 @@ public class NetworkProtocol {
 	 * @throws NetworkException when network problems occur.
 	 */
 	public List<AssignmentDto> getAssignments() throws NetworkException {
+	    List<AssignmentDto> assignments = null;
 	    try {
             assignments = apiAssignments.getAssignmentsOfCourse(getCourseID());
         } catch (IllegalArgumentException e) {
@@ -238,6 +221,7 @@ public class NetworkProtocol {
 	 * @throws NetworkException when network problems occur.
 	 */
 	public List<AssessmentDto> getAssessmentsWithGroups(String userId) throws NetworkException {
+	    List<AssessmentDto> assessments = null;
 	    try {
 	        assessments = apiUser.getAssessmentsOfUserForCourse(userId, getCourseID());
 	    } catch (IllegalArgumentException e) {
