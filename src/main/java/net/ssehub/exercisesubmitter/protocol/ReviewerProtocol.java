@@ -6,6 +6,7 @@ import java.util.List;
 import net.ssehub.exercisesubmitter.protocol.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
@@ -73,6 +74,22 @@ public class ReviewerProtocol extends NetworkProtocol {
                     DataType.ASSESSMENTS_NOT_FOUND);
         }
         return singleAssessment;
+    }
+    
+    /**
+     * Creates the Assessment for an Assignment.
+     * @param body The Assessment body.
+     * @param assignmentId The id of the specified assignment.
+     * @throws NetworkException when network problems occur.
+     */
+    public void createAssessment(AssessmentCreateDto body,String assignmentId) throws NetworkException {
+        try {
+            apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), basePath);
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENTS_NOT_FOUND);
+        }
     }
     
 }
