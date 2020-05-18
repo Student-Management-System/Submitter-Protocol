@@ -1,4 +1,4 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 /**
  * A Network Exception occurs if there is a problem with the REST server.

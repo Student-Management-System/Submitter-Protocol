@@ -1,9 +1,12 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.backend.NetworkProtocol;
+import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 
@@ -18,7 +21,6 @@ import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 public class NetworkProtocolUnitTests {
     
     private static final String TEST_COURSE_NAME = "java";
-    private static final String TEST_SEMESTER = "wise1920";
     
     /**
      * Test if the REST server is not found.

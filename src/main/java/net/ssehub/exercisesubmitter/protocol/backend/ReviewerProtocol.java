@@ -1,9 +1,9 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.ssehub.exercisesubmitter.protocol.DataNotFoundException.DataType;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;

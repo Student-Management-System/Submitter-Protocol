@@ -1,4 +1,4 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 /**
  * Declares an exception for the case, that a requested data tape is not found.

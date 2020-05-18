@@ -1,4 +1,4 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 
 /**

@@ -1,11 +1,11 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.ssehub.exercisesubmitter.protocol.DataNotFoundException.DataType;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
@@ -101,6 +101,14 @@ public class NetworkProtocol {
         semester = SemesterUtils.getSemester();
 		this.courseName = courseName;
 		this.basePath = basePath;
+	}
+	
+	/**
+	 * Sets the access token after the user has successfully logged in / out.
+	 * @param accessToken The access token retrieved from the student management system, <tt>null</tt> to log out.
+	 */
+	public void setAccessToken(String accessToken) {
+	    apiClient.setAccessToken(accessToken);
 	}
 	
 	/**

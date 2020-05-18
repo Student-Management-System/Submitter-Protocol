@@ -1,4 +1,4 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 /**
  * Exception denoting that the user could not login, because his/her credentials are wrong / unknown for the system.

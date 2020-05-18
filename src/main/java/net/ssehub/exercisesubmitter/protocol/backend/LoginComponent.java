@@ -1,4 +1,4 @@
-package net.ssehub.exercisesubmitter.protocol;
+package net.ssehub.exercisesubmitter.protocol.backend;
 
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.api.AuthenticationApi;
@@ -34,13 +34,13 @@ public class LoginComponent {
     
     // User Data
     private String userName;
-    private String token;
+    private String managementToken;
     private String userID;
     
     /**
      * Instantiates the {@link LoginComponent} by specifying the authentication and student management service to use.
-     * @param authenticationURL
-     * @param stdMgmtURL
+     * @param authenticationURL The URL of the authentication server (aka Sparky service)
+     * @param stdMgmtURL The URL of the student management service
      */
     public LoginComponent(String authenticationURL, String stdMgmtURL) {
         // Sparky Service to retrieve token
@@ -72,10 +72,11 @@ public class LoginComponent {
         
         // Login into SparkyService to retrieve usable token
         AuthenticationInfoDto authInfo = null;
+        String tmpToken = null;
         try {
             authInfo = authApi.authenticate(credentials);
             this.userName = authInfo.getUser().getUsername();
-            this.token = authInfo.getToken().getToken();
+            tmpToken = authInfo.getToken().getToken();
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), authenticationURL);
         } catch (ApiException e) {
@@ -83,16 +84,19 @@ public class LoginComponent {
                 + "\", credentials are unknown. Please check that user exist.");
         }
         
-        AuthSystemCredentials tokenAsJson = new AuthSystemCredentials();
-        tokenAsJson.setToken(token);
-        try {
-            AuthTokenDto loginData = mgmtAuthApi.loginWithToken(tokenAsJson);
-            userID = loginData.getUserId();
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), stdMgmtURL);
-        } catch (net.ssehub.studentmgmt.backend_api.ApiException e) {
-            throw new UnknownCredentialsException("Could not login \"" + userName
-                + "\", credentials are unknown. Please check that user exist.");
+        if (null != tmpToken && null != authInfo) {
+            AuthSystemCredentials tokenAsJson = new AuthSystemCredentials();
+            tokenAsJson.setToken(tmpToken);
+            try {
+                AuthTokenDto loginData = mgmtAuthApi.loginWithToken(tokenAsJson);
+                userID = loginData.getUserId();
+                this.managementToken = loginData.getAccessToken();
+            } catch (IllegalArgumentException e) {
+                throw new ServerNotFoundException(e.getMessage(), stdMgmtURL);
+            } catch (net.ssehub.studentmgmt.backend_api.ApiException e) {
+                throw new UnknownCredentialsException("Could not login \"" + userName
+                    + "\", credentials are unknown. Please check that user exist.");
+            }
         }
         
         return userID != null;
@@ -107,11 +111,11 @@ public class LoginComponent {
     }
 
     /**
-     * Returns the token to be used to query for other services.
-     * @return the token.
+     * Returns the token to be used to query the <b>Student Management Service</b>.
+     * @return The token of the <b>Student Management Service</b>.
      */
-    public String getToken() {
-        return token;
+    public String getManagementToken() {
+        return managementToken;
     }
 
     /**
