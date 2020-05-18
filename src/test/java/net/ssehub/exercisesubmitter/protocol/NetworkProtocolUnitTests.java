@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.ApiException;
+import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+
 
 /**
  * This class declares <b>unit</b> tests for the {@link NetworkProtocol} class.

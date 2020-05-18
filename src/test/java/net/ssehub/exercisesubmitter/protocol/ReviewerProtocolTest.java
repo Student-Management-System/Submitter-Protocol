@@ -5,7 +5,8 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import io.swagger.client.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+
 
 /**
  * This class declares unit tests for the {@link ReviewerProtocol} class.

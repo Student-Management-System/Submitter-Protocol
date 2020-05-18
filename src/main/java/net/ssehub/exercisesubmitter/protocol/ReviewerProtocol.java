@@ -3,10 +3,10 @@ package net.ssehub.exercisesubmitter.protocol;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.swagger.client.ApiException;
-import io.swagger.client.api.AssessmentsApi;
-import io.swagger.client.model.AssessmentDto;
 import net.ssehub.exercisesubmitter.protocol.DataNotFoundException.DataType;
+import net.ssehub.studentmgmt.backend_api.ApiException;
+import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
  * Network protocol designed for the &quot;Exercise Reviewer&quot;.

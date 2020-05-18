@@ -8,11 +8,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import io.swagger.client.model.AssessmentDto;
-import io.swagger.client.model.AssignmentDto;
-import io.swagger.client.model.AssignmentDto.StateEnum;
-import io.swagger.client.model.CourseDto;
-import io.swagger.client.model.GroupDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
+import net.ssehub.studentmgmt.backend_api.model.CourseDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
+
 
 /**
  * This class declares <b>integration</b> tests for the {@link NetworkProtocol} class.

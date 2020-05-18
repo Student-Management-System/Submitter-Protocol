@@ -5,17 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.AssignmentsApi;
-import io.swagger.client.api.CoursesApi;
-import io.swagger.client.api.UsersApi;
-import io.swagger.client.model.AssessmentDto;
-import io.swagger.client.model.AssignmentDto;
-import io.swagger.client.model.AssignmentDto.StateEnum;
-import io.swagger.client.model.CourseDto;
-import io.swagger.client.model.GroupDto;
 import net.ssehub.exercisesubmitter.protocol.DataNotFoundException.DataType;
+import net.ssehub.studentmgmt.backend_api.ApiClient;
+import net.ssehub.studentmgmt.backend_api.ApiException;
+import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
+import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
+import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
+import net.ssehub.studentmgmt.backend_api.model.CourseDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 
 /**
  * Manages the network protocol communication with the API for the exercise submitter.
@@ -231,7 +231,7 @@ public class NetworkProtocol {
 	 */
 	public List<AssessmentDto> getAssessmentsWithGroups(String userId) throws NetworkException {
 	    try {
-	        assessments = apiUser.getAssessmentsWithGroupsOfUserForCourse(userId, getCourseID());
+	        assessments = apiUser.getAssessmentsOfUserForCourse(userId, getCourseID());
 	    } catch (IllegalArgumentException e) {
 	        throw new ServerNotFoundException(e.getMessage(), basePath);
 	    } catch (ApiException e) {
@@ -243,6 +243,18 @@ public class NetworkProtocol {
 	    }
 	    
 	    return assessments;
+	}
+	
+	/**
+	 * Returns the destination path of an <b>Assessment</b> for a <b>Student</b> inside the repository, considering
+	 * its <b>Group</b> assignment for that specific assessment.
+	 * Will retrieve the correct group assignment automatically.
+	 * @param userID The user whose assessments are requested.
+	 * @return A list of folders to traverse form the repository root to the upload destination.
+	 * @throws NetworkException If network problems occur.
+	 */
+	public String[] getPathOfAssessment(String userID, String assessment) throws NetworkException {
+	    return null;
 	}
 	
 	/**
