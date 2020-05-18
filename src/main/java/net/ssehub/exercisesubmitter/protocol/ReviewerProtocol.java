@@ -111,4 +111,21 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
     }
     
+    /**
+     * Updates an Assessment.
+     * @param body The body of the assessment that is updated.
+     * @param assignmentId The id of the specified assignment.
+     * @param assessmentId The id of the specified assessment.
+     * @throws NetworkException when network problems occur.
+     */
+    public void updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) throws NetworkException {
+        try {
+            apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, assessmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), basePath);
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
+        }
+    }
+    
 }
