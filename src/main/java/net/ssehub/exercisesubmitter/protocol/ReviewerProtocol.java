@@ -8,6 +8,7 @@ import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 
 /**
  * Network protocol designed for the &quot;Exercise Reviewer&quot;.
@@ -88,7 +89,25 @@ public class ReviewerProtocol extends NetworkProtocol {
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), basePath);
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENTS_NOT_FOUND);
+            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
+        }
+    }
+    
+    /**
+     * Creates a Partial Assessment.
+     * @param body The body of the partial assessment
+     * @param assignmentId The id of the specified assignment.
+     * @param assessmentId The id of the specified assessment.
+     * @throws NetworkException when network problems occur.
+     */
+    public void createPartialAssessment(PartialAssessmentDto body, String assignmentId, String assessmentId) 
+            throws NetworkException {
+        try {
+            apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId, assessmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), basePath);
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
     }
     
