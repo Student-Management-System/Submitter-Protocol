@@ -128,4 +128,20 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
     }
     
+    /**
+     * Deletes an Assessment.
+     * @param assignmentId The id of the specified assignment.
+     * @param assessmentId The id of the specified assessment.
+     * @throws NetworkException when network problems occur.
+     */
+    public void deleteAssessment(String assignmentId, String assessmentId) throws NetworkException {
+        try {
+            apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), basePath);
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessment not found", courseName, DataType.ASSESSMENTS_NOT_FOUND);
+        }
+    }
+    
 }
