@@ -89,11 +89,19 @@ public abstract class AbstractSettings<C> {
     }
         
     /**
+     * Returns the configuration class.
+     * Required since generics are not available during runtime and the configuration class is needed to load the first
+     * instance.
+     * @return the configuration class.
+     */
+    protected abstract Class<C> getConfigClass();
+    
+    /**
      * Parsed the given configuration and loads it.
      * @param configAsJson The configuration to use at the whole application.
      */
     protected void loadConfig(String configAsJson) {
-        config = jsonParser.deserialize(configAsJson, config.getClass());
+        config = jsonParser.deserialize(configAsJson, getConfigClass());
     }
     
     /**
