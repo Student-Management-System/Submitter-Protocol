@@ -103,6 +103,14 @@ public abstract class AbstractSettings<C> {
     protected abstract String getSettingsFileName();
     
     /**
+     * Allows setting the configuration in sub classes.
+     * @param config The configuration to set.
+     */
+    protected void setConfiguration(C config) {
+        this.config = config;
+    }
+    
+    /**
      * Saves the currently used configuration.
      * May be used to create a new configuration or to create test cases.
      * @param out The writer to save the configuration.
