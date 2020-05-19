@@ -16,6 +16,9 @@ import net.ssehub.studentmgmt.backend_api.api.UsersApi;
  *
  */
 public class LoginComponentIntegrationTests {
+    // Test parameters
+    private static final String TEST_AUTH_SERVER = "http://147.172.178.30:8080";
+    private static final String TEST_MANAGEMENT_SERVER = "http://147.172.178.30:3000";
     
     /**
      * Tests precondition if credentials have been provided via external properties (to avoid placing valid credentials
@@ -58,7 +61,7 @@ public class LoginComponentIntegrationTests {
         assumeSpecified(pw, "test_password", "password");
         
         // Perform login
-        LoginComponent loginComp = new LoginComponent("http://147.172.178.30:8080", "http://147.172.178.30:3000");
+        LoginComponent loginComp = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
         boolean success = loginComp.login(userName, pw);
         
         // Test if login was successful
@@ -79,7 +82,6 @@ public class LoginComponentIntegrationTests {
     @Test
     public void testRetrievelOfValidAccessToken() throws UnknownCredentialsException, ServerNotFoundException {
         String testUserID = "abc6e1c0-6db0-4c35-8d97-07cc7173c34c";
-        String mgmtURL = "http://147.172.178.30:3000";
         String userName = System.getProperty("test_user");
         String pw = System.getProperty("test_password");
         
@@ -89,7 +91,7 @@ public class LoginComponentIntegrationTests {
         
         // Precondition: Check that tested services requires valid token
         ApiClient client = new ApiClient();
-        client.setBasePath(mgmtURL);
+        client.setBasePath(TEST_MANAGEMENT_SERVER);
         UsersApi userApi = new UsersApi(client);
         boolean exceptionOccured = false;
         try {
@@ -102,7 +104,7 @@ public class LoginComponentIntegrationTests {
             + "was queried.");
         
         // Perform login
-        LoginComponent loginComp = new LoginComponent("http://147.172.178.30:8080", mgmtURL);
+        LoginComponent loginComp = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
         loginComp.login(userName, pw);
         
         //Query a service that requires valid token
