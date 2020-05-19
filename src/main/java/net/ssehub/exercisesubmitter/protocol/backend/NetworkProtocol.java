@@ -257,12 +257,23 @@ public class NetworkProtocol {
      * its <b>Group</b> assignment for that specific assessment.
      * Will retrieve the correct group assignment automatically.
      * @param userID The user whose assessments are requested.
-     * @param assessmentID The ID of the the assessment that is requested.
+     * @param assignmentID The ID of the the assessment that is requested.
      * @return A list of folders to traverse form the repository root to the upload destination.
      * @throws NetworkException If network problems occur.
      */
-    public String[] getPathOfAssessment(String userID, String assessmentID) throws NetworkException {
-        return null;
+    public String getGroupForAssignment(String userID, String assignmentID) throws NetworkException {
+        String groupName = null;
+        try {
+            List<GroupDto> groups = apiUser.getGroupsOfUserForCourse(userID, getCourseID());
+            groupName = groups.get(0).getName();
+        } catch (ApiException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NetworkException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return groupName;
     }
     
     /**

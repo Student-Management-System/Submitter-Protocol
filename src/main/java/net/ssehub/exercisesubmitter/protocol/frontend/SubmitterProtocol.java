@@ -1,9 +1,15 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.ssehub.exercisesubmitter.protocol.backend.LoginComponent;
+import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkProtocol;
 import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 
 /**
  * Network protocol that provides API calls as required by the <b>Standalone / Eclise Exercise Submitter</b>.
@@ -46,6 +52,23 @@ public class SubmitterProtocol {
         }
         
         return loggedIn;
+    }
+    
+    /**
+     * Returns the open list of assignments, for the user.
+     * @return The list of assignments, which may be currently be edited.
+     * 
+     * @throws NetworkException If network problems occur.
+     */
+    public List<AssignmentDto> getOpenAssignments() throws NetworkException {
+        List<AssignmentDto> assignments = new ArrayList<>();
+        for (AssignmentDto assignmentDto : protocol.getAssignments()) {
+            if (assignmentDto.getState() == StateEnum.IN_PROGRESS) {
+                assignments.add(assignmentDto);
+            }
+        }
+        
+        return assignments;
     }
 
 }

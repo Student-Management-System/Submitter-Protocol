@@ -139,5 +139,13 @@ public class NetworkProtocolIntegrationTests {
         Assertions.assertNotNull(assignments, "Assignment map was null, but should never be null.");
         Assertions.assertFalse(assignments.isEmpty(), "Map of assignments was empty");
     }
+    
+//    @Test
+//    public void testGetPathOfAssessment() throws NetworkException {
+//        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
+//        np.setSemester(TEST_SEMESTER);
+//        String groupName = np.getGroupForAssignment(TEST_USER_ID, "b2f6c008-b9f7-477f-9e8b-ff34ce339077");
+//        System.out.println(groupName);
+//    }
 
 }
