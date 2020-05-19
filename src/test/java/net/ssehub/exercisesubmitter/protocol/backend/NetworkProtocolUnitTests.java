@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
-import net.ssehub.exercisesubmitter.protocol.backend.NetworkProtocol;
-import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 

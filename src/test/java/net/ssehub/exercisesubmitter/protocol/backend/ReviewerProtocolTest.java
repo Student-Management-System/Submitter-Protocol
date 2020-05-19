@@ -5,8 +5,6 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
-import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 
