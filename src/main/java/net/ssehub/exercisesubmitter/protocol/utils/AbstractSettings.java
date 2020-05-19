@@ -19,6 +19,8 @@ import net.ssehub.studentmgmt.backend_api.JSON;
 
 /**
  * Abstract class that may be used to create a JSON based configuration.
+ * Please note that methods are <tt>protected</tt> by default and may be declared as <tt>public</tt> in sub classes
+ * if desired.
  * @param <C> the configuration class to be used.
  * @author El-Sharkawy
  *
@@ -77,12 +79,20 @@ public abstract class AbstractSettings<C> {
             throw new IOException(e);
         }
     }
+    
+    /**
+     * Returns the configuration.
+     * @return The configuration.
+     */
+    protected C getConfiguration() {
+        return config;
+    }
         
     /**
      * Parsed the given configuration and loads it.
      * @param configAsJson The configuration to use at the whole application.
      */
-    public void loadConfig(String configAsJson) {
+    protected void loadConfig(String configAsJson) {
         config = jsonParser.deserialize(configAsJson, config.getClass());
     }
     
@@ -97,7 +107,7 @@ public abstract class AbstractSettings<C> {
      * May be used to create a new configuration or to create test cases.
      * @param out The writer to save the configuration.
      */
-    public void saveConfiguration(Writer out) {
+    protected void saveConfiguration(Writer out) {
         String configAsJson = jsonParser.serialize(config);
         try {
             out.write(configAsJson);
