@@ -33,6 +33,11 @@ public class ReviewerProtocol extends NetworkProtocol {
      */
     private AssessmentDto singleAssessment;
     
+    /**
+     * The default constructor of the class to be used by the reviewer.
+     * @param basePath The REST URL of the student management server.
+     * @param courseName The course that is associated with the ExerciseReviewer.
+     */
     public ReviewerProtocol(String basePath, String courseName) {
         super(basePath, courseName);
         apiAssessments = new AssessmentsApi(getApiClient());
@@ -48,9 +53,9 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments not found", courseName, DataType.ASSESSMENTS_NOT_FOUND);
+            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         
         return assessments;
@@ -69,9 +74,9 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             singleAssessment = apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments for the specified assignement not found", courseName,
+            throw new DataNotFoundException("Assessments for the specified assignement not found", getCourseName(),
                     DataType.ASSESSMENTS_NOT_FOUND);
         }
         return singleAssessment;
@@ -83,13 +88,14 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param assignmentId The id of the specified assignment.
      * @throws NetworkException when network problems occur.
      */
-    public void createAssessment(AssessmentCreateDto body,String assignmentId) throws NetworkException {
+    public void createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
         try {
             apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
+            throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
+                DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
     }
     
@@ -105,9 +111,10 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
+            throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
+                DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
     }
     
@@ -122,9 +129,10 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessmentbody not found", courseName, DataType.ASSESSMENT_BODY_NOT_FOUND);
+            throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
+                DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
     }
     
@@ -138,9 +146,9 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessment not found", courseName, DataType.ASSESSMENTS_NOT_FOUND);
+            throw new DataNotFoundException("Assessment not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
     }
 }

@@ -39,13 +39,15 @@ public class SemesterUtils {
      */
     public static String getSemester() {
         
-        if(calendar.get(Calendar.MONTH) >= Calendar.APRIL && calendar.get(Calendar.MONTH) <= Calendar.SEPTEMBER) {
+        if (calendar.get(Calendar.MONTH) >= Calendar.APRIL && calendar.get(Calendar.MONTH) <= Calendar.SEPTEMBER) {
             semester = "sose" + formateDate(calendar.get(Calendar.YEAR));
         } else {
             if (calendar.get(Calendar.MONTH) >= Calendar.JANUARY && calendar.get(Calendar.MONTH) <= Calendar.MARCH) {
-                semester = "wise" + formateDate(calendar.get(Calendar.YEAR) - 1) + formateDate(calendar.get(Calendar.YEAR)); 
+                semester = "wise" + formateDate(calendar.get(Calendar.YEAR) - 1)
+                    + formateDate(calendar.get(Calendar.YEAR)); 
             } else {
-                semester = "wise" + formateDate(calendar.get(Calendar.YEAR)) + (formateDate(calendar.get(Calendar.YEAR) + 1));
+                semester = "wise" + formateDate(calendar.get(Calendar.YEAR))
+                    + (formateDate(calendar.get(Calendar.YEAR) + 1));
             }
             
         }

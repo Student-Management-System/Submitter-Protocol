@@ -11,8 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import net.ssehub.exercisesubmitter.protocol.backend.SemesterUtils;
-
 
 /**
  * Tests for the {@link SemesterUtils} class.
@@ -45,6 +43,8 @@ public class SemesterUtilsTest {
     
     /**
      * Method to run all tests and set the Year for the test to 2020.
+     * @param monthOfYear The month of the year (0-based)
+     * @param expectedSemester The expected semester if year 2020 is used.
      */
     @ParameterizedTest(name = "Semester {index}/2020 -> {1}")
     @MethodSource("data")
