@@ -314,7 +314,7 @@ public class NetworkProtocol {
         Map<String, State> assignments = new HashMap<>();
         
         try {
-            for (Assignment assignment : getAssignments(null)) {
+            for (Assignment assignment : getAssignments((AssignmentDto.StateEnum[]) null)) {
                 assignments.put(assignment.getName(), assignment.getState());
             }
         } catch (NetworkException e) {
