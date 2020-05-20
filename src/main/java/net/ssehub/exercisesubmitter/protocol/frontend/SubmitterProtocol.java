@@ -10,7 +10,7 @@ import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 
 /**
- * Network protocol that provides API calls as required by the <b>Standalone / Eclise Exercise Submitter</b>.
+ * Network protocol that provides API calls as required by the <b>Standalone / Eclipse Exercise Submitter</b>.
  * Instances will store information (i.e., states) about the user and the course that is queried.
  * @author El-Sharkawy
  *
