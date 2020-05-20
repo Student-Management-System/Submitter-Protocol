@@ -53,6 +53,14 @@ public class SubmitterProtocol {
     }
     
     /**
+     * Used to select the semester.
+     * @param semester The semester to use (four lower case letters + 2 digits).
+     */
+    public void setSemester(String semester) {
+        protocol.setSemester(semester);
+    }
+    
+    /**
      * Returns the open list of assignments, for the user.
      * @return The list of assignments, which may be currently be edited.
      * 
