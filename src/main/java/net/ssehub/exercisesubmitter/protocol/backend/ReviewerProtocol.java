@@ -1,6 +1,5 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
@@ -24,16 +23,6 @@ public class ReviewerProtocol extends NetworkProtocol {
     private AssessmentsApi apiAssessments;
     
     /**
-     * List of assessments.
-     */
-    private List<AssessmentDto> assessments = new ArrayList<>();
-    
-    /**
-     * Single assessment.
-     */
-    private AssessmentDto singleAssessment;
-    
-    /**
      * The default constructor of the class to be used by the reviewer.
      * @param basePath The REST URL of the student management server.
      * @param courseName The course that is associated with the ExerciseReviewer.
@@ -50,6 +39,7 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @throws NetworkException when network problems occur.
      */
     public List<AssessmentDto> getAssessments(String assignmentId) throws NetworkException {
+        List<AssessmentDto> assessments = null;
         try {
             assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
         } catch (IllegalArgumentException e) {
@@ -71,6 +61,7 @@ public class ReviewerProtocol extends NetworkProtocol {
      */
     public AssessmentDto getAssessmentForAssignment(String assignmentId, String assessmentId) 
             throws NetworkException {
+        AssessmentDto singleAssessment = null;
         try {
             singleAssessment = apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
