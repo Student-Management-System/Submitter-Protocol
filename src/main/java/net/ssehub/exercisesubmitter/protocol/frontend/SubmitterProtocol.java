@@ -19,6 +19,7 @@ public class SubmitterProtocol {
     private LoginComponent login;
     private boolean loggedIn;
     private NetworkProtocol protocol;
+    private String submissionServer;
     
     /**
      * Creates a new {@link SubmitterProtocol} instance for a specific course. This <b>won't</b> login the user,
@@ -26,11 +27,13 @@ public class SubmitterProtocol {
      * @param authenticationURL The URL of the authentication server (aka Sparky service)
      * @param stdMgmtURL The URL of the student management service
      * @param courseName The course that is associated with the exercise submitter.
+     * @param submissionServer The root (URL) where to submit assignments (exercises).
      */
-    public SubmitterProtocol(String authenticationURL, String stdMgmtURL, String courseName) {
+    public SubmitterProtocol(String authenticationURL, String stdMgmtURL, String courseName, String submissionServer) {
         login = new LoginComponent(authenticationURL, stdMgmtURL);
         protocol = new NetworkProtocol(stdMgmtURL, courseName);
         loggedIn = false;
+        this.submissionServer = submissionServer;
     }
     
     /**
@@ -61,7 +64,7 @@ public class SubmitterProtocol {
     }
     
     /**
-     * Returns the open list of assignments, for the user.
+     * Returns the open list of assignments (in state submission), for the user.
      * @return The list of assignments, which may be currently be edited.
      * 
      * @throws NetworkException If network problems occur.
@@ -80,4 +83,22 @@ public class SubmitterProtocol {
         return protocol.getAssignments(StateEnum.EVALUATED, StateEnum.CLOSED);
     }
 
+    /**
+     * Computes the URL where to upload assignments.
+     * @param assignment An assignment, which is currently in state submission
+     * @return The absolute URL where to submit the specified assignment.
+     * @see #getOpenAssignments()
+     */
+    public String getSubmissionUrl(Assignment assignment) throws NetworkException {
+        String destination = submissionServer + "/" + assignment.getName() + "/";
+        if (assignment.isGroupWork()) {
+            // Get group for assignment
+            String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
+            destination += groupName;
+        } else {
+            destination += login.getUserName();
+        }
+        
+        return destination;
+    }
 }

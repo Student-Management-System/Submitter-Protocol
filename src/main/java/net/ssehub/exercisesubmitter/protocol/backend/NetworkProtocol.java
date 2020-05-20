@@ -291,15 +291,14 @@ public class NetworkProtocol {
     public String getGroupForAssignment(String userID, String assignmentID) throws NetworkException {
         String groupName = null;
         try {
-            List<GroupDto> groups = apiUser.getGroupsOfUserForCourse(userID, getCourseID());
-            groupName = groups.get(0).getName();
+            // TODO SE: Considers only assignments in submission, currently
+            GroupDto groupDto = apiUser.getGroupOfAssignment(userID, getCourseID(), assignmentID);
+            groupName = groupDto.getName();
         } catch (ApiException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NetworkException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new DataNotFoundException("No assignment realted group information found", assignmentID,
+               DataType.GROUP_NOT_FOUND);
         }
+        
         return groupName;
     }
     
