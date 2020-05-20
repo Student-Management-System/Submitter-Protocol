@@ -1,6 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,16 +216,18 @@ public class NetworkProtocol {
     
     /**
      * Getter for all assignments of a course.
-     * @param state Optional filters for {@link AssignmentDto} that matches the specified state, will return all
-     *     assignments if state is <tt>null</tt>.
+     * @param states Optional filters for {@link AssignmentDto} that matches the specified states, will return all
+     *     assignments if states are <tt>null</tt> or empty.
      * @return the assignments of a course (will never be <tt>null</tt>).
      * @throws NetworkException when network problems occur.
      */
-    public List<Assignment> getAssignments(AssignmentDto.StateEnum state) throws NetworkException {
+    public List<Assignment> getAssignments(AssignmentDto.StateEnum... states) throws NetworkException {
         final List<Assignment> assignments = new ArrayList<>();
         try {
             apiAssignments.getAssignmentsOfCourse(getCourseID()).stream()
-                .filter(a -> null == state || a.getState() == state)
+                // Arrays as stream based on https://stackoverflow.com/a/1128728
+                .filter(a -> null == states || states.length == 0
+                    || Arrays.stream(states).anyMatch(a.getState()::equals))
                 .map(a -> toAssignment(a))
                 .filter(a -> null != a)
                 .forEach(assignments::add);

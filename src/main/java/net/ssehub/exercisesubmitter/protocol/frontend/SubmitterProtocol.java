@@ -69,5 +69,15 @@ public class SubmitterProtocol {
     public List<Assignment> getOpenAssignments() throws NetworkException {
         return protocol.getAssignments(StateEnum.IN_PROGRESS);
     }
+    
+    /**
+     * Returns the list of reviewed assignments, for the user.
+     * @return The list of assignments, which are reviewed by the tutors.
+     * 
+     * @throws NetworkException If network problems occur.
+     */
+    public List<Assignment> getReviewedAssignments() throws NetworkException {
+        return protocol.getAssignments(StateEnum.EVALUATED, StateEnum.CLOSED);
+    }
 
 }
