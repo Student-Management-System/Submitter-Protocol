@@ -5,7 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
@@ -13,7 +18,6 @@ import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
-import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 
@@ -21,9 +25,11 @@ import net.ssehub.studentmgmt.backend_api.model.GroupDto;
  * Manages the network protocol communication with the API for the exercise submitter.
  * 
  * @author Kunold
+ * @author El-Sharkawy
  *
  */
 public class NetworkProtocol {
+    private static final Logger LOGGER = LogManager.getLogger(NetworkProtocol.class); 
     
     /**
      * The ApiClient enables to set a BasePath for the other API`s.
@@ -209,24 +215,42 @@ public class NetworkProtocol {
     
     /**
      * Getter for all assignments of a course.
+     * @param state Optional filters for {@link AssignmentDto} that matches the specified state, will return all
+     *     assignments if state is <tt>null</tt>.
      * @return the assignments of a course (will never be <tt>null</tt>).
      * @throws NetworkException when network problems occur.
      */
-    public List<AssignmentDto> getAssignments() throws NetworkException {
-        List<AssignmentDto> assignments = null;
+    public List<Assignment> getAssignments(AssignmentDto.StateEnum state) throws NetworkException {
+        final List<Assignment> assignments = new ArrayList<>();
         try {
-            assignments = apiAssignments.getAssignmentsOfCourse(getCourseID());
+            apiAssignments.getAssignmentsOfCourse(getCourseID()).stream()
+                .filter(a -> null == state || a.getState() == state)
+                .map(a -> toAssignment(a))
+                .filter(a -> null != a)
+                .forEach(assignments::add);
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), basePath);
         } catch (ApiException e) {
             throw new DataNotFoundException("Assignment not found", getCourseID(), DataType.ASSIGNMENTS_NOT_FOUND);
         }
         
-        if (null == assignments) {
-            assignments = new ArrayList<>();
-        }
-        
         return assignments;
+    }
+    
+    /**
+     * Part of {@link #getAssignments(net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum) to handle
+     * exception in cases of data, which cannot be handled by the tools.
+     * @param dto The {@link AssignmentDto} retrieved by the REST server.
+     * @return The equivalence to be handled by the reviewer / submitters
+     */
+    private static Assignment toAssignment(AssignmentDto dto) {
+        Assignment assignment = null;
+        try {
+            assignment = new Assignment(dto);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Error occured while handling {}, discared it because of {}", dto, e.getMessage());
+        }
+        return assignment;
     }
     
     /**
@@ -279,16 +303,16 @@ public class NetworkProtocol {
     /**
      * Returns a map of all specified submissions and their permissions.<br>
      * This is a 2-tuple in the form of <tt>(assignment name, permission)</tt>.
-     * The <tt>assignment name</tt> is also used as top level folder inside the repostory to store all submissions
+     * The <tt>assignment name</tt> is also used as top level folder inside the repository to store all submissions
      * related to the assignment.
      * @return A map of all <tt>(assignment name, permission)</tt>s, won't be <tt>null</tt>.
      */
-    public Map<String, StateEnum> readPermissions() {
-        Map<String, StateEnum> assignments = new HashMap<>();
+    public Map<String, State> readPermissions() {
+        Map<String, State> assignments = new HashMap<>();
         
         try {
-            for (AssignmentDto dto : getAssignments()) {
-                assignments.put(dto.getName(), dto.getState());
+            for (Assignment assignment : getAssignments(null)) {
+                assignments.put(assignment.getName(), assignment.getState());
             }
         } catch (NetworkException e) {
             // TODO Auto-generated catch block 
@@ -297,5 +321,4 @@ public class NetworkProtocol {
         
         return assignments;
     }
-
 }

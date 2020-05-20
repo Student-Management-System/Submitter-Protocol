@@ -1,6 +1,5 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.LoginComponent;
@@ -8,7 +7,6 @@ import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkProtocol;
 import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
-import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 
 /**
@@ -60,15 +58,8 @@ public class SubmitterProtocol {
      * 
      * @throws NetworkException If network problems occur.
      */
-    public List<AssignmentDto> getOpenAssignments() throws NetworkException {
-        List<AssignmentDto> assignments = new ArrayList<>();
-        for (AssignmentDto assignmentDto : protocol.getAssignments()) {
-            if (assignmentDto.getState() == StateEnum.IN_PROGRESS) {
-                assignments.add(assignmentDto);
-            }
-        }
-        
-        return assignments;
+    public List<Assignment> getOpenAssignments() throws NetworkException {
+        return protocol.getAssignments(StateEnum.IN_PROGRESS);
     }
 
 }

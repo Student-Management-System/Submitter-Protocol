@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
-import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
-import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 
@@ -102,7 +102,7 @@ public class NetworkProtocolIntegrationTests {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
         np.setSemester(TEST_SEMESTER);
         try {
-            List<AssignmentDto> assignments = np.getAssignments();
+            List<Assignment> assignments = np.getAssignments(null);
             Assertions.assertNotNull(assignments, "Assignment list was null, but should never be null.");
             Assertions.assertFalse(assignments.isEmpty(), "List of assignments was empty");
         } catch (NetworkException e) {
@@ -135,7 +135,7 @@ public class NetworkProtocolIntegrationTests {
     public void testReadPermissions() {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
         np.setSemester(TEST_SEMESTER);
-        Map <String, StateEnum> assignments = np.readPermissions();
+        Map <String, State> assignments = np.readPermissions();
         Assertions.assertNotNull(assignments, "Assignment map was null, but should never be null.");
         Assertions.assertFalse(assignments.isEmpty(), "Map of assignments was empty");
     }
