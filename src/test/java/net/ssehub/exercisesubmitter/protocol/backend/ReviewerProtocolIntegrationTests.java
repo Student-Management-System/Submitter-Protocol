@@ -14,7 +14,7 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
  * @author Kunold
  *
  */
-public class ReviewerProtocolTest { 
+public class ReviewerProtocolIntegrationTests { 
     /**
      * The test data.
      */
