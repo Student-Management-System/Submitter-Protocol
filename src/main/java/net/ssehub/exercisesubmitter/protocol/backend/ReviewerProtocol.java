@@ -33,6 +33,17 @@ public class ReviewerProtocol extends NetworkProtocol {
     }
     
     /**
+     * Constructor intended for testing (Inversion of Control allows setting of Mocks).
+     * @param basePath The REST URL of the student management server.
+     * @param courseName The course that is associated with the exercise submitter.
+     * @param apiAssessments The API to query <b>assessment</b> related information.
+     */
+    public ReviewerProtocol(String basePath, String courseName, AssessmentsApi apiAssessments) {
+        super(basePath, courseName);
+        apiAssessments = null;
+    }
+    
+    /**
      * Getter for the Assessments of an Assignment.
      * @param assignmentId the id of the specified assignment.
      * @return List of Assessments.
