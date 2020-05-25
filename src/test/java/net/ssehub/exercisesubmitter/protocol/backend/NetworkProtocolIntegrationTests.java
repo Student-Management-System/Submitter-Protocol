@@ -12,7 +12,6 @@ import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
-import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 
 
 /**
