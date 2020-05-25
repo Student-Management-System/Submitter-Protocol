@@ -37,6 +37,22 @@ public class SubmitterProtocol {
     }
     
     /**
+     * Allows to stub dependent network components for <b>testing</b>.
+     * Will only replace components that are not <tt>null</tt>.
+     * @param login The login component to use during tests.
+     * @param protocol The component to simulate REST calls during tests.
+     */
+    void setNetworkComponents(LoginComponent login, NetworkProtocol protocol) {
+        if (null != login) {
+            this.login = login;
+        }
+        
+        if (null != protocol) {
+            this.protocol = protocol;
+        }
+    }
+    
+    /**
      * Logs the user in into the <b>student management system</b>.
      * @param userName The user name of the user to login.
      * @param password The password of the user to login.
@@ -108,9 +124,9 @@ public class SubmitterProtocol {
         if (assignment.isGroupWork()) {
             // Get group for assignment
             String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
-            path[1] += groupName;
+            path[1] = groupName;
         } else {
-            path[1] += login.getUserName();
+            path[1] = login.getUserName();
         }
         
         return path;
