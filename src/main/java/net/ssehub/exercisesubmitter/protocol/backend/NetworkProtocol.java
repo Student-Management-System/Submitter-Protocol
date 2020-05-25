@@ -196,25 +196,6 @@ public class NetworkProtocol {
     }
     
     /**
-     * Getter for the groups of a user.
-     * @param userID The id of the user whose groups are requested.
-     * @return the group of a user.
-     * @throws NetworkException when network problems occur.
-     */
-    public List<GroupDto> getGroups(String userID) throws NetworkException {
-        List<GroupDto> groups = null;
-        try {
-            groups = apiUser.getGroupsOfUserForCourse(userID, getCourseID());
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
-        } catch (ApiException e) {
-            throw new DataNotFoundException("Group not found", userID, DataType.GROUP_NOT_FOUND);
-        }
-        
-        return groups;
-    }
-    
-    /**
      * Getter for all assignments of a course.
      * @param states Optional filters for {@link AssignmentDto} that matches the specified states, will return all
      *     assignments if states are <tt>null</tt> or empty.

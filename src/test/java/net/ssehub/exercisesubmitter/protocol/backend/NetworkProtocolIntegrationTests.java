@@ -77,23 +77,7 @@ public class NetworkProtocolIntegrationTests {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
     }
-    
-    /**
-     * Test if a List of groups is returned.
-     */
-    @Test
-    public void testGetGroup() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
-        try {
-            List<GroupDto> groups = np.getGroups(TEST_USER_ID);
-            Assertions.assertNotNull(groups, "Group list was null, but should never be null.");
-            Assertions.assertFalse(groups.isEmpty(), "List of groups was empty");
-        } catch (NetworkException e) {
-            Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
-        }
-    }
-    
+
     /**
      * Test if a List of assignments is returned.
      */
