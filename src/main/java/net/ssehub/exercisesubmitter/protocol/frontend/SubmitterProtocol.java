@@ -87,18 +87,32 @@ public class SubmitterProtocol {
      * Computes the URL where to upload assignments.
      * @param assignment An assignment, which is currently in state submission
      * @return The absolute URL where to submit the specified assignment.
+     * @throws NetworkException If network problems occur.
      * @see #getOpenAssignments()
      */
     public String getSubmissionUrl(Assignment assignment) throws NetworkException {
-        String destination = submissionServer + "/" + assignment.getName() + "/";
+        String[] path = getPathToSubmission(assignment);
+        return submissionServer + "/" + path[0] + "/" + path[1];
+    }
+   
+    /**
+     * Returns the destination path to a submission relative to the root of the repository.
+     * @param assignment An assignment, to be submitted, replayed, or replayed after review.
+     * @return An array of the form <tt>[assignment, user/group]</tt>.
+     * @throws NetworkException If network problems occur.
+     */
+    public String[] getPathToSubmission(Assignment assignment) throws NetworkException {
+        String[] path = new String[2];
+        path[0] = assignment.getName();
+        
         if (assignment.isGroupWork()) {
             // Get group for assignment
             String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
-            destination += groupName;
+            path[1] += groupName;
         } else {
-            destination += login.getUserName();
+            path[1] += login.getUserName();
         }
         
-        return destination;
+        return path;
     }
 }

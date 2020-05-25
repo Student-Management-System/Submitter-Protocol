@@ -272,7 +272,6 @@ public class NetworkProtocol {
     public String getGroupForAssignment(String userID, String assignmentID) throws NetworkException {
         String groupName = null;
         try {
-            // TODO SE: Considers only assignments in submission, currently
             GroupDto groupDto = apiUser.getGroupOfAssignment(userID, getCourseID(), assignmentID);
             groupName = groupDto.getName();
         } catch (ApiException e) {
