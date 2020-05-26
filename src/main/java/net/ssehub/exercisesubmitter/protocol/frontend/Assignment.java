@@ -110,7 +110,7 @@ public class Assignment {
      * Returns whether the assignment should be done in home work groups are by individuals.
      * @return <tt>true</tt> for groups, <tt>false</tt> for individuals.
      */
-    boolean isGroupWork() {
+    public boolean isGroupWork() {
         return isGroupwork;
     }
 }
