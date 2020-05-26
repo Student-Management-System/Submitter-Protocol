@@ -12,9 +12,6 @@ import java.nio.file.Paths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.google.gson.Gson;
-
-import io.gsonfire.GsonFireBuilder;
 import net.ssehub.studentmgmt.backend_api.JSON;
 
 /**
@@ -36,11 +33,7 @@ public abstract class AbstractSettings<C> {
      * Default constructor for inherited classes.
      */
     protected AbstractSettings() {
-        jsonParser = new JSON();
-        Gson gson = new GsonFireBuilder().createGsonBuilder()
-            .setPrettyPrinting()
-            .create();
-        jsonParser.setGson(gson);
+        jsonParser = JsonUtils.createParser();
       
     }
     
