@@ -5,6 +5,9 @@ import java.util.List;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
+import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
+import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
+import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
@@ -36,11 +39,15 @@ public class ReviewerProtocol extends NetworkProtocol {
      * Constructor intended for testing (Inversion of Control allows setting of Mocks).
      * @param basePath The REST URL of the student management server.
      * @param courseName The course that is associated with the exercise submitter.
+     * @param apiUser The API to query <b>user</b> related information.
+     * @param apiCourse The API to query <b>course</b> related information.
+     * @param apiAssignments The API to query <b>assignment</b> related information.
      * @param apiAssessments The API to query <b>assessment</b> related information.
      */
-    public ReviewerProtocol(String basePath, String courseName, AssessmentsApi apiAssessments) {
-        super(basePath, courseName);
-        apiAssessments = null;
+    ReviewerProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
+            AssignmentsApi apiAssignments, AssessmentsApi apiAssessments) {
+        super(basePath, courseName, apiUser, apiCourse, apiAssignments);
+        this.apiAssessments = apiAssessments;
     }
     
     /**
@@ -90,15 +97,18 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param assignmentId The id of the specified assignment.
      * @throws NetworkException when network problems occur.
      */
-    public void createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
+    public boolean createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
+        boolean success = false;
         try {
-            apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
+            AssessmentDto result = apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
+            success = result != null;
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
+        return success;
     }
     
     /**
