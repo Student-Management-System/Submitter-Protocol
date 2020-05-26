@@ -24,6 +24,7 @@ public class ReviewerProtocolUnitTests {
     private static final String TEST_COURSE_NAME = "java";
     private static final String TEST_BASE_PATH = "http://147.172.178.30:3000";
     private static final String TEST_ASSIGNMENT_ID = "001";
+    private static final String TEST_COURSE_ID = "java-wise1920";
 
     /**
      * Tests if a Assessment is created.
@@ -34,6 +35,7 @@ public class ReviewerProtocolUnitTests {
         AssessmentCreateDto body = new AssessmentCreateDto();
         body.setAchievedPoints(new BigDecimal(10));
         
+        // Mock: Simulate creation of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
             Mockito.when(assessmentApiMock.createAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
@@ -42,28 +44,31 @@ public class ReviewerProtocolUnitTests {
             Assertions.fail("Should not be thrown " + e1.getMessage());
         }
         
-        CoursesApi courseApiMock = Mockito.mock(CoursesApi.class);
-        
-        try {
-            CourseDto result = new CourseDto();
-            result.setId("java-wise1920");
-            Mockito.when(courseApiMock.getCourseByNameAndSemester(Mockito.anyString(), Mockito.anyString()))
-            .thenReturn(result);
-        } catch (ApiException e) {
-            Assertions.fail("Should not be thrown " + e.getMessage());
-        }
-        
-        ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, courseApiMock, null,
+        ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, createCourseMock(), null,
                 assessmentApiMock);
         
         try {
             boolean check = rp.createAssessment(body, TEST_ASSIGNMENT_ID);
             Assertions.assertTrue(check);
-            Mockito.verify(assessmentApiMock).createAssessment(body, TEST_COURSE_NAME, TEST_ASSIGNMENT_ID);
+            // Check if server mock was used
+            Mockito.verify(assessmentApiMock).createAssessment(body, TEST_COURSE_ID, TEST_ASSIGNMENT_ID);
         } catch (NetworkException | ApiException e) {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
         
+    }
+
+    private CoursesApi createCourseMock() {
+        CoursesApi courseApiMock = Mockito.mock(CoursesApi.class);
+        try {
+            CourseDto result = new CourseDto();
+            result.setId(TEST_COURSE_ID);
+            Mockito.when(courseApiMock.getCourseByNameAndSemester(Mockito.anyString(), Mockito.any()))
+                .thenReturn(result);
+        } catch (ApiException e) {
+            Assertions.fail("Should not be thrown " + e.getMessage());
+        }
+        return courseApiMock;
     }
 
 }
