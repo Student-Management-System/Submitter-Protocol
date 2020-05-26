@@ -44,8 +44,10 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param apiAssignments The API to query <b>assignment</b> related information.
      * @param apiAssessments The API to query <b>assessment</b> related information.
      */
+    //checkstyle: stop parameter number check
     ReviewerProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
             AssignmentsApi apiAssignments, AssessmentsApi apiAssessments) {
+    //checkstyle: start parameter number check
         super(basePath, courseName, apiUser, apiCourse, apiAssignments);
         this.apiAssessments = apiAssessments;
     }
@@ -144,7 +146,8 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @return True if Assessment was updated successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
-    public boolean updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) throws NetworkException {
+    public boolean updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) 
+            throws NetworkException {
         boolean success = false;
         try {
             AssessmentDto result =  apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 

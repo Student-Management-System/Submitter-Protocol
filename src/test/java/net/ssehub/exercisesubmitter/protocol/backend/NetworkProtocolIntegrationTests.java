@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
 
 
@@ -85,7 +86,7 @@ public class NetworkProtocolIntegrationTests {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
         np.setSemester(TEST_SEMESTER);
         try {
-            List<Assignment> assignments = np.getAssignments(null);
+            List<Assignment> assignments = np.getAssignments((StateEnum[]) null);
             Assertions.assertNotNull(assignments, "Assignment list was null, but should never be null.");
             Assertions.assertFalse(assignments.isEmpty(), "List of assignments was empty");
         } catch (NetworkException e) {
