@@ -95,6 +95,7 @@ public class ReviewerProtocol extends NetworkProtocol {
      * Creates the Assessment for an Assignment.
      * @param body The Assessment body.
      * @param assignmentId The id of the specified assignment.
+     * @return True if Assessment was created successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
     public boolean createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
@@ -116,18 +117,23 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param body The body of the partial assessment
      * @param assignmentId The id of the specified assignment.
      * @param assessmentId The id of the specified assessment.
+     * @return True if PartialAssessment was created successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
-    public void createPartialAssessment(PartialAssessmentDto body, String assignmentId, String assessmentId) 
+    public boolean createPartialAssessment(PartialAssessmentDto body, String assignmentId, String assessmentId) 
             throws NetworkException {
+        boolean success = false;
         try {
-            apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId, assessmentId);
+            PartialAssessmentDto result =  apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId,
+                    assessmentId);
+            success = result != null;
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
+        return success;
     }
     
     /**
@@ -135,32 +141,40 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param body The body of the assessment that is updated.
      * @param assignmentId The id of the specified assignment.
      * @param assessmentId The id of the specified assessment.
+     * @return True if Assessment was updated successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
-    public void updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) throws NetworkException {
+    public boolean updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) throws NetworkException {
+        boolean success = false;
         try {
-            apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, assessmentId);
+            AssessmentDto result =  apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 
+                    assessmentId);
+            success = result != null;
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
+        return success;
     }
     
     /**
      * Deletes an Assessment.
      * @param assignmentId The id of the specified assignment.
      * @param assessmentId The id of the specified assessment.
+     * @return True if Assessment was deleted successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
-    public void deleteAssessment(String assignmentId, String assessmentId) throws NetworkException {
+    public boolean deleteAssessment(String assignmentId, String assessmentId) throws NetworkException {
+        boolean success = false;
         try {
-            apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
+            success = apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
             throw new DataNotFoundException("Assessment not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
+        return success;
     }
 }
