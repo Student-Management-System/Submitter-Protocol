@@ -275,7 +275,7 @@ public class NetworkProtocol {
             GroupDto groupDto = apiUser.getGroupOfAssignment(userID, getCourseID(), assignmentID);
             groupName = groupDto.getName();
         } catch (ApiException e) {
-            throw new DataNotFoundException("No assignment realted group information found", assignmentID,
+            throw new DataNotFoundException("No assignment related group information found", assignmentID,
                DataType.GROUP_NOT_FOUND);
         }
         
