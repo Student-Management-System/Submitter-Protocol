@@ -212,11 +212,12 @@ public class NetworkProtocol {
                 .map(a -> toAssignment(a))
                 .filter(a -> null != a)
                 .forEach(assignments::add);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assignment not found", getCourseID(), DataType.ASSIGNMENTS_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         
         return assignments;
     }
@@ -247,11 +248,12 @@ public class NetworkProtocol {
         List<AssessmentDto> assessments = null;
         try {
             assessments = apiUser.getAssessmentsOfUserForCourse(userId, getCourseID());
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments not found", userId, DataType.ASSESSMENTS_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         
         if (null == assessments) {
             assessments = new ArrayList<>();
@@ -274,10 +276,13 @@ public class NetworkProtocol {
         try {
             GroupDto groupDto = apiUser.getGroupOfAssignment(userID, getCourseID(), assignmentID);
             groupName = groupDto.getName();
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("No assignment related group information found", assignmentID,
                DataType.GROUP_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         
         return groupName;
     }
