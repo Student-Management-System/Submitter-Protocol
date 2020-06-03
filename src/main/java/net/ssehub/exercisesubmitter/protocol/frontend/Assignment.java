@@ -44,6 +44,18 @@ public class Assignment {
         this.name = dto.getName();
         this.assignmentID = dto.getId();
         
+        if (null == dto.getState()) {
+            String errMsg = name + " has no state";
+            LOGGER.warn(errMsg);
+            throw new IllegalArgumentException(errMsg);
+        }
+        
+        if (null == dto.getCollaboration()) {
+            String errMsg = "No collaboration type defined for " + name;
+            LOGGER.warn(errMsg);
+            throw new IllegalArgumentException(errMsg);
+        }
+        
         switch (dto.getState()) {
         case INVISIBLE:
             state = State.INVISIBLE;
@@ -80,6 +92,20 @@ public class Assignment {
             LOGGER.warn(errMsg);
             throw new IllegalArgumentException(errMsg);
         }
+    }
+    
+    /**
+     * Creates manually an Assignment.
+     * @param name The name of the assigment
+     * @param assignmentID The ID used by the REST system, may be <tt>null</tt> during unit tests
+     * @param state The state of the assignment. 
+     * @param isGroupwork <tt>true</tt> for groups, <tt>false</tt> for individuals.
+     */
+    public Assignment(String name, String assignmentID, State state, boolean isGroupwork) {
+        this.name = name;
+        this.assignmentID = assignmentID;
+        this.state = state;
+        this.isGroupwork = isGroupwork;
     }
     
     /**
