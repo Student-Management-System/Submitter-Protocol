@@ -96,7 +96,7 @@ public class Assignment {
     
     /**
      * Creates manually an Assignment.
-     * @param name The name of the assigment
+     * @param name The name of the assignment
      * @param assignmentID The ID used by the REST system, may be <tt>null</tt> during unit tests
      * @param state The state of the assignment. 
      * @param isGroupwork <tt>true</tt> for groups, <tt>false</tt> for individuals.
