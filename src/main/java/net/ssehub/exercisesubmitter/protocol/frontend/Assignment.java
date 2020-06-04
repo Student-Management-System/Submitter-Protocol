@@ -17,7 +17,7 @@ import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 public class Assignment {
     
     /**
-     * State whether the assignment is open to be edited and sumitted or in review.
+     * State whether the assignment is open to be edited and submitted or in review.
      * @author El-Sharkawy
      *
      */
