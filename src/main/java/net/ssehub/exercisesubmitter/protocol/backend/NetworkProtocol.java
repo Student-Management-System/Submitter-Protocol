@@ -16,6 +16,7 @@ import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
+import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
@@ -54,6 +55,11 @@ public class NetworkProtocol {
     private AssignmentsApi apiAssignments;
     
     /**
+     * The API to get the group informations.
+     */
+    private GroupsApi apiGroups;
+    
+    /**
      * The name of the course that uses the exercise submitter.
      * Will be read from the config File.
      */
@@ -85,6 +91,7 @@ public class NetworkProtocol {
         apiUser = new UsersApi(apiClient);
         apiCourse = new CoursesApi(apiClient);
         apiAssignments = new AssignmentsApi(apiClient);
+        apiGroups = new GroupsApi(apiClient);
         semester = SemesterUtils.getSemester();
         this.courseName = courseName;
         this.basePath = basePath;
@@ -97,13 +104,16 @@ public class NetworkProtocol {
      * @param apiUser The API to query <b>user</b> related information.
      * @param apiCourse The API to query <b>course</b> related information.
      * @param apiAssignments The API to query <b>assignment</b> related information.
+     * @param apiGroups The API to query <b>group</b> related informations.
      */
+    //checkstyle: stop parameter number check
     NetworkProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
-        AssignmentsApi apiAssignments) {
-        
+        AssignmentsApi apiAssignments, GroupsApi apiGroups) {
+    //checkstyle: start parameter number check  
         this.apiUser = apiUser;
         this.apiCourse = apiCourse;
         this.apiAssignments = apiAssignments;
+        this.apiGroups = apiGroups;
         this.courseName = courseName;
         this.basePath = basePath;
         
@@ -285,6 +295,26 @@ public class NetworkProtocol {
         // checkstyle: start exception type check
         
         return groupName;
+    }
+    
+    /**
+     * Getter for the groups of an assignment at submission end.
+     * @param assignmentId The ID of the assignment for that the groups are requested.
+     * @return A list of groups at the end of submission.
+     * @throws NetworkException If network problems occur.
+     */
+    public List<GroupDto> getGroupsAtAssignmentEnd(String assignmentId) throws NetworkException {
+        List<GroupDto> groups = null;
+        
+        try {
+            groups = apiGroups.getGroupsFromAssignment(courseId, assignmentId);
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
+            throw new DataNotFoundException("No Groups for the assignment found", assignmentId, 
+                    DataType.GROUP_NOT_FOUND);
+        }
+        
+        return groups;
     }
     
     /**
