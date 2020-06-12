@@ -314,6 +314,10 @@ public class NetworkProtocol {
                     DataType.GROUP_NOT_FOUND);
         }
         
+        if (null == groups) {
+            groups = new ArrayList<>();
+        }
+        
         return groups;
     }
     
