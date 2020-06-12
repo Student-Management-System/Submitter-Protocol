@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
@@ -13,6 +12,7 @@ import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 
 
 /**
@@ -29,6 +29,7 @@ public class NetworkProtocolIntegrationTests {
     public static final String TEST_SERVER = "http://147.172.178.30:3000";
     public static final String TEST_COURSE_ID = "java";
     public static final String TEST_USER_ID = "a019ea22-5194-4b83-8d31-0de0dc9bca53";
+    public static final String TEST_ASSIGNMENT_ID = "75b799a1-a406-419b-a448-909aa3d34afa";
     public static final String TEST_SEMESTER = "wise1920";
 
     /**
@@ -97,8 +98,6 @@ public class NetworkProtocolIntegrationTests {
     /**
      * Test if a List of assessments is returned.
      */
-    //TODO TK: deactivated till API query is fixed
-    @Disabled
     @Test
     public void testGetAssessmentsWithGoups() {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
@@ -122,6 +121,22 @@ public class NetworkProtocolIntegrationTests {
         Map <String, State> assignments = np.readPermissions();
         Assertions.assertNotNull(assignments, "Assignment map was null, but should never be null.");
         Assertions.assertFalse(assignments.isEmpty(), "Map of assignments was empty");
+    }
+    
+    /**
+     * Tests if a list of groups at submission end is returned.
+     */
+    @Test
+    public void testGetGroupsAtSubmissionEnd() {
+        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
+        np.setSemester(TEST_SEMESTER);
+        try {
+            List<GroupDto> groups = np.getGroupsAtAssignmentEnd(TEST_ASSIGNMENT_ID);
+            Assertions.assertNotNull(groups, "Groups list was null, but should never be null.");
+            Assertions.assertFalse(groups.isEmpty(), "List of groups was empty");
+        } catch (NetworkException e) {
+            Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
+        }
     }
     
 //    @Test
