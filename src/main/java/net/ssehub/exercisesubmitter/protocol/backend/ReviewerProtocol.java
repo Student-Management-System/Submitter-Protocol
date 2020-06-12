@@ -7,6 +7,7 @@ import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
+import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
@@ -43,12 +44,13 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param apiCourse The API to query <b>course</b> related information.
      * @param apiAssignments The API to query <b>assignment</b> related information.
      * @param apiAssessments The API to query <b>assessment</b> related information.
+     * @param apiGroup The API to query <b>group</b> related information.
      */
     //checkstyle: stop parameter number check
     ReviewerProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
-            AssignmentsApi apiAssignments, AssessmentsApi apiAssessments) {
+            AssignmentsApi apiAssignments, AssessmentsApi apiAssessments, GroupsApi apiGroup) {
     //checkstyle: start parameter number check
-        super(basePath, courseName, apiUser, apiCourse, apiAssignments);
+        super(basePath, courseName, apiUser, apiCourse, apiAssignments, apiGroup);
         this.apiAssessments = apiAssessments;
     }
     

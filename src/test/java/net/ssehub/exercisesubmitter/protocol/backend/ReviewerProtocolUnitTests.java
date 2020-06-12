@@ -47,7 +47,7 @@ public class ReviewerProtocolUnitTests {
         }
         
         ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, createCourseMock(), null,
-                assessmentApiMock);
+                assessmentApiMock, null);
         
         try {
             boolean check = rp.createAssessment(body, TEST_ASSIGNMENT_ID);
@@ -80,7 +80,7 @@ public class ReviewerProtocolUnitTests {
         }
         
         ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, createCourseMock(), null,
-                assessmentApiMock);
+                assessmentApiMock, null);
         
         try {
             boolean check = rp.createPartialAssessment(body, TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
@@ -112,7 +112,7 @@ public class ReviewerProtocolUnitTests {
         }
         
         ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, createCourseMock(), null,
-                assessmentApiMock);
+                assessmentApiMock, null);
         
         try {
             boolean check = rp.updateAssessment(body, TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
@@ -144,7 +144,7 @@ public class ReviewerProtocolUnitTests {
         }
         
         ReviewerProtocol rp = new ReviewerProtocol(TEST_BASE_PATH, TEST_COURSE_NAME, null, createCourseMock(), null,
-                assessmentApiMock);
+                assessmentApiMock, null);
         
         try {
             boolean check = rp.deleteAssessment(TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
