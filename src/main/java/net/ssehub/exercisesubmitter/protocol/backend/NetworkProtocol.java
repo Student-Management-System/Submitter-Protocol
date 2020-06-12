@@ -307,7 +307,7 @@ public class NetworkProtocol {
         List<GroupDto> groups = null;
         
         try {
-            groups = apiGroups.getGroupsFromAssignment(courseId, assignmentId);
+            groups = apiGroups.getGroupsFromAssignment(getCourseID(), assignmentId);
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("No Groups for the assignment found", assignmentId, 
