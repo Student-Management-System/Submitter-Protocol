@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 
-
 /**
  * This class declares <b>unit</b> tests for the {@link NetworkProtocol} class.
  * These tests won't communicate with the REST test server.
@@ -31,7 +30,7 @@ public class NetworkProtocolUnitTests {
         Mockito.when(userApiMock.getCoursesOfUser(Mockito.anyString()))
             .thenThrow(new IllegalArgumentException("Some detailed description why the server is not reachable"));
         
-        NetworkProtocol np = new NetworkProtocol(url, TEST_COURSE_NAME, userApiMock, null, null);
+        NetworkProtocol np = new NetworkProtocol(url, TEST_COURSE_NAME, userApiMock, null, null, null);
         try {
             np.getCourses("userID");
             Assertions.fail("Expected ServerNotFoundException, but did not occur.");
@@ -41,5 +40,5 @@ public class NetworkProtocolUnitTests {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
     }
-
+    
 }
