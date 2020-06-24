@@ -1,5 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,12 +31,14 @@ public class SubmitterProtocolUnitTests {
         // Test data
         String expectedExercise = "Exercise";
         String expectedUserOrGroup = "user";
+        BigDecimal maxPoints = new BigDecimal(100);
         
         // Single assignment
         AssignmentDto dto = new AssignmentDto();
         dto.setName(expectedExercise);
         dto.setCollaboration(CollaborationEnum.SINGLE);
         dto.setState(StateEnum.IN_PROGRESS);
+        dto.setPoints(maxPoints);
         Assignment assignment = new Assignment(dto);
         
         // Mock of REST calls
@@ -60,6 +64,7 @@ public class SubmitterProtocolUnitTests {
         String expectedExercise = "Exercise";
         String expectedUserOrGroup = "group";
         String usedAssignmentID = "123";
+        BigDecimal maxPoints = new BigDecimal(100);
         
         // Single assignment
         AssignmentDto dto = new AssignmentDto();
@@ -67,6 +72,7 @@ public class SubmitterProtocolUnitTests {
         dto.setCollaboration(CollaborationEnum.GROUP);
         dto.setState(StateEnum.IN_PROGRESS);
         dto.setId(usedAssignmentID);
+        dto.setPoints(maxPoints);
         Assignment assignment = new Assignment(dto);
         
         // Mock of REST calls
