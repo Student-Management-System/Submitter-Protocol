@@ -33,6 +33,7 @@ public class Assignment {
     private String assignmentID;
     private State state;
     private boolean isGroupwork;
+    private double points;
     
     /**
      * Instantiates a new assignments for exercises based on an {@link AssignmentDto} retrieved from the server.
@@ -43,6 +44,7 @@ public class Assignment {
     public Assignment(AssignmentDto dto) throws IllegalArgumentException {
         this.name = dto.getName();
         this.assignmentID = dto.getId();
+        this.points = dto.getPoints().doubleValue();
         
         if (null == dto.getState()) {
             String errMsg = name + " has no state";
@@ -138,5 +140,13 @@ public class Assignment {
      */
     public boolean isGroupWork() {
         return isGroupwork;
+    }
+    
+    /**
+     * The points that can be achieved at the assignment.
+     * @return The points of the assignment.
+     */
+    public double getPoints( ) {
+        return points;
     }
 }
