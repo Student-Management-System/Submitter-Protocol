@@ -39,9 +39,9 @@ public class ExerciseReviewerProtocol {
      */
     public String getSubmissionRealUsersReviews(String assignmentId) {
         String userReviews;
-        List<AssessmentDto> assessment = null;
+        List<AssessmentDto> assessments = null;
         try {
-            assessment = protocol.getAssessments(assignmentId);
+            assessments = protocol.getAssessments(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
@@ -49,13 +49,13 @@ public class ExerciseReviewerProtocol {
         userReviews = USER + SEPARATOR + assignment.getName() + SEPARATOR + assignment.getName() + SEPARATOR 
                 + assignment.getName() + LINE_END;
         //second line: *max*    points  points  points
-        userReviews += MAX_POINTS + SEPARATOR + assignment.getName() + SEPARATOR + assignment.getName() + SEPARATOR 
-                + assignment.getName() + LINE_END; //TODO: needs getter for assignment points
+        userReviews += MAX_POINTS + SEPARATOR + assignment.getPoints() + SEPARATOR + assignment.getPoints() + SEPARATOR 
+                + assignment.getPoints() + LINE_END;
         
-        for (AssessmentDto ass : assessment) {
+        for (AssessmentDto assessment : assessments) {
             //TODO: needs user name instead of id
-            userReviews += ass.getUserId() + SEPARATOR + ass.getAchievedPoints() + SEPARATOR + ass.getAchievedPoints()
-                + SEPARATOR + ass.getAchievedPoints() + LINE_END;
+            userReviews += assessment.getUserId() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                    + assessment.getAchievedPoints() + SEPARATOR + assessment.getAchievedPoints() + LINE_END;
         }
         
         return userReviews;
