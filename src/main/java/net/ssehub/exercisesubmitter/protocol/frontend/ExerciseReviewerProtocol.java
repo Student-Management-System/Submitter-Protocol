@@ -52,13 +52,39 @@ public class ExerciseReviewerProtocol {
         userReviews += MAX_POINTS + SEPARATOR + assignment.getPoints() + SEPARATOR + assignment.getPoints() + SEPARATOR 
                 + assignment.getPoints() + LINE_END;
         
+        // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
         for (AssessmentDto assessment : assessments) {
             //TODO: needs user name instead of id
             userReviews += assessment.getUserId() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                    + assessment.getAchievedPoints() + SEPARATOR + assessment.getAchievedPoints() + LINE_END;
+                    + assessment.getComment() + LINE_END;
         }
         
         return userReviews;
+    }
+    
+    /**
+     * Returns a formated String with all groups and their users.
+     * @param assignmentId The ID of the assignment.
+     * @return All users whose submission is reviewed.
+     */
+    public String getSubmissionReviewerUsers(String assignmentId) {
+        String submissionUsers = "";
+        List<AssessmentDto> assessments = null;
+        
+        try {
+            assessments = protocol.getAssessments(assignmentId);
+        } catch (NetworkException e) {
+            e.printStackTrace();
+        }
+        
+        //groupenname   vollername    rz-kennung  uni-mail
+        for (AssessmentDto assessment : assessments) {
+            //TODO: need groupname and userinformations
+            submissionUsers += assessment.getGroupId() + SEPARATOR + assessment.getUserId() + SEPARATOR 
+                    + assessment.getUserId() + SEPARATOR + assessment.getUserId() + LINE_END;
+        }
+        
+        return submissionUsers;
     }
     
 }
