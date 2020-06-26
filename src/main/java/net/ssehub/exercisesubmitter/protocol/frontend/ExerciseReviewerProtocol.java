@@ -19,7 +19,7 @@ public class ExerciseReviewerProtocol {
     private static final String SEPARATOR = "\t";
     private static final String LINE_END = "\n";
     
-    private ReviewerProtocol protocol;
+    private ReviewerProtocol rp;
     private Assignment assignment;
     
     
@@ -29,7 +29,7 @@ public class ExerciseReviewerProtocol {
      * @param courseName The course that is associated with the exercise submitter.
      */
     public ExerciseReviewerProtocol(String stdMgmtURL, String courseName) {
-        protocol = new ReviewerProtocol(stdMgmtURL, courseName);
+        rp = new ReviewerProtocol(stdMgmtURL, courseName);
     }
     
     /**
@@ -41,7 +41,7 @@ public class ExerciseReviewerProtocol {
         String userReviews;
         List<AssessmentDto> assessments = null;
         try {
-            assessments = protocol.getAssessments(assignmentId);
+            assessments = rp.getAssessments(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
@@ -72,12 +72,12 @@ public class ExerciseReviewerProtocol {
         List<AssessmentDto> assessments = null;
         
         try {
-            assessments = protocol.getAssessments(assignmentId);
+            assessments = rp.getAssessments(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
         
-        //groupenname   vollername    rz-kennung  uni-mail
+        //gruppenname   vollername    rz-kennung  uni-mail
         for (AssessmentDto assessment : assessments) {
             //TODO: need groupname and userinformations
             submissionUsers += assessment.getGroupId() + SEPARATOR + assessment.getUserId() + SEPARATOR 
@@ -85,6 +85,37 @@ public class ExerciseReviewerProtocol {
         }
         
         return submissionUsers;
+    }
+    
+    /**
+     * Returns a formated String with all groups and there review.
+     * @param assignmentId The ID of the assignment.
+     * @return All groups whose submission is reviewed.
+     */
+    public String getSubmissionReviews(String assignmentId) {
+        String submissionReviews;
+        List<AssessmentDto> assessments = null;
+        
+        try {
+            assessments = rp.getAssessments(assignmentId);
+        } catch (NetworkException e) {
+            e.printStackTrace();
+        }
+        
+        //first line: user  taskname    taskname    taskname
+        submissionReviews = USER + SEPARATOR + assignment.getName() + SEPARATOR + assignment.getName() + SEPARATOR 
+                + assignment.getName() + LINE_END;
+        //second line: *max*    points  points  points
+        submissionReviews += MAX_POINTS + SEPARATOR + assignment.getPoints() + SEPARATOR + assignment.getPoints() 
+                + SEPARATOR + assignment.getPoints() + LINE_END;
+        
+        //gruppenname   punkte  kommentar   upload erfolgreich
+        for (AssessmentDto assessment : assessments) {
+            submissionReviews += assessment.getGroupId() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                    + assessment.getComment() + SEPARATOR + assessment.getId() + LINE_END;
+        }
+        
+        return submissionReviews;
     }
     
 }
