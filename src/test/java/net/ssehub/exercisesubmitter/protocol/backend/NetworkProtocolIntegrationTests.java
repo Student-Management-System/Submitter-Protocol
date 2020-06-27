@@ -99,7 +99,6 @@ public class NetworkProtocolIntegrationTests {
     /**
      * Test if a List of assessments is returned.
      */
-    @Disabled
     @Test
     public void testGetAssessmentsWithGoups() {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
