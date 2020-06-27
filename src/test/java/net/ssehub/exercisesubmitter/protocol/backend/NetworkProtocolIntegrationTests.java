@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
@@ -98,6 +99,7 @@ public class NetworkProtocolIntegrationTests {
     /**
      * Test if a List of assessments is returned.
      */
+    @Disabled
     @Test
     public void testGetAssessmentsWithGoups() {
         NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
