@@ -79,8 +79,8 @@ public class ExerciseReviewerProtocol {
         
         //gruppenname   vollername    rz-kennung  uni-mail
         for (AssessmentDto assessment : assessments) {
-            //TODO: need groupname and userinformations
-            submissionUsers += assessment.getGroupId() + SEPARATOR + assessment.getUserId() + SEPARATOR 
+            //TODO: need userinformations
+            submissionUsers += assessment.getGroup().getName() + SEPARATOR + assessment.getUserId() + SEPARATOR 
                     + assessment.getUserId() + SEPARATOR + assessment.getUserId() + LINE_END;
         }
         
@@ -111,8 +111,8 @@ public class ExerciseReviewerProtocol {
         
         //gruppenname   punkte  kommentar   upload erfolgreich
         for (AssessmentDto assessment : assessments) {
-            submissionReviews += assessment.getGroupId() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                    + assessment.getComment() + SEPARATOR + assessment.getId() + LINE_END;
+            submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
+                    + SEPARATOR + assessment.getComment() + SEPARATOR + assessment.getId() + LINE_END;
         }
         
         return submissionReviews;
