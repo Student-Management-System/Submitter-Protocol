@@ -81,9 +81,10 @@ public class ExerciseReviewerProtocol {
         
         //gruppenname   vollername    rz-kennung  uni-mail
         for (AssessmentDto assessment : assessments) {
-            //TODO: need userinformations
-            submissionUsers += assessment.getGroup().getName() + SEPARATOR + assessment.getUserId() + SEPARATOR 
-                    + assessment.getUserId() + SEPARATOR + assessment.getUserId() + LINE_END;
+            for (UserDto user : assessment.getGroup().getUsers()) {
+                submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
+                        + user.getRzName() + SEPARATOR + user.getEmail() + LINE_END;
+            }
         }
         
         return submissionUsers;
