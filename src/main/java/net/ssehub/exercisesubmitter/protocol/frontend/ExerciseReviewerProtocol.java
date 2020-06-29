@@ -5,6 +5,7 @@ import java.util.List;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
 /**
  * Network protocol that provides API calls as required by the <b>Eclipse Exercise Reviewer</b>.
@@ -54,9 +55,10 @@ public class ExerciseReviewerProtocol {
         
         // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
         for (AssessmentDto assessment : assessments) {
-            //TODO: needs user name instead of id
-            userReviews += assessment.getUserId() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                    + assessment.getComment() + LINE_END;
+            for (UserDto user : assessment.getGroup().getUsers()) {
+                userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                        + assessment.getComment() + LINE_END;
+            }
         }
         
         return userReviews;
