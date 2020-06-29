@@ -21,7 +21,6 @@ public class ExerciseReviewerProtocol {
     private static final String LINE_END = "\n";
     
     private ReviewerProtocol rp;
-    private Assignment assignment;
     
     
     /**
@@ -39,22 +38,31 @@ public class ExerciseReviewerProtocol {
      * @return All users and their points to an assignment.
      */
     public String getSubmissionRealUsersReviews(String assignmentId) {
-        String userReviews;
+        String userReviews = "";
         List<AssessmentDto> assessments = null;
         try {
             assessments = rp.getAssessments(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
-        //first line: user  taskname    taskname    taskname
-        userReviews = USER + SEPARATOR + assignment.getName() + SEPARATOR + assignment.getName() + SEPARATOR 
-                + assignment.getName() + LINE_END;
-        //second line: *max*    points  points  points
-        userReviews += MAX_POINTS + SEPARATOR + assignment.getPoints() + SEPARATOR + assignment.getPoints() + SEPARATOR 
-                + assignment.getPoints() + LINE_END;
         
-        // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
+        boolean firstIteration = true;
         for (AssessmentDto assessment : assessments) {
+            // is only added once to the string at the top of the string
+            if (firstIteration) {
+                //first line: user  taskname    taskname    taskname
+                userReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
+                        + assessment.getAssignment().getName() + SEPARATOR + assessment.getAssignment().getName() 
+                        + LINE_END;
+                //second line: *max*    points  points  points
+                userReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
+                        + assessment.getAssignment().getPoints() + SEPARATOR + assessment.getAssignment().getPoints() 
+                        + LINE_END;
+                
+                firstIteration = false;
+            }
+            
+            // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
             for (UserDto user : assessment.getGroup().getUsers()) {
                 userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
                         + assessment.getComment() + LINE_END;
@@ -96,7 +104,7 @@ public class ExerciseReviewerProtocol {
      * @return All groups whose submission is reviewed.
      */
     public String getSubmissionReviews(String assignmentId) {
-        String submissionReviews;
+        String submissionReviews = "";
         List<AssessmentDto> assessments = null;
         
         try {
@@ -105,15 +113,22 @@ public class ExerciseReviewerProtocol {
             e.printStackTrace();
         }
         
-        //first line: user  taskname    taskname    taskname
-        submissionReviews = USER + SEPARATOR + assignment.getName() + SEPARATOR + assignment.getName() + SEPARATOR 
-                + assignment.getName() + LINE_END;
-        //second line: *max*    points  points  points
-        submissionReviews += MAX_POINTS + SEPARATOR + assignment.getPoints() + SEPARATOR + assignment.getPoints() 
-                + SEPARATOR + assignment.getPoints() + LINE_END;
-        
-        //gruppenname   punkte  kommentar   upload erfolgreich
+        boolean firstIteration = true;
         for (AssessmentDto assessment : assessments) {
+            // is only added once to the string at the top of the string
+            if (firstIteration) {
+                //first line: user  taskname    taskname    taskname
+                submissionReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
+                        + assessment.getAssignment().getName() + SEPARATOR + assessment.getAssignment().getName() 
+                        + LINE_END;
+                //second line: *max*    points  points  points
+                submissionReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
+                        + assessment.getAssignment().getPoints() + SEPARATOR + assessment.getAssignment().getPoints() 
+                        + LINE_END;
+                
+                firstIteration = false;
+            }
+            //gruppenname   punkte  kommentar   upload erfolgreich
             submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
                     + SEPARATOR + assessment.getComment() + SEPARATOR + assessment.getId() + LINE_END;
         }
