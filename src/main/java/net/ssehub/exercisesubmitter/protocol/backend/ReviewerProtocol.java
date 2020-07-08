@@ -12,6 +12,7 @@ import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
 /**
  * Network protocol designed for the &quot;Exercise Reviewer&quot;.
@@ -20,6 +21,10 @@ import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
  *
  */
 public class ReviewerProtocol extends NetworkProtocol {
+    private static final String USER = "user";
+    private static final String MAX_POINTS = "*max*";
+    private static final String SEPARATOR = "\t";
+    private static final String LINE_END = "\n";
     
     /**
      * The API to get the assessment informations.
@@ -181,5 +186,114 @@ public class ReviewerProtocol extends NetworkProtocol {
             throw new DataNotFoundException("Assessment not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         return success;
+    }
+    
+    /**
+     * Returns a formated String with all users and their points to an assignment.
+     * @param assignmentId The ID of the assignment.
+     * @return All users and their points to an assignment.
+     */
+    public String getSubmissionRealUsersReviews(String assignmentId) throws NetworkException {
+        String userReviews = "";
+        List<AssessmentDto> assessments = null;
+        
+        try {
+            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
+        }
+        
+        boolean firstIteration = true;
+        for (AssessmentDto assessment : assessments) {
+            // is only added once to the string at the top of the string
+            if (firstIteration) {
+                //first line: user  taskname    taskname    taskname
+                userReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
+                        + assessment.getAssignment().getName() + LINE_END;
+                //second line: *max*    points  points  points
+                userReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
+                        + assessment.getAssignment().getPoints() + LINE_END;
+                
+                firstIteration = false;
+            }
+            
+            // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
+            for (UserDto user : assessment.getGroup().getUsers()) {
+                userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                        + assessment.getComment() + LINE_END;
+            }
+        }
+        
+        return userReviews;
+    }
+    
+    /**
+     * Returns a formated String with all groups and their users.
+     * @param assignmentId The ID of the assignment.
+     * @return All users whose submission is reviewed.
+     */
+    public String getSubmissionReviewerUsers(String assignmentId) throws NetworkException {
+        String submissionUsers = "";
+        List<AssessmentDto> assessments = null;
+        
+        try {
+            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
+        }
+        
+        //gruppenname   vollername    rz-kennung  uni-mail
+        for (AssessmentDto assessment : assessments) {
+            for (UserDto user : assessment.getGroup().getUsers()) {
+                submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
+                        + user.getRzName() + SEPARATOR + user.getEmail() + LINE_END;
+            }
+        }
+        
+        return submissionUsers;
+    }
+    
+    
+    /**
+     * Returns a formated String with all groups and there review.
+     * @param assignmentId The ID of the assignment.
+     * @return All groups whose submission is reviewed.
+     * @throws NetworkException when network problems occur.
+     */
+    public String getSubmissionReviews(String assignmentId) throws NetworkException {
+        String submissionReviews = "";
+        List<AssessmentDto> assessments = null;
+        
+        try {
+            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
+        } catch (ApiException e) {
+            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
+        }
+        
+        boolean firstIteration = true;
+        for (AssessmentDto assessment : assessments) {
+            // is only added once to the string at the top of the string
+            if (firstIteration) {
+                //first line: user  taskname    taskname    taskname
+                submissionReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
+                        + assessment.getAssignment().getName() + LINE_END;
+                //second line: *max*    points  points  points
+                submissionReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
+                        + assessment.getAssignment().getPoints() + LINE_END;
+                
+                firstIteration = false;
+            }
+            //gruppenname   punkte  kommentar   upload erfolgreich
+            submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
+                    + SEPARATOR + assessment.getComment() + LINE_END;
+        }
+        
+        return submissionReviews;
     }
 }
