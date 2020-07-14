@@ -18,6 +18,7 @@ import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
@@ -109,7 +110,7 @@ public class ReviewerProtocolUnitTests {
      */
     @Test
     public void testUpdateAssessment() {
-        AssessmentDto body = new AssessmentDto();
+        AssessmentUpdateDto body = new AssessmentUpdateDto();
         body.setAchievedPoints(new BigDecimal(10));
         
         // Mock: Simulate update of an assessment on server

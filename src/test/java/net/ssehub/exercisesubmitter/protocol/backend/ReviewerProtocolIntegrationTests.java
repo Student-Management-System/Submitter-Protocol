@@ -3,7 +3,6 @@ package net.ssehub.exercisesubmitter.protocol.backend;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
@@ -36,7 +35,6 @@ public class ReviewerProtocolIntegrationTests {
     /**
      * Tests if a List of Assessments for an Assignment is returned.
      */
-    @Disabled
     @Test
     public void testGetAssessments() {
         // Requires a valid user to be logged in
@@ -58,7 +56,6 @@ public class ReviewerProtocolIntegrationTests {
     /**
      * Tests if a single Assessment for an Assignment is returned.
      */
-    @Disabled
     @Test
     public void testGetAssessmentForAssignment() {
         // Requires a valid user to be logged in

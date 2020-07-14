@@ -11,6 +11,7 @@ import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
@@ -156,11 +157,11 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @return True if Assessment was updated successfully, False otherwise.
      * @throws NetworkException when network problems occur.
      */
-    public boolean updateAssessment(AssessmentDto body, String assignmentId, String assessmentId) 
+    public boolean updateAssessment(AssessmentUpdateDto body, String assignmentId, String assessmentId) 
             throws NetworkException {
         boolean success = false;
         try {
-            AssessmentDto result =  apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 
+            AssessmentDto result = apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 
                     assessmentId);
             success = result != null;
         } catch (IllegalArgumentException e) {
