@@ -11,8 +11,16 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
  * This class declares unit tests for the {@link ReviewerProtocol} class.
+ * Requires valid credentials for testing provided via VM arguments. If no credentials are provided,
+ * test will be skipped (and marked yellow in Jenkins).
+ * Required properties are:
+ * <ul>
+ *   <li>test_user</li>
+ *   <li>test_password</li>
+ * </ul>
  * 
  * @author Kunold
+ * @author El-Sharkawy
  *
  */
 public class ReviewerProtocolIntegrationTests { 
@@ -31,8 +39,13 @@ public class ReviewerProtocolIntegrationTests {
     @Disabled
     @Test
     public void testGetAssessments() {
+        // Requires a valid user to be logged in
+        LoginComponent login = LoginComponentIntegrationTests.createLoginForTests();
+        
         ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
         rp.setSemester(TEST_SEMESTER);
+        rp.setAccessToken(login.getManagementToken());
+        
         try {
             List <AssessmentDto> assessments = rp.getAssessments(TEST_ASSIGNMENT_ID);
             Assertions.assertNotNull(assessments, "Assessment List was null, but never should be null");
@@ -48,8 +61,13 @@ public class ReviewerProtocolIntegrationTests {
     @Disabled
     @Test
     public void testGetAssessmentForAssignment() {
+        // Requires a valid user to be logged in
+        LoginComponent login = LoginComponentIntegrationTests.createLoginForTests();
+        
         ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
         rp.setSemester(TEST_SEMESTER);
+        rp.setAccessToken(login.getManagementToken());
+
         try {
             AssessmentDto assessment = rp.getAssessmentForAssignment(TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
             Assertions.assertNotNull(assessment, "No Assessment returned");

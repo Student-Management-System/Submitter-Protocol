@@ -21,6 +21,35 @@ public class LoginComponentIntegrationTests {
     private static final String TEST_MANAGEMENT_SERVER = "http://147.172.178.30:3000";
     
     /**
+     * Create a {@link LoginComponent}, which may be used during testing.
+     * If no credentials are provided, test will be skipped (and marked yellow in Jenkins).
+     * Required properties are:
+     * <ul>
+     *   <li>test_user</li>
+     *   <li>test_password</li>
+     * </ul>
+     * 
+     * @return A logged in user.
+     */
+    public static LoginComponent createLoginForTests() {
+        String userName = System.getProperty("test_user");
+        String pw = System.getProperty("test_password");
+        LoginComponentIntegrationTests.assumeSpecified(userName, "test_user", "user name");
+        LoginComponentIntegrationTests.assumeSpecified(pw, "test_password", "password");
+        
+        LoginComponent login = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
+        try {
+            login.login(userName, pw);
+        } catch (UnknownCredentialsException e) {
+            Assertions.fail(e);
+        } catch (ServerNotFoundException e) {
+            Assertions.fail(e);
+        }
+        
+        return login;
+    }
+    
+    /**
      * Tests precondition if credentials have been provided via external properties (to avoid placing valid credentials
      * inside the repository). If no credentials are provided, test will be skipped (and marked yellow in Jenkins).
      * Required properties are:
@@ -38,7 +67,7 @@ public class LoginComponentIntegrationTests {
             + "a test " + typeName + " via the property \"" + propertyName + "\", either on the command line via "
             + "-D" + propertyName + "= or on in maven/Eclipse via specifying system properties.");        
     }
-
+    
     /**
      * Tests the integration of three systems to login a user.
      * The involved systems are:

@@ -122,7 +122,7 @@ public class Assignment {
      * Returns the ID of the assignment to query the REST server, should not be used by the submitter/reviewer directly.
      * @return The ID to query the REST server for additional information.
      */
-    String getID() {
+    protected String getID() {
         return assignmentID;
     }
     

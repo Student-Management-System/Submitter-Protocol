@@ -72,6 +72,9 @@ public class ReviewerProtocol extends NetworkProtocol {
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
+            if (401 == e.getCode()) {
+                throw new UnauthorizedException("User not authorized, but required to query Assessments.");
+            }
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         

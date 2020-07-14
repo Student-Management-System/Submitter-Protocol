@@ -300,7 +300,7 @@ public class NetworkProtocol {
     /**
      * Getter for the groups of an assignment at submission end.
      * @param assignmentId The ID of the assignment for that the groups are requested.
-     * @return A list of groups at the end of submission.
+     * @return A list of groups at the end of submission. List will be empty if no results are found.
      * @throws NetworkException If network problems occur.
      */
     public List<GroupDto> getGroupsAtAssignmentEnd(String assignmentId) throws NetworkException {
