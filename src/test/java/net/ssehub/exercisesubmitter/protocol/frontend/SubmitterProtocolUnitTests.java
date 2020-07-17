@@ -48,8 +48,8 @@ public class SubmitterProtocolUnitTests {
         protocol.setNetworkComponents(loginMock, null);
         
         // Test: Correct computation of destination path
-        String[] path = protocol.getPathToSubmission(assignment);
-        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, path);
+        SubmissionTarget dest = protocol.getPathToSubmission(assignment);
+        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, dest.getPath());
     }
     
     /**
@@ -83,8 +83,8 @@ public class SubmitterProtocolUnitTests {
         protocol.setNetworkComponents(null, networkMock);
         
         // Test: Correct computation of destination path
-        String[] path = protocol.getPathToSubmission(assignment);
-        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, path);
+        SubmissionTarget dest = protocol.getPathToSubmission(assignment);
+        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, dest.getPath());
     }
 
 }
