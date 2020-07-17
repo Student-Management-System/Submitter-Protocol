@@ -98,6 +98,18 @@ public class SubmitterProtocol {
     public List<Assignment> getReviewedAssignments() throws NetworkException {
         return protocol.getAssignments(StateEnum.EVALUATED, StateEnum.CLOSED);
     }
+    
+    /**
+     * Returns the list of reviewable assignments, for tutors.<br/>
+     * <b style="color:red">Note:</b> This should only used inside the ExerciseReviewer, although is further protected
+     * by the student management server. It may becomes confusing for students if they see this list.
+     * @return The list of assignments, which may currently reviewed by the tutors.
+     * 
+     * @throws NetworkException If network problems occur.
+     */
+    public List<Assignment> getReviewableAssignments() throws NetworkException {
+        return protocol.getAssignments(StateEnum.IN_REVIEW);
+    }
 
     /**
      * Returns the destination path to a submission.
