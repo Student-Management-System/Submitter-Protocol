@@ -30,6 +30,15 @@ public class SubmissionTarget {
     }
     
     /**
+     * Returns the absolute path (as one String with leading slash) of the assignment within the server.
+     * This is equal to calling {@link #getPath()} and concatenating the segments with a slash sign. 
+     * @return <tt>&#x2F; getPath()[0] &#x2F; getPath()[1]</tt>
+     */
+    public String getAbsolutePathInRepository() {
+        return "/" + path[0] + "/" + path[1];
+    }
+    
+    /**
      * Returns the complete URL where to submit the assignment via SVN.
      * @return The full URL where to submit the assignment.
      */
