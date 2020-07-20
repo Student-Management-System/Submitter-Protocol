@@ -49,7 +49,7 @@ public class SubmitterProtocolUnitTests {
         
         // Test: Correct computation of destination path
         SubmissionTarget dest = protocol.getPathToSubmission(assignment);
-        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, dest.getPath());
+        Assertions.assertEquals("/" + expectedExercise + "/" + expectedUserOrGroup, dest.getAbsolutePathInRepository());
     }
     
     /**
@@ -84,7 +84,7 @@ public class SubmitterProtocolUnitTests {
         
         // Test: Correct computation of destination path
         SubmissionTarget dest = protocol.getPathToSubmission(assignment);
-        Assertions.assertArrayEquals(new String[] {expectedExercise, expectedUserOrGroup}, dest.getPath());
+        Assertions.assertEquals("/" + expectedExercise + "/" + expectedUserOrGroup, dest.getAbsolutePathInRepository());
     }
 
 }
