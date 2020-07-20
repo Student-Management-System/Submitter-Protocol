@@ -24,6 +24,7 @@ public class SubmissionTarget {
      * Returns the target location of the assignment within the server.
      * Sub-folders are stored as single elements of the array.
      * @return The relative path <b>within</b> the target server, where to submit the assignment.
+     * @deprecated Use {@link #getAbsolutePathInRepository()} or {@link #getAssignmentPath()}
      */
     public String[] getPath() {
         return path;
@@ -36,6 +37,15 @@ public class SubmissionTarget {
      */
     public String getAbsolutePathInRepository() {
         return "/" + path[0] + "/" + path[1];
+    }
+    
+    /**
+     * Returns the absolute path (as one String with leading slash) of all submission targets for the specified
+     * assignment. 
+     * @return The folder containing all submissions.
+     */
+    public String getAssignmentPath() {
+        return "/" + path[0];
     }
     
     /**
