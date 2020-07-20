@@ -48,10 +48,19 @@ public class SubmissionTarget {
     }
     
     /**
-     * Returns the complete URL where to submit the assignment via SVN.
+     * Returns the complete URL where to submit an individual submission via SVN.
      * @return The full URL where to submit the assignment.
      */
     public String getSubmissionURL() {
+        return url + "/" + path[0] + "/" + path[1];
+    }
+    
+    /**
+     * Returns the complete URL where all submissions of all participants are stored via SVN.<br/>
+     * <b style="color:red">Note: </b> This is intended for the ExerciseReviewer only.
+     * @return The full URL where to submit the assignment.
+     */
+    public String getAllSubmissionsURL() {
         return url + "/" + path[0] + "/" + path[1];
     }
     
