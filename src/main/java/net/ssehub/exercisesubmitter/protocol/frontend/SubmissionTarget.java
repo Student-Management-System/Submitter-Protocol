@@ -61,7 +61,7 @@ public class SubmissionTarget {
      * @return The full URL where to submit the assignment.
      */
     public String getAllSubmissionsURL() {
-        return url + "/" + path[0] + "/" + path[1];
+        return url + "/" + path[0];
     }
     
     @Override
