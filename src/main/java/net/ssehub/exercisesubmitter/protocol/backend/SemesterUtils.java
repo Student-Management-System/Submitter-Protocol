@@ -38,9 +38,9 @@ public class SemesterUtils {
      * @return The current semester as String.
      */
     public static String getSemester() {
-        
+        // Semester is always assumed by the management system to be in: 4 letters + 4 digits
         if (calendar.get(Calendar.MONTH) >= Calendar.APRIL && calendar.get(Calendar.MONTH) <= Calendar.SEPTEMBER) {
-            semester = "sose" + formateDate(calendar.get(Calendar.YEAR));
+            semester = "sose" + formateDate(calendar.get(Calendar.YEAR)) + formateDate(calendar.get(Calendar.YEAR));
         } else {
             if (calendar.get(Calendar.MONTH) >= Calendar.JANUARY && calendar.get(Calendar.MONTH) <= Calendar.MARCH) {
                 semester = "wise" + formateDate(calendar.get(Calendar.YEAR) - 1)
