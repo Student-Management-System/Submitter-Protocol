@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.sound.sampled.Line;
+
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -172,7 +173,6 @@ public class ReviewerProtocolUnitTests {
     /**
      * Tests if the returned String with the user and assessment informations is correct formated.
      */
-    @Disabled
     @Test
     public void testGetSubmissionRealUsersReviews() {
         
@@ -196,13 +196,13 @@ public class ReviewerProtocolUnitTests {
         }
         
         String expected = readReviewFile("submissionRealUsersReviews");
+        expected += System.lineSeparator();
         Assertions.assertEquals(expected, actual);
     }
     
     /**
      * Tests if the returned String with the group and user informations is correct formated.
      */
-    @Disabled
     @Test
     public void testGetSubmissionReviewerUsers() {
         
@@ -226,13 +226,14 @@ public class ReviewerProtocolUnitTests {
         }
         
         String expected = readReviewFile("submissionReviewer");
+        expected += System.lineSeparator();
         Assertions.assertEquals(expected, actual);
     }
     
     /**
      *  Tests if the returned String with the group and review informations is correct formated.
      */
-    @Disabled
+    
     @Test
     public void testGetSubmissionReviews() {
         
@@ -272,7 +273,7 @@ public class ReviewerProtocolUnitTests {
             content = Files.readString(path.toPath()).trim();
             // next line need to be commented out under windows since lineSeperator has another behavior on windows, 
             // than under linux
-            //content = content.replace("\n", System.lineSeparator());
+            content = content.replace("\n", System.lineSeparator());
         } catch (IOException e) {
             Assertions.fail("Could not read configuration from " + path.getAbsolutePath(), e);
         }
