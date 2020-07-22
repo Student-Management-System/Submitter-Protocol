@@ -209,6 +209,8 @@ public class ReviewerProtocol extends NetworkProtocol {
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         
+        // counter is used to know when the last line is written, so there won´t be a line break
+        int counter = assessments.size();
         boolean firstIteration = true;
         for (AssessmentDto assessment : assessments) {
             // is only added once to the string at the top of the string
@@ -225,9 +227,18 @@ public class ReviewerProtocol extends NetworkProtocol {
             
             // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
             for (UserDto user : assessment.getGroup().getUsers()) {
-                userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                        + assessment.getComment() + LINE_BREAK;
+                if (counter > 1) {
+                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                            + assessment.getComment() + LINE_BREAK;                    
+                } else if (counter == 1 && assessment.getGroup().getUsers().size() > 1) {
+                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                            + assessment.getComment() + LINE_BREAK;
+                } else {
+                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
+                            + assessment.getComment();
+                }
             }
+            counter--;
         }
         
         return userReviews;
@@ -250,12 +261,23 @@ public class ReviewerProtocol extends NetworkProtocol {
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         
+        // counter is used to know when the last line is written, so there won´t be a line break
+        int counter = assessments.size();
         //gruppenname   vollername    rz-kennung  uni-mail
         for (AssessmentDto assessment : assessments) {
             for (UserDto user : assessment.getGroup().getUsers()) {
-                submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
-                        + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;
+                if (counter > 1) {
+                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
+                            + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;                    
+                } else  if (counter == 1 && assessment.getGroup().getUsers().size() > 1) {
+                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
+                            + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;
+                } else {
+                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
+                            + user.getRzName() + SEPARATOR + user.getEmail();
+                }
             }
+            counter--;
         }
         
         return submissionUsers;

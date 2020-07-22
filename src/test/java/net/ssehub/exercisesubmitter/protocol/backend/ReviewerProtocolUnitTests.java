@@ -194,7 +194,6 @@ public class ReviewerProtocolUnitTests {
         }
         
         String expected = readReviewFile("submissionRealUsersReviews");
-        expected += System.lineSeparator();
         Assertions.assertEquals(expected, actual);
     }
     
@@ -224,7 +223,6 @@ public class ReviewerProtocolUnitTests {
         }
         
         String expected = readReviewFile("submissionReviewer");
-        expected += System.lineSeparator();
         Assertions.assertEquals(expected, actual);
     }
     
