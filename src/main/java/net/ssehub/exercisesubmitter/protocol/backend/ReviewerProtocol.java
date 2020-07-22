@@ -25,7 +25,7 @@ public class ReviewerProtocol extends NetworkProtocol {
     private static final String USER = "user";
     private static final String MAX_POINTS = "*max*";
     private static final String SEPARATOR = "\t";
-    private static final String LINE_END = "\n";
+    private static final String LINE_BREAK = System.lineSeparator();
     
     /**
      * The API to get the assessment informations.
@@ -215,10 +215,10 @@ public class ReviewerProtocol extends NetworkProtocol {
             if (firstIteration) {
                 //first line: user  taskname    taskname    taskname
                 userReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
-                        + assessment.getAssignment().getName() + LINE_END;
+                        + assessment.getAssignment().getName() + LINE_BREAK;
                 //second line: *max*    points  points  points
                 userReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
-                        + assessment.getAssignment().getPoints() + LINE_END;
+                        + assessment.getAssignment().getPoints() + LINE_BREAK;
                 
                 firstIteration = false;
             }
@@ -226,7 +226,7 @@ public class ReviewerProtocol extends NetworkProtocol {
             // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
             for (UserDto user : assessment.getGroup().getUsers()) {
                 userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                        + assessment.getComment() + LINE_END;
+                        + assessment.getComment() + LINE_BREAK;
             }
         }
         
@@ -254,7 +254,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         for (AssessmentDto assessment : assessments) {
             for (UserDto user : assessment.getGroup().getUsers()) {
                 submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
-                        + user.getRzName() + SEPARATOR + user.getEmail() + LINE_END;
+                        + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;
             }
         }
         
@@ -281,21 +281,30 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
         
         boolean firstIteration = true;
+        // counter is used to know when the last line is written, so there won´t be a line break
+        int counter = assessments.size();
         for (AssessmentDto assessment : assessments) {
             // is only added once to the string at the top of the string
             if (firstIteration) {
                 //first line: user  taskname    taskname    taskname
                 submissionReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
-                        + assessment.getAssignment().getName() + LINE_END;
+                        + assessment.getAssignment().getName() + LINE_BREAK;
                 //second line: *max*    points  points  points
                 submissionReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
-                        + assessment.getAssignment().getPoints() + LINE_END;
+                        + assessment.getAssignment().getPoints() + LINE_BREAK;
                 
                 firstIteration = false;
             }
+            
             //gruppenname   punkte  kommentar   upload erfolgreich
-            submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
-                    + SEPARATOR + assessment.getComment() + LINE_END;
+            if (counter > 1) {
+                submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
+                    + SEPARATOR + assessment.getComment() + LINE_BREAK;                
+            } else {
+                submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
+                    + SEPARATOR + assessment.getComment();
+            }
+            counter--;
         }
         
         return submissionReviews;
