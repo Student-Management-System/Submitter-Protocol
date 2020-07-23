@@ -9,7 +9,7 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 
 /**
- * This class declares unit tests for the {@link ReviewerProtocol} class.
+ * This class declares integration tests for the {@link ReviewerProtocol} class.
  * Requires valid credentials for testing provided via VM arguments. If no credentials are provided,
  * test will be skipped (and marked yellow in Jenkins).
  * Required properties are:

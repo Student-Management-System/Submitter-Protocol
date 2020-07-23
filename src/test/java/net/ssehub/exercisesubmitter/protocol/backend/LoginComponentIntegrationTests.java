@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
+import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
@@ -16,9 +17,6 @@ import net.ssehub.studentmgmt.backend_api.api.UsersApi;
  *
  */
 public class LoginComponentIntegrationTests {
-    // Test parameters
-    private static final String TEST_AUTH_SERVER = "http://147.172.178.30:8080";
-    private static final String TEST_MANAGEMENT_SERVER = "http://147.172.178.30:3000";
     
     /**
      * Create a {@link LoginComponent}, which may be used during testing.
@@ -32,14 +30,10 @@ public class LoginComponentIntegrationTests {
      * @return A logged in user.
      */
     public static LoginComponent createLoginForTests() {
-        String userName = System.getProperty("test_user");
-        String pw = System.getProperty("test_password");
-        LoginComponentIntegrationTests.assumeSpecified(userName, "test_user", "user name");
-        LoginComponentIntegrationTests.assumeSpecified(pw, "test_password", "password");
-        
-        LoginComponent login = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
+        String[] credentials = TestUtils.retreiveCredentialsFormVmArgs();
+        LoginComponent login = new LoginComponent(TestUtils.TEST_AUTH_SERVER, TestUtils.TEST_MANAGEMENT_SERVER);
         try {
-            login.login(userName, pw);
+            login.login(credentials[0], credentials[1]);
         } catch (UnknownCredentialsException e) {
             Assertions.fail(e);
         } catch (ServerNotFoundException e) {
@@ -62,7 +56,7 @@ public class LoginComponentIntegrationTests {
      * @param propertyName the name of the properties (one from above)
      * @param typeName The name of the properties (human readable name)
      */
-    private static void assumeSpecified(String variable, String propertyName, String typeName) {
+    public static void assumeSpecified(String variable, String propertyName, String typeName) {
         Assumptions.assumeTrue(variable != null && !variable.isEmpty(), "No " + typeName + " specified, please specify "
             + "a test " + typeName + " via the property \"" + propertyName + "\", either on the command line via "
             + "-D" + propertyName + "= or on in maven/Eclipse via specifying system properties.");        
@@ -90,7 +84,7 @@ public class LoginComponentIntegrationTests {
         assumeSpecified(pw, "test_password", "password");
         
         // Perform login
-        LoginComponent loginComp = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
+        LoginComponent loginComp = new LoginComponent(TestUtils.TEST_AUTH_SERVER, TestUtils.TEST_MANAGEMENT_SERVER);
         boolean success = loginComp.login(userName, pw);
         
         // Test if login was successful
@@ -120,7 +114,7 @@ public class LoginComponentIntegrationTests {
         
         // Precondition: Check that tested services requires valid token
         ApiClient client = new ApiClient();
-        client.setBasePath(TEST_MANAGEMENT_SERVER);
+        client.setBasePath(TestUtils.TEST_MANAGEMENT_SERVER);
         UsersApi userApi = new UsersApi(client);
         boolean exceptionOccured = false;
         try {
@@ -133,7 +127,7 @@ public class LoginComponentIntegrationTests {
             + "was queried.");
         
         // Perform login
-        LoginComponent loginComp = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
+        LoginComponent loginComp = new LoginComponent(TestUtils.TEST_AUTH_SERVER, TestUtils.TEST_MANAGEMENT_SERVER);
         loginComp.login(userName, pw);
         
         //Query a service that requires valid token
