@@ -1,5 +1,6 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +41,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // Load assignment, which is used to retrieve available reviews
         Assignment assignment = reviewer.getReviewableAssignments().stream()
-            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE))
             .findFirst()
             .orElse(null);
         Assertions.assertNotNull(assignment);
@@ -53,12 +54,12 @@ public class ExerciseReviewerProtocolIntegrationTests {
 
     /**
      * Tests {@link ExerciseReviewerProtocol#getAssessmentForSubmission(String)}.
-     * Method should get an assessment for the given user/group name.
+     * Method should get an assessment for the given user name.
      * @throws NetworkException If server, which is used for the integration test,
      *     can not be reached through a network error or miss-configuration.
      */
     @Test
-    public void testGetAssessmentForSubmission() throws NetworkException {
+    public void testGetAssessmentForSubmissionSingle() throws NetworkException {
         String reviewedUser = "mmustermann";
         
         // Init protocol
@@ -66,7 +67,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // Load assignment, which is used to retrieve available reviews
         Assignment assignment = reviewer.getReviewableAssignments().stream()
-            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE))
             .findFirst()
             .orElse(null);
         Assertions.assertNotNull(assignment);
@@ -87,6 +88,44 @@ public class ExerciseReviewerProtocolIntegrationTests {
     }
     
     /**
+     * Tests {@link ExerciseReviewerProtocol#getAssessmentForSubmission(String)}.
+     * Method should get an assessment for the given group name.
+     * @throws NetworkException If server, which is used for the integration test,
+     *     can not be reached through a network error or miss-configuration.
+     */
+    @Test
+    public void testGetAssessmentForSubmissionGroup() throws NetworkException {
+        String reviewedUser = "Testgroup 1";
+        
+        // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Load assignment, which is used to retrieve available reviews
+        Assignment assignment = reviewer.getReviewableAssignments().stream()
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP))
+            .findFirst()
+            .orElse(null);
+        Assertions.assertNotNull(assignment);
+        
+        // Test postcondition: Retrieve reviews for the user
+        reviewer.loadAssessments(assignment);
+        try {
+            Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
+            Assertions.assertNotNull(assessment);
+            Assertions.assertEquals(reviewedUser, assessment.getSubmitterName());
+            User[] expected = new User[] {new User("Max Mustermann", "mmustermann"),
+                new User("Hans Peter", "hpeter")};
+            List<User> actual = new ArrayList<>();
+            for (User user : assessment) {
+                actual.add(user);
+            }
+            Assertions.assertArrayEquals(expected, actual.toArray());
+        } catch (NetworkException e) {
+            Assertions.fail("Unexpected exception: Method should return an assessment stub for review", e);
+        }
+    }
+    
+    /**
      * Tests that {@link ExerciseReviewerProtocol#submitAssessment(Assessment)} can update an existing assessment on the
      * server.
      */
@@ -99,7 +138,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // Load assignment, which is used to retrieve available reviews
         Assignment assignment = reviewer.getReviewableAssignments().stream()
-            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE))
             .findFirst()
             .orElse(null);
         Assertions.assertNotNull(assignment);

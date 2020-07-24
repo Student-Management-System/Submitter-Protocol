@@ -36,4 +36,42 @@ public class User {
     public String getAccountName() {
         return accountName;
     }
+
+    @Override
+    public int hashCode() {
+        // Generated
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((accountName == null) ? 0 : accountName.hashCode());
+        result = prime * result + ((fullName == null) ? 0 : fullName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // Generated
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof User)) {
+            return false;
+        }
+        User other = (User) obj;
+        if (accountName == null) {
+            if (other.accountName != null) {
+                return false;
+            }
+        } else if (!accountName.equals(other.accountName)) {
+            return false;
+        }
+        if (fullName == null) {
+            if (other.fullName != null) {
+                return false;
+            }
+        } else if (!fullName.equals(other.fullName)) {
+            return false;
+        }
+        return true;
+    }
+    
 }
