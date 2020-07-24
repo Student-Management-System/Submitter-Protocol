@@ -191,7 +191,8 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @throws NetworkException when network problems occur.
      */
     public boolean updateAssessment(AssessmentUpdateDto body, String assignmentId, String assessmentId) 
-            throws NetworkException {
+        throws NetworkException {
+
         boolean success = false;
         try {
             AssessmentDto result = apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 

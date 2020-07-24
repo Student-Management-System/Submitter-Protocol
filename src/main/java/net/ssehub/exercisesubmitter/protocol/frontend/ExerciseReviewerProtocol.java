@@ -8,6 +8,7 @@ import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataT
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
@@ -71,6 +72,19 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
      */
     public List<Assessment> getAssessments() {
         return assessments;
+    }
+    
+    /**
+     * Submits the assessment to the student management system.
+     * @param assessment A review to submit.
+     * @return <tt>true</tt> if submission was successful, otherwise <tt>false</tt>.
+     * @throws NetworkException when network problems occur.
+     */
+    public boolean submitAssessment(Assessment assessment) throws NetworkException {
+        AssessmentUpdateDto updateDto = new AssessmentUpdateDto();
+        updateDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
+        updateDto.setComment(assessment.getAssessmentDTO().getComment());
+        return getProtocol().updateAssessment(updateDto, assignment.getID(), assessment.getAssessmentID());
     }
     
     /**

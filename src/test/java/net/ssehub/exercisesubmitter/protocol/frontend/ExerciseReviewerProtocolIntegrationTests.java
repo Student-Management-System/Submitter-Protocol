@@ -71,7 +71,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
             .orElse(null);
         Assertions.assertNotNull(assignment);
         
-        // Test postcondition: Retrieve reviews for assignment, should not be empty
+        // Test postcondition: Retrieve reviews for the user
         reviewer.loadAssessments(assignment);
         try {
             Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
@@ -84,6 +84,43 @@ public class ExerciseReviewerProtocolIntegrationTests {
         } catch (NetworkException e) {
             Assertions.fail("Unexpected exception: Method should return an assessment stub for review", e);
         }
+    }
+    
+    /**
+     * Tests that {@link ExerciseReviewerProtocol#submitAssessment(Assessment)} can update an existing assessment on the
+     * server.
+     */
+    @Test
+    public void testSubmitAssessmentUpdate() throws NetworkException {
+        String reviewedUser = "mmustermann";
+        
+        // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Load assignment, which is used to retrieve available reviews
+        Assignment assignment = reviewer.getReviewableAssignments().stream()
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .findFirst()
+            .orElse(null);
+        Assertions.assertNotNull(assignment);
+        
+        // Edit existing assessment
+        reviewer.loadAssessments(assignment);
+        Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
+        Assertions.assertNotNull(assessment);
+        double points = assessment.getAchievedPoints();
+        // We need anything new to check and we need to avoid buffer overflow
+        double newPoints = (points % assignment.getPoints()) + 1;
+        Assertions.assertNotEquals(points, newPoints);
+        assessment.setAchievedPoints(newPoints);
+        reviewer.submitAssessment(assessment);
+        
+        // Test: Assignment should have changed points on server (avoid cache of reviewer by creating a new instance)
+        reviewer = initReviewer();
+        Assertions.assertTrue(reviewer.getAssessments().isEmpty());
+        reviewer.loadAssessments(assignment);
+        assessment = reviewer.getAssessmentForSubmission(reviewedUser);
+        Assertions.assertEquals(newPoints, assessment.getAchievedPoints());
     }
     
     /**

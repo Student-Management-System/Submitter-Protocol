@@ -69,14 +69,14 @@ public class Assessment implements Iterable<User> {
         return assignment.getID();
     }
     
-//    /**
-//     * Grants full access to the DTO object which is used to transfer (down- and upload) all (partial) review data of
-//     * one submission.
-//     * @return The assessment dto.
-//     */
-//    protected AssessmentDto getAssessmentDTO() {
-//        return assessment;
-//    }
+    /**
+     * Grants full access to the DTO object which is used to transfer (down- and upload) all (partial) review data of
+     * one submission.
+     * @return The assessment dto.
+     */
+    protected AssessmentDto getAssessmentDTO() {
+        return assessment;
+    }
     
     /**
      * Returns the unique name of the related group or student.
@@ -122,5 +122,10 @@ public class Assessment implements Iterable<User> {
     @Override
     public Iterator<User> iterator() {
         return participants.iterator();
+    }
+    
+    @Override
+    public String toString() {
+        return "Assessment for '" + assignment.getName() + "' of " + getSubmitterName();
     }
 }
