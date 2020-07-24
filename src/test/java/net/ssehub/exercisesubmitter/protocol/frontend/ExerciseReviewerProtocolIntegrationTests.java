@@ -77,6 +77,10 @@ public class ExerciseReviewerProtocolIntegrationTests {
             Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
             Assertions.assertNotNull(assessment);
             Assertions.assertEquals(reviewedUser, assessment.getSubmitterName());
+            for (User user : assessment) {
+                // Single exercise -> should have exactly one user
+                Assertions.assertEquals(reviewedUser, user.getAccountName());                
+            }
         } catch (NetworkException e) {
             Assertions.fail("Unexpected exception: Method should return an assessment stub for review", e);
         }
