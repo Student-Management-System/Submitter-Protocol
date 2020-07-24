@@ -3,8 +3,14 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
 
 /**
  * Network protocol that provides API calls as required by the <b>Eclipse Exercise Reviewer</b>.
@@ -15,7 +21,6 @@ import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
  */
 public class ExerciseReviewerProtocol extends SubmitterProtocol {
     
-    private ReviewerProtocol rp;
 
     private List<Assessment> assessments;
     private Assignment assignment;
@@ -31,8 +36,13 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         String submissionServer) {
         
         super(authenticationURL, stdMgmtURL, courseName, submissionServer);
-        rp = new ReviewerProtocol(stdMgmtURL, courseName);
+        setNetworkComponents(null, new ReviewerProtocol(stdMgmtURL, courseName));
         assessments = new ArrayList<>();
+    }
+    
+    @Override
+    protected ReviewerProtocol getProtocol() {
+        return (ReviewerProtocol) super.getProtocol();
     }
     
     /**
@@ -48,7 +58,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         assessments.clear();
         this.assignment = assignment;
         
-        rp.getAssessments(assignment.getID()).stream()
+        getProtocol().getAssessments(assignment.getID()).stream()
             .map(a -> new Assessment(a, assignment))
             .forEach(assessments::add);
     }
@@ -64,6 +74,58 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
     }
     
     /**
+     * Retrieves / creates an assessment for the group / user with the specified name.
+     * It will create a new (empty) assessment, if there does not exist an assessment for the specified submitter.
+     * @param name The name of the submitter (group name for group submissions, user account name (RZ name) for single
+     *     user submissions).
+     * @return An {@link Assessment} which may be used to review a submission
+     */
+    public Assessment getAssessmentForSubmission(String name) throws NetworkException {
+        Assessment assessment = getAssessments().stream()
+            .filter(a -> name.equals(a.getSubmitterName()))
+            .findFirst()
+            .orElse(createAssessment(name));
+        
+        return assessment;
+    }
+    
+    /**
+     * Creates a new blank {@link Assessment} and adds this to {@link #assessments}.
+     * This {@link Assessment} object may be used to review an existent submission.
+     * @param name The name of the submitter (group name for group submissions, user account name (RZ name) for single
+     *     user submissions).
+     * @return An {@link Assessment} which may be used to review a submission (will be added to {@link #assessments} as
+     *     side effect).
+     */
+    private Assessment createAssessment(String name) throws NetworkException {
+        AssessmentDto dto = new AssessmentDto();
+        
+        if (assignment.isGroupWork()) {
+            GroupDto group = getProtocol().getGroupsAtAssignmentEnd(assignment.getID()).stream()
+                .filter(g -> name.equals(g.getName()))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Could not find group '" + name + "'", name,
+                    DataType.GROUP_NOT_FOUND));
+            
+            dto.setGroup(group);
+            dto.setGroupId(group.getId());
+        } else {
+            UserDto user = getProtocol().getUsersOfCourse(CourseRoleEnum.STUDENT).stream()
+                .filter(u -> name.equals(u.getRzName()))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Could not find user '" + name + "'", name,
+                    DataType.USER_NOT_FOUND));
+            
+            dto.setUser(user);
+            dto.setUserId(user.getId());
+        }
+        
+        Assessment assessment = new Assessment(dto, assignment);
+        assessments.add(assessment);
+        return assessment;
+    }
+    
+    /**
      * Returns a formated String with all users and their points to an assignment.
      * @param assignmentId The ID of the assignment.
      * @return All users and their points to an assignment.
@@ -72,7 +134,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         String userReviews = "null";
         
         try {
-            userReviews = rp.getSubmissionRealUsersReviews(assignmentId);
+            userReviews = getProtocol().getSubmissionRealUsersReviews(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
@@ -89,7 +151,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         String submissionUsers = "null";
         
         try {
-            submissionUsers = rp.getSubmissionReviewerUsers(assignmentId);
+            submissionUsers = getProtocol().getSubmissionReviewerUsers(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }
@@ -106,7 +168,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         String submissionReviews = "null";
         
         try {
-            submissionReviews = rp.getSubmissionReviews(assignmentId);
+            submissionReviews = getProtocol().getSubmissionReviews(assignmentId);
         } catch (NetworkException e) {
             e.printStackTrace();
         }

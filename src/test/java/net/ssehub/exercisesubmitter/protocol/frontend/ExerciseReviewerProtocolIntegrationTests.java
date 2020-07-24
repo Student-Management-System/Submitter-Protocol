@@ -32,6 +32,63 @@ public class ExerciseReviewerProtocolIntegrationTests {
     @Test
     public void testLoadAssessments() throws NetworkException {
         // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Test precondition: No assessments available
+        List<Assessment> assessments = reviewer.getAssessments();
+        Assertions.assertTrue(assessments.isEmpty());
+        
+        // Load assignment, which is used to retrieve available reviews
+        Assignment assignment = reviewer.getReviewableAssignments().stream()
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .findFirst()
+            .orElse(null);
+        Assertions.assertNotNull(assignment);
+        
+        // Test postcondition: Retrieve reviews for assignment, should not be empty
+        reviewer.loadAssessments(assignment);
+        assessments = reviewer.getAssessments();
+        Assertions.assertFalse(assessments.isEmpty());
+    }
+
+    /**
+     * Tests {@link ExerciseReviewerProtocol#getAssessmentForSubmission(String)}.
+     * Method should get an assessment for the given user/group name.
+     * @throws NetworkException If server, which is used for the integration test,
+     *     can not be reached through a network error or miss-configuration.
+     */
+    @Test
+    public void testGetAssessmentForSubmission() throws NetworkException {
+        String reviewedUser = "mmustermann";
+        
+        // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Load assignment, which is used to retrieve available reviews
+        Assignment assignment = reviewer.getReviewableAssignments().stream()
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
+            .findFirst()
+            .orElse(null);
+        Assertions.assertNotNull(assignment);
+        
+        // Test postcondition: Retrieve reviews for assignment, should not be empty
+        reviewer.loadAssessments(assignment);
+        try {
+            Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
+            Assertions.assertNotNull(assessment);
+            Assertions.assertEquals(reviewedUser, assessment.getSubmitterName());
+        } catch (NetworkException e) {
+            Assertions.fail("Unexpected exception: Method should return an assessment stub for review", e);
+        }
+    }
+    
+    /**
+     * Creates an {@link ExerciseReviewerProtocol} with default settings and logs in a tutor.
+     * Useful for most tests.
+     * @return {@link ExerciseReviewerProtocol} usuable for testing.
+     */
+    private ExerciseReviewerProtocol initReviewer() {
+        // Init protocol
         ExerciseReviewerProtocol reviewer = new ExerciseReviewerProtocol(TestUtils.TEST_AUTH_SERVER,
             TestUtils.TEST_MANAGEMENT_SERVER, TestUtils.TEST_DEFAULT_JAVA_COURSE, TestUtils.TEST_SUBMISSION_SERVER);
         reviewer.setSemester(TestUtils.TEST_DEFAULT_SEMESTER);
@@ -41,20 +98,6 @@ public class ExerciseReviewerProtocolIntegrationTests {
         } catch (NetworkException e) {
             Assertions.fail("Could not login as tutor/lecturor", e);
         }
-        
-        // Test precondition: No assessments available
-        List<Assessment> assessments = reviewer.getAssessments();
-        Assertions.assertTrue(assessments.isEmpty());
-        
-        // Load assignment, which is used to retreive available reviews
-        Assignment assignment = reviewer.getReviewableAssignments().stream()
-            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEABLE_ASSIGNMENT))
-            .findFirst()
-            .orElse(null);
-        Assertions.assertNotNull(assignment);
-        
-        // Test postcondition: Retrieve reviews for assignment, should not be empty
-        reviewer.loadAssessments(assignment);
-        Assertions.assertFalse(assessments.isEmpty());
+        return reviewer;
     }
 }

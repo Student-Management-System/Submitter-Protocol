@@ -72,6 +72,14 @@ public class SubmitterProtocol {
     }
     
     /**
+     * Returns the internally used low-level protocol.
+     * @return The low-level protocol.
+     */
+    protected NetworkProtocol getProtocol() {
+        return protocol;
+    }
+    
+    /**
      * Used to select the semester.
      * @param semester The semester to use (four lower case letters + 2 digits).
      */

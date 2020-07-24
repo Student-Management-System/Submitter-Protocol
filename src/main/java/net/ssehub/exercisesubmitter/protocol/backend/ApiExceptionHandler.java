@@ -32,7 +32,13 @@ class ApiExceptionHandler {
             throw new ServerNotFoundException(exc.getMessage(), basePath);
         }
         if (exc instanceof ApiException) {
-            String responseBody = ((ApiException) exc).getResponseBody();
+            ApiException apiExc = (ApiException) exc;
+            
+            if (401 == apiExc.getCode()) {
+                throw new UnauthorizedException("User not authorized, but required to query Assessments.");
+            }
+            
+            String responseBody = apiExc.getResponseBody();
             if (responseBody != null && responseBody.contains("\"status\":500")
                 && responseBody.contains("\"message\":\"pre:ZuulAuthorizationFilter\"")) {
                 // Sparky services blocks the route because of access rules

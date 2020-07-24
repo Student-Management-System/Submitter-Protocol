@@ -1,11 +1,13 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
+import net.ssehub.studentmgmt.backend_api.api.CourseParticipantsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
 import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
@@ -14,6 +16,7 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
 
 /**
  * Network protocol designed for the &quot;Exercise Reviewer&quot;.
@@ -33,13 +36,20 @@ public class ReviewerProtocol extends NetworkProtocol {
     private AssessmentsApi apiAssessments;
     
     /**
+     * The API to get information about participants of a course.
+     */
+    private CourseParticipantsApi apiParticipants;
+    
+    /**
      * The default constructor of the class to be used by the reviewer.
      * @param basePath The REST URL of the student management server.
      * @param courseName The course that is associated with the ExerciseReviewer.
      */
     public ReviewerProtocol(String basePath, String courseName) {
         super(basePath, courseName);
+        // Use always getApiClient() to keep same settings (e.g., setting of access token)
         apiAssessments = new AssessmentsApi(getApiClient());
+        apiParticipants = new CourseParticipantsApi(getApiClient());
     }
     
     /**
@@ -70,16 +80,38 @@ public class ReviewerProtocol extends NetworkProtocol {
         List<AssessmentDto> assessments = null;
         try {
             assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
-            if (401 == e.getCode()) {
-                throw new UnauthorizedException("User not authorized, but required to query Assessments.");
-            }
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         
         return assessments;
+    }
+    
+    /**
+     * Returns the list of all participants (users, tutors, lecturers) of a course.
+     * @param courseRoles Optional list of roles to filter.
+     * @return All participants of the current course or only users that have one of the specified roles.
+     */
+    public List<UserDto> getUsersOfCourse(CourseRoleEnum... courseRoles) throws NetworkException {
+        List<UserDto> users = null;
+        try {
+            List<String> roles = null;
+            if (null != courseRoles) {
+                roles = new ArrayList<>();
+                for (CourseRoleEnum role : courseRoles) {
+                    roles.add(role.name());
+                }
+            }
+            users = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null);            
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
+            throw new DataNotFoundException("User(s) not found", getCourseName(), DataType.USER_NOT_FOUND);
+        }
+        
+        return users;
     }
     
     
@@ -91,7 +123,8 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @throws NetworkException when network problems occur.
      */
     public AssessmentDto getAssessmentForAssignment(String assignmentId, String assessmentId) 
-            throws NetworkException {
+        throws NetworkException {
+        
         AssessmentDto singleAssessment = null;
         try {
             singleAssessment = apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
@@ -209,7 +242,7 @@ public class ReviewerProtocol extends NetworkProtocol {
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         
-        // counter is used to know when the last line is written, so there won´t be a line break
+        // counter is used to know when the last line is written, so there wonï¿½t be a line break
         int counter = assessments.size();
         boolean firstIteration = true;
         for (AssessmentDto assessment : assessments) {
@@ -261,7 +294,7 @@ public class ReviewerProtocol extends NetworkProtocol {
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
         
-        // counter is used to know when the last line is written, so there won´t be a line break
+        // counter is used to know when the last line is written, so there wonï¿½t be a line break
         int counter = assessments.size();
         //gruppenname   vollername    rz-kennung  uni-mail
         for (AssessmentDto assessment : assessments) {
@@ -303,7 +336,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
         
         boolean firstIteration = true;
-        // counter is used to know when the last line is written, so there won´t be a line break
+        // counter is used to know when the last line is written, so there wonï¿½t be a line break
         int counter = assessments.size();
         for (AssessmentDto assessment : assessments) {
             // is only added once to the string at the top of the string
