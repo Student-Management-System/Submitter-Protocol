@@ -1,5 +1,6 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -92,7 +93,32 @@ public class Assessment implements Iterable<User> {
     public String getFullReviewComment() {
         return assessment.getComment();
     }
-
+    
+    /**
+     * Sets the review comment / synopsis.
+     * This does not affect any partial assignments given by review tools automatically.
+     * @param reviewComment The comment/description of the review.
+     */
+    public void setFullReviewComment(String reviewComment) {
+        assessment.setComment(reviewComment);
+    }
+    
+    /**
+     * Returns the achieved points.
+     * @return The number of achieved points for the submissions, <tt>0</tt> if not specified so far.
+     */
+    public Double getAchievedPoints() {
+        return assessment.getAchievedPoints() != null ? assessment.getAchievedPoints().doubleValue() : 0;
+    }
+    
+    /**
+     * Sets the number of achieved points.
+     * @param points The number of achieved points for the submissions.
+     */
+    public void setAchievedPoints(double points) {
+        assessment.setAchievedPoints(new BigDecimal(points));
+    }
+    
     @Override
     public Iterator<User> iterator() {
         return participants.iterator();
