@@ -82,7 +82,7 @@ public class Assessment implements Iterable<User> {
      * Returns the unique name of the related group or student.
      * @return In case of a group work the group name, the user account name (RZ name) otherwise.
      */
-    protected String getSubmitterName() {
+    public String getSubmitterName() {
         return assignment.isGroupWork() ? assessment.getGroup().getName() : assessment.getUser().getRzName();
     }
     
