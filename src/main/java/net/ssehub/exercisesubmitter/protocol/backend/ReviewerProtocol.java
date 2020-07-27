@@ -114,7 +114,6 @@ public class ReviewerProtocol extends NetworkProtocol {
         return users;
     }
     
-    
     /**
      * Getter for one Assessment of an Assignment.
      * @param assignmentId the id of the specified assignment.
@@ -138,24 +137,44 @@ public class ReviewerProtocol extends NetworkProtocol {
     }
     
     /**
+     * Getter for one Assessment of an Assignment.
+     * @param assignmentId the id of the specified assignment.
+     * @param assessmentId the id of the specified assessment.
+     * @return the assessment of an assignment.
+     * @throws NetworkException when network problems occur.
+     */
+    public boolean assessmentExists(String assignmentId, String assessmentId) throws NetworkException {
+        boolean exists = false;
+        try {
+            apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
+            exists = true;
+        } catch (IllegalArgumentException e) {
+            throw new ServerNotFoundException(e.getMessage(), getBasePath());
+        } catch (ApiException e) {
+            // No action needed -> exists = false
+        }
+        return exists;
+    }
+    
+    /**
      * Creates the Assessment for an Assignment.
      * @param body The Assessment body.
      * @param assignmentId The id of the specified assignment.
-     * @return True if Assessment was created successfully, False otherwise.
+     * @return The ID on the server of the newly created assessment.
      * @throws NetworkException when network problems occur.
      */
-    public boolean createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
-        boolean success = false;
+    public String createAssessment(AssessmentCreateDto body, String assignmentId) throws NetworkException {
+        String id;
         try {
             AssessmentDto result = apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
-            success = result != null;
+            id = result.getId();
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
-        return success;
+        return id;
     }
     
     /**

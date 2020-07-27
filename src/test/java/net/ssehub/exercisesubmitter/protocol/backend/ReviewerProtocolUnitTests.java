@@ -61,8 +61,8 @@ public class ReviewerProtocolUnitTests {
                 assessmentApiMock, null);
         
         try {
-            boolean check = rp.createAssessment(body, TEST_ASSIGNMENT_ID);
-            Assertions.assertTrue(check);
+            String id = rp.createAssessment(body, TEST_ASSIGNMENT_ID);
+            Assertions.assertNotNull(id);
             // Check if server mock was used
             Mockito.verify(assessmentApiMock).createAssessment(body, TEST_COURSE_ID, TEST_ASSIGNMENT_ID);
         } catch (NetworkException | ApiException e) {

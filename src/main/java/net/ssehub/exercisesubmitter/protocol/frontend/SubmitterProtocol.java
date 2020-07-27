@@ -139,4 +139,12 @@ public class SubmitterProtocol {
         
         return new SubmissionTarget(submissionServer, path);
     }
+    
+    /**
+     * The ID of the user, used by the <b>student management system</b>.
+     * @return the userID.
+     */
+    protected String getUserID() {
+        return login.getUserID();
+    }
 }

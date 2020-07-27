@@ -7,7 +7,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
  * Declares <b>integration</b> tests for the {@link ExerciseReviewerProtocol}.
@@ -159,6 +162,62 @@ public class ExerciseReviewerProtocolIntegrationTests {
         reviewer.loadAssessments(assignment);
         assessment = reviewer.getAssessmentForSubmission(reviewedUser);
         Assertions.assertEquals(newPoints, assessment.getAchievedPoints());
+    }
+    
+    /**
+     * Tests that {@link ExerciseReviewerProtocol#submitAssessment(Assessment)} can create a new existing assessment
+     * on the server.
+     */
+    @Test
+    public void testSubmitAssessmentCreate() throws NetworkException {
+        String reviewedGroup = "Testgroup 3";
+        
+        // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Load assignment, which is used to retrieve available reviews
+        Assignment assignment = reviewer.getReviewableAssignments().stream()
+            .filter(a -> a.getID().equals(TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP))
+            .findFirst()
+            .orElse(null);
+        Assertions.assertNotNull(assignment);
+        
+        // Create a new assessment
+        reviewer.loadAssessments(assignment);
+        Assessment assessment = reviewer.getAssessmentForSubmission(reviewedGroup);
+        Assertions.assertNotNull(assessment);
+        assessment.setAchievedPoints(assignment.getPoints());
+        assessment.setFullReviewComment("Perfect solution");
+        
+        // New assessment must not have an ID, otherwise it exist already on server
+        Assertions.assertNull(assessment.getAssessmentID());
+        
+        // Double check that assignment does not exist on server
+        ReviewerProtocol rp = reviewer.getProtocol();
+        AssessmentDto candiate = rp.getAssessments(assessment.getAssignmentID()).stream()
+                .filter(a -> reviewedGroup.equals(a.getGroup().getName()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNull(candiate);
+        
+        // Upload new assessment
+        reviewer.submitAssessment(assessment);
+        
+        // Test post condition: Assignment as an ID and exist on server
+        Assertions.assertNotNull(assessment.getAssessmentID());
+        candiate = rp.getAssessments(assessment.getAssignmentID()).stream()
+                .filter(a -> reviewedGroup.equals(a.getGroup().getName()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(candiate);
+        
+        // All good, Clean up: Remove new assignment from server
+        try {
+            rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+        } catch (Exception e) {
+            // Currently, assessment is deleted but due to wrong header the result throws an exception
+            // This needs to be fixed on server first
+        }
     }
     
     /**
