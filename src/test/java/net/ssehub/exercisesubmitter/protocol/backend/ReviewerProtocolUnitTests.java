@@ -51,8 +51,10 @@ public class ReviewerProtocolUnitTests {
         // Mock: Simulate creation of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
+            AssessmentDto newAssessment = new AssessmentDto();
+            newAssessment.setId("A-ID");
             Mockito.when(assessmentApiMock.createAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(new AssessmentDto());
+                .thenReturn(newAssessment);
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
         }
