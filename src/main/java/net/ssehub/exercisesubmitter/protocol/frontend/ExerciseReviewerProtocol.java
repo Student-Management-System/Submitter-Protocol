@@ -90,9 +90,12 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
     /**
      * Retrieves / creates an assessment for the group / user with the specified name.
      * It will create a new (empty) assessment, if there does not exist an assessment for the specified submitter.
+     * <b style="color:red">Note:</b> Newly created assignments won't be uploaded to the server automatically.
+     * Changes and new assessments must be uploaded via the {@link #submitAssessment(Assessment)} method.
      * @param name The name of the submitter (group name for group submissions, user account name (RZ name) for single
      *     user submissions).
      * @return An {@link Assessment} which may be used to review a submission
+     * @see #submitAssessment(Assessment)
      */
     public Assessment getAssessmentForSubmission(String name) throws NetworkException {
         Assessment assessment = getAssessments().stream()

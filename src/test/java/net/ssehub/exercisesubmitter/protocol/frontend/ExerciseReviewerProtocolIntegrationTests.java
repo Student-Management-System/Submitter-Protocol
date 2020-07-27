@@ -89,13 +89,13 @@ public class ExerciseReviewerProtocolIntegrationTests {
     
     /**
      * Tests {@link ExerciseReviewerProtocol#getAssessmentForSubmission(String)}.
-     * Method should get an assessment for the given group name.
+     * Method should get an assessment for the given group name, which has no assignment on the server so far.
      * @throws NetworkException If server, which is used for the integration test,
      *     can not be reached through a network error or miss-configuration.
      */
     @Test
-    public void testGetAssessmentForSubmissionGroup() throws NetworkException {
-        String reviewedUser = "Testgroup 1";
+    public void testGetAssessmentForSubmissionGroupCreateOnTheFly() throws NetworkException {
+        String reviewedGroup = "Testgroup 3";
         
         // Init protocol
         ExerciseReviewerProtocol reviewer = initReviewer();
@@ -110,11 +110,10 @@ public class ExerciseReviewerProtocolIntegrationTests {
         // Test postcondition: Retrieve reviews for the user
         reviewer.loadAssessments(assignment);
         try {
-            Assessment assessment = reviewer.getAssessmentForSubmission(reviewedUser);
+            Assessment assessment = reviewer.getAssessmentForSubmission(reviewedGroup);
             Assertions.assertNotNull(assessment);
-            Assertions.assertEquals(reviewedUser, assessment.getSubmitterName());
-            User[] expected = new User[] {new User("Max Mustermann", "mmustermann"),
-                new User("Hans Peter", "hpeter")};
+            Assertions.assertEquals(reviewedGroup, assessment.getSubmitterName());
+            User[] expected = new User[] {new User("elshar", "elshar"), new User("kunold", "kunold")};
             List<User> actual = new ArrayList<>();
             for (User user : assessment) {
                 actual.add(user);
@@ -165,7 +164,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
     /**
      * Creates an {@link ExerciseReviewerProtocol} with default settings and logs in a tutor.
      * Useful for most tests.
-     * @return {@link ExerciseReviewerProtocol} usuable for testing.
+     * @return {@link ExerciseReviewerProtocol} usable for testing.
      */
     private ExerciseReviewerProtocol initReviewer() {
         // Init protocol
