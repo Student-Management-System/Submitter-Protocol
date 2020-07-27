@@ -210,6 +210,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
                 .findFirst()
                 .orElse(null);
         Assertions.assertNotNull(candiate);
+        Assertions.assertEquals(assessment.getAssessmentID(), candiate.getId());
         
         // All good, Clean up: Remove new assignment from server
         try {
