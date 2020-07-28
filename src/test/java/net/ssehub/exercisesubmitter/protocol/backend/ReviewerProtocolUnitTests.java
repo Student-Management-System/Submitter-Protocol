@@ -144,14 +144,12 @@ public class ReviewerProtocolUnitTests {
     @Test
     public void testDeleteAssessment() {
 
-        boolean result = true;
         
         // Mock: Simulate deletion of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
-            Mockito.when(assessmentApiMock.deleteAssessment(Mockito.anyString(), Mockito.anyString(), 
-                    Mockito.anyString()))
-                .thenReturn(result);
+            Mockito.doNothing().when(assessmentApiMock).deleteAssessment(Mockito.anyString(), Mockito.anyString(), 
+                    Mockito.anyString());
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
         }
@@ -179,7 +177,9 @@ public class ReviewerProtocolUnitTests {
         // Mock: Simulate return of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
-            Mockito.when(assessmentApiMock.getAllAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString()))
+            Mockito.when(assessmentApiMock.getAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString(),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                Mockito.any()))
                 .thenReturn(createAssessmentList());
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
@@ -208,7 +208,9 @@ public class ReviewerProtocolUnitTests {
         // Mock: Simulate return of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
-            Mockito.when(assessmentApiMock.getAllAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString()))
+            Mockito.when(assessmentApiMock.getAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString(),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                Mockito.any()))
                 .thenReturn(createAssessmentList());
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
@@ -238,7 +240,9 @@ public class ReviewerProtocolUnitTests {
         // Mock: Simulate return of an assessment on server
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
-            Mockito.when(assessmentApiMock.getAllAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString()))
+            Mockito.when(assessmentApiMock.getAssessmentsForAssignment(Mockito.anyString(), Mockito.anyString(),
+                Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                Mockito.any()))
                 .thenReturn(createAssessmentList());
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());

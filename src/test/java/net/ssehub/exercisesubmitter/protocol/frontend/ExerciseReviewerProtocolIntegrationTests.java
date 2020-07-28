@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
-import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
@@ -213,12 +212,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         Assertions.assertEquals(assessment.getAssessmentID(), candiate.getId());
         
         // All good, Clean up: Remove new assignment from server
-        try {
-            rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
-        } catch (Exception e) {
-            // Currently, assessment is deleted but due to wrong header the result throws an exception
-            // This needs to be fixed on server first
-        }
+        rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
     }
     
     /**

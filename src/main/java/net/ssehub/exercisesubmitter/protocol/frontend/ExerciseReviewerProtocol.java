@@ -107,7 +107,6 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
                 createDto.setGroupId(assessment.getAssessmentDTO().getGroupId());
             } else {
                 createDto.setUserId(assessment.getAssessmentDTO().getUserId());
-                createDto.setUser(assessment.getAssessmentDTO().getUser());
             }
             String id = getProtocol().createAssessment(createDto, assessment.getAssignmentID());
             if (null != id) {

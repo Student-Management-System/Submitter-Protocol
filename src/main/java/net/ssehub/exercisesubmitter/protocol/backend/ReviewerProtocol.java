@@ -79,7 +79,8 @@ public class ReviewerProtocol extends NetworkProtocol {
     public List<AssessmentDto> getAssessments(String assignmentId) throws NetworkException {
         List<AssessmentDto> assessments = null;
         try {
-            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
+                null, null, null, null, null);
         // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
@@ -236,7 +237,9 @@ public class ReviewerProtocol extends NetworkProtocol {
     public boolean deleteAssessment(String assignmentId, String assessmentId) throws NetworkException {
         boolean success = false;
         try {
-            success = apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
+            apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
+            // API definition: This method was successful iff no exception was thrown
+            success = true;
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
@@ -255,7 +258,8 @@ public class ReviewerProtocol extends NetworkProtocol {
         List<AssessmentDto> assessments = null;
         
         try {
-            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
+                null, null, null, null, null);
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
@@ -307,7 +311,8 @@ public class ReviewerProtocol extends NetworkProtocol {
         List<AssessmentDto> assessments = null;
         
         try {
-            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
+                null, null, null, null, null);
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
@@ -348,7 +353,8 @@ public class ReviewerProtocol extends NetworkProtocol {
         List<AssessmentDto> assessments = null;
         
         try {
-            assessments = apiAssessments.getAllAssessmentsForAssignment(super.getCourseID(), assignmentId);
+            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
+                null, null, null, null, null);
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
