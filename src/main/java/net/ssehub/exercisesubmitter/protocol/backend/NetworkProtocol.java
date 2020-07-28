@@ -154,6 +154,14 @@ public class NetworkProtocol {
     }
     
     /**
+     * Returns the API to query for groups.
+     * @return The API to query for groups.
+     */
+    protected GroupsApi getGroupsApi() {
+        return apiGroups;
+    }
+    
+    /**
      * Used to select the semester.
      * @param semester The semester to use (four lower case letters + 2 digits).
      */

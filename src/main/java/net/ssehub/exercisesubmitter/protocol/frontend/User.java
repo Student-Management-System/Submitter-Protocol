@@ -1,5 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.util.Objects;
+
 /**
  * Represents (group) participants that belong to one submission.
  * @author El-Sharkawy
@@ -9,16 +11,19 @@ public class User {
 
     private String fullName;
     private String accountName;
+    private String eMail;
     
     /**
      * Creates a new user instance, that represents a user of a submissions, which should be reviewed as part of an
      * {@link Assessment}.
      * @param fullName The full name (first + last name) of the user.
      * @param accountName The account name (RZ name) of the user.
+     * @param eMail The e-mail address of the user.
      */
-    protected User(String fullName, String accountName) {
+    protected User(String fullName, String accountName, String eMail) {
         this.fullName = fullName;
         this.accountName = accountName;
+        this.eMail = eMail;
     }
     
     /**
@@ -36,20 +41,30 @@ public class User {
     public String getAccountName() {
         return accountName;
     }
-
-    @Override
-    public int hashCode() {
-        // Generated
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((accountName == null) ? 0 : accountName.hashCode());
-        result = prime * result + ((fullName == null) ? 0 : fullName.hashCode());
-        return result;
+    
+    /**
+     * Returns the e-mail address of the user.
+     * @return The e-mail address of the user.
+     */
+    public String getEMail() {
+        return eMail;
     }
 
+    /**
+     * <b>Generated.</b><p>
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountName, eMail, fullName);
+    }
+
+    /**
+     * <b>Generated.</b><p>
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object obj) {
-        // Generated
         if (this == obj) {
             return true;
         }
@@ -57,21 +72,13 @@ public class User {
             return false;
         }
         User other = (User) obj;
-        if (accountName == null) {
-            if (other.accountName != null) {
-                return false;
-            }
-        } else if (!accountName.equals(other.accountName)) {
-            return false;
-        }
-        if (fullName == null) {
-            if (other.fullName != null) {
-                return false;
-            }
-        } else if (!fullName.equals(other.fullName)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(accountName, other.accountName) && Objects.equals(eMail, other.eMail)
+                && Objects.equals(fullName, other.fullName);
+    }
+
+    @Override
+    public String toString() {
+        return getFullName() + " <" + getEMail() + ">";
     }
     
 }

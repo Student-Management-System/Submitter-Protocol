@@ -115,7 +115,8 @@ public class ExerciseReviewerProtocolIntegrationTests {
             Assessment assessment = reviewer.getAssessmentForSubmission(reviewedGroup);
             Assertions.assertNotNull(assessment);
             Assertions.assertEquals(reviewedGroup, assessment.getSubmitterName());
-            User[] expected = new User[] {new User("elshar", "elshar"), new User("kunold", "kunold")};
+            User[] expected = new User[] {new User("elshar", "elshar", "elshar@test.com"),
+                new User("kunold", "kunold", "kunold@test.com")};
             List<User> actual = new ArrayList<>();
             for (User user : assessment) {
                 actual.add(user);
@@ -213,6 +214,22 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // All good, Clean up: Remove new assignment from server
         rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link ExerciseReviewerProtocol#loadParticipants()} loads all participating students.
+     */
+    @Test
+    public void testLoadParticipants() throws NetworkException {
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        List<User> participants = reviewer.loadParticipants();
+        Assertions.assertNotNull(participants);
+        Assertions.assertFalse(participants.isEmpty());
+        Assertions.assertTrue(participants.contains(new User("Max Mustermann", "mmustermann",
+            "max.mustermann@test.com")));
+        Assertions.assertTrue(participants.contains(new User("Hans Peter", "hpeter", "hans.peter@test.com")));
+        Assertions.assertTrue(participants.contains(new User("elshar", "elshar", "elshar@test.com")));
+        Assertions.assertTrue(participants.contains(new User("kunold", "kunold", "kunold@test.com")));
     }
     
     /**

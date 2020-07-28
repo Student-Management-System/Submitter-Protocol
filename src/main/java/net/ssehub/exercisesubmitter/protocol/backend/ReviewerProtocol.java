@@ -14,6 +14,7 @@ import net.ssehub.studentmgmt.backend_api.api.UsersApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
@@ -95,6 +96,7 @@ public class ReviewerProtocol extends NetworkProtocol {
      * Returns the list of all participants (users, tutors, lecturers) of a course.
      * @param courseRoles Optional list of roles to filter.
      * @return All participants of the current course or only users that have one of the specified roles.
+     * @throws NetworkException when network problems occur.
      */
     public List<UserDto> getUsersOfCourse(CourseRoleEnum... courseRoles) throws NetworkException {
         List<UserDto> users = null;
@@ -113,6 +115,25 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
         
         return users;
+    }
+    
+    /**
+     * Returns the list of all groups participating at a group assignment (must be checked before).
+     * @param assignmentID The ID of a group assignment (is not checked inside this method).
+     * @return The list of all participating groups.
+     * @throws NetworkException when network problems occur.
+     */
+    public List<GroupDto> getUsersOfAssignment(String assignmentID) throws NetworkException {
+        List<GroupDto> groups = null;
+        try {
+            groups = getGroupsApi().getGroupsFromAssignment(getCourseID(), assignmentID);
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
+            throw new DataNotFoundException("Groups of assignment not found", getCourseName(),
+                DataType.GROUP_NOT_FOUND);
+        }
+        
+        return groups;
     }
     
     /**
@@ -216,7 +237,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         boolean success = false;
         try {
             AssessmentDto result = apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 
-                    assessmentId);
+                assessmentId);
             success = result != null;
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());

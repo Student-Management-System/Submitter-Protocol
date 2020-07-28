@@ -43,11 +43,11 @@ public class Assessment implements Iterable<User> {
         List<User> participants = new ArrayList<>();
         if (assignment.isGroupWork()) {
             assessment.getGroup().getUsers().stream()
-                .map(u -> new User(u.getUsername(), u.getRzName()))
+                .map(u -> new User(u.getUsername(), u.getRzName(), u.getEmail()))
                 .forEach(participants::add);
         } else {
             UserDto userDto = assessment.getUser();
-            participants.add(new User(userDto.getUsername(), userDto.getRzName()));
+            participants.add(new User(userDto.getUsername(), userDto.getRzName(), userDto.getEmail()));
         }
         
         this.participants = Collections.unmodifiableList(participants);
@@ -126,6 +126,6 @@ public class Assessment implements Iterable<User> {
     
     @Override
     public String toString() {
-        return "Assessment for '" + assignment.getName() + "' of " + getSubmitterName();
+        return "Assessment '" + assignment.getName() + "' of " + getSubmitterName();
     }
 }

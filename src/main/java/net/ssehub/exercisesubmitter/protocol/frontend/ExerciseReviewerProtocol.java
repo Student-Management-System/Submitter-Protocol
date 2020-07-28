@@ -126,6 +126,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
      * @param name The name of the submitter (group name for group submissions, user account name (RZ name) for single
      *     user submissions).
      * @return An {@link Assessment} which may be used to review a submission
+     * @throws NetworkException when network problems occur.
      * @see #submitAssessment(Assessment)
      */
     public Assessment getAssessmentForSubmission(String name) throws NetworkException {
@@ -144,6 +145,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
      *     user submissions).
      * @return An {@link Assessment} which may be used to review a submission (will be added to {@link #assessments} as
      *     side effect).
+     * @throws NetworkException when network problems occur.
      */
     private Assessment createAssessment(String name) throws NetworkException {
         AssessmentDto dto = new AssessmentDto();
@@ -172,6 +174,21 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         assessments.add(assessment);
         return assessment;
     }
+    
+    
+    /**
+     * Returns all participating students of the course.
+     * @return All participants of the course.
+     * @throws NetworkException when network problems occur.
+     */
+    public List<User> loadParticipants() throws NetworkException {
+        List<User> participants = new ArrayList<>();
+        getProtocol().getUsersOfCourse(CourseRoleEnum.STUDENT).stream()
+            .map(u -> new User(u.getUsername(), u.getRzName(), u.getEmail()))
+            .forEach(participants::add);
+        return participants;
+    }
+
     
     /**
      * Returns a formated String with all users and their points to an assignment.
@@ -223,5 +240,4 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         
         return submissionReviews;
     }
-    
 }
