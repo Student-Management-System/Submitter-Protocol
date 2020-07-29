@@ -174,6 +174,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // Init protocol
         ExerciseReviewerProtocol reviewer = initReviewer();
+        ReviewerProtocol rp = reviewer.getProtocol();
         
         // Load assignment, which is used to retrieve available reviews
         Assignment assignment = reviewer.getReviewableAssignments().stream()
@@ -190,10 +191,18 @@ public class ExerciseReviewerProtocolIntegrationTests {
         assessment.setFullReviewComment("Perfect solution");
         
         // New assessment must not have an ID, otherwise it exist already on server
+        if (null != assessment.getAssessmentID()) {
+            // Delete (a manually) submitted assessment and try it again
+            rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+            reviewer.loadAssessments(assignment);
+            assessment = reviewer.getAssessmentForSubmission(reviewedGroup);
+            Assertions.assertNotNull(assessment);
+            assessment.setAchievedPoints(assignment.getPoints());
+            assessment.setFullReviewComment("Perfect solution");
+        }
         Assertions.assertNull(assessment.getAssessmentID());
         
         // Double check that assignment does not exist on server
-        ReviewerProtocol rp = reviewer.getProtocol();
         AssessmentDto candiate = rp.getAssessments(assessment.getAssignmentID()).stream()
                 .filter(a -> reviewedGroup.equals(a.getGroup().getName()))
                 .findFirst()
