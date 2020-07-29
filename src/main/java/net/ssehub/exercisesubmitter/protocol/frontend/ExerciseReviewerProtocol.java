@@ -243,7 +243,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
     
     @Override
     public SubmissionTarget getPathToSubmission(Assignment assignment, String submissionName) {
-        // Make this method visisble as part of the reviewer protocol
+        // Make this method visible as part of the reviewer protocol
         return super.getPathToSubmission(assignment, submissionName);
     }
 }
