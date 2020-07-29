@@ -149,4 +149,10 @@ public class Assignment {
     public double getPoints( ) {
         return points;
     }
+    
+    @Override
+    public String toString() {
+        // Only used for Debugging purpose
+        return getName();
+    }
 }
