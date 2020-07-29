@@ -126,18 +126,31 @@ public class SubmitterProtocol {
      * @throws NetworkException If network problems occur.
      */
     public SubmissionTarget getPathToSubmission(Assignment assignment) throws NetworkException {
-        String[] path = new String[2];
-        path[0] = assignment.getName();
-        
+        SubmissionTarget target;
         if (assignment.isGroupWork()) {
             // Get group for assignment
             String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
-            path[1] = groupName;
+            target = getPathToSubmission(assignment, groupName);
         } else {
-            path[1] = login.getUserName();
+            target = getPathToSubmission(assignment, login.getUserName());
         }
         
-        return new SubmissionTarget(submissionServer, path);
+        return target;
+    }
+    
+    /**
+     * Returns the destination path to a submission.<br/>
+     * <b style="color:red">Note:</b> This is intended to be used only be the ExerciseReviewer to retrieve the
+     * {@link SubmissionTarget} for other users. Please use {@link #getPathToSubmission(Assignment)} inside the
+     * ExerciseSubmitter.
+     * @param assignment An assignment, to be submitted, replayed, or replayed after review.
+     * @param submissionName The name of the user in case of an individual submission, or the group name in case
+     *     of a group submission.
+     * @return A specification that contains the target location where to submit the assignment.
+     * @see #getPathToSubmission(Assignment)
+     */
+    protected SubmissionTarget getPathToSubmission(Assignment assignment, String submissionName) {
+        return new SubmissionTarget(submissionServer, new String[] {assignment.getName(), submissionName});
     }
     
     /**
