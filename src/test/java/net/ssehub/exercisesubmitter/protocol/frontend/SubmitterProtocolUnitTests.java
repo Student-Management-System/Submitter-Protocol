@@ -44,7 +44,7 @@ public class SubmitterProtocolUnitTests {
         // Mock of REST calls
         LoginComponent loginMock = Mockito.mock(LoginComponent.class);
         Mockito.when(loginMock.getUserName()).thenReturn(expectedUserOrGroup);
-        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, null);
+        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, "a_url");
         protocol.setNetworkComponents(loginMock, null);
         
         // Test: Correct computation of destination path
@@ -79,7 +79,7 @@ public class SubmitterProtocolUnitTests {
         NetworkProtocol networkMock = Mockito.mock(NetworkProtocol.class);
         Mockito.when(networkMock.getGroupForAssignment(Mockito.any(), Mockito.anyString()))
             .thenReturn(expectedUserOrGroup);
-        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, null);
+        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, "a_url");
         protocol.setNetworkComponents(null, networkMock);
         
         // Test: Correct computation of destination path
