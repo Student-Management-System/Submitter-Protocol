@@ -1,6 +1,8 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -150,6 +152,23 @@ public class Assignment {
         return points;
     }
     
+    @Override
+    public int hashCode() {
+        return Objects.hash(assignmentID);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Assignment)) {
+            return false;
+        }
+        Assignment other = (Assignment) obj;
+        return Objects.equals(assignmentID, other.assignmentID);
+    }
+
     @Override
     public String toString() {
         // Only used for Debugging purpose
