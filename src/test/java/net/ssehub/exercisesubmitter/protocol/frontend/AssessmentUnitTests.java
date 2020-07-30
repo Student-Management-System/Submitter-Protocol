@@ -61,6 +61,37 @@ public class AssessmentUnitTests {
     }
     
     /**
+     * Tests that {@link Assessment#partialAsssesmentSize()} returns valid values.
+     */
+    @Test
+    public void testPartialAsssesmentSize() {
+        Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
+        UserDto user = new UserDto();
+        user.setUsername("a user");
+        user.setEmail("a@mail.com");
+        user.setRzName("auser");
+        
+        AssessmentDto dto = new AssessmentDto();
+        dto.setId("AssessmentID 1");
+        dto.setUser(user);
+        
+        Assessment assessment = new Assessment(dto, assignment);
+        
+        // Check that there is no NullPointerException thrown
+        Assertions.assertEquals(0, assessment.partialAsssesmentSize());
+        
+        // Add one partial assessment
+        PartialAssessmentDto partial1 = new PartialAssessmentDto();
+        partial1.setAssessmentId("pAssessment ID 1");
+        partial1.comment("This is problematic");
+        partial1.setType("Compiler");
+        partial1.setSeverity(SeverityEnum.WARNING);
+        dto.addPartialAssessmentsItem(partial1);
+        
+        Assertions.assertEquals(1, assessment.partialAsssesmentSize());
+    }
+    
+    /**
      * Asserts that the {@link PartialAssessmentDto} is correctly transformed into a string.
      * @param summary The expected summary
      * @param partial The {@link PartialAssessmentDto} to be transformed

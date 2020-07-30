@@ -126,7 +126,7 @@ public class Assessment implements Iterable<User> {
      */
     public int partialAsssesmentSize() {
         List<PartialAssessmentDto> partials = assessment.getPartialAssessments();
-        return partials != null ? partials.size() : null;
+        return partials != null ? partials.size() : 0;
     }
     
     /**
