@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
 /**
@@ -117,6 +118,66 @@ public class Assessment implements Iterable<User> {
      */
     public void setAchievedPoints(double points) {
         assessment.setAchievedPoints(new BigDecimal(points));
+    }
+    
+    /**
+     * Returns the number of partial assessments (provided by submission tools) related to this assessment.
+     * @return The number of partial assessments (&ge; 0).
+     */
+    public int partialAsssesmentSize() {
+        List<PartialAssessmentDto> partials = assessment.getPartialAssessments();
+        return partials != null ? partials.size() : null;
+    }
+    
+    /**
+     * Returns the partial assessment at the specified position.
+     *
+     * @param index A 0-based index of the assessment to return.
+     * @return the partial assessment at the specified position.
+     * @throws IndexOutOfBoundsException if the index is out of range (<tt>index < 0 || index >= 
+     *     {@link #partialAsssesmentSize()} </tt>)
+     * @see {@link #partialAsssesmentSize()}
+     */
+    public PartialAssessmentDto getPartialAssessment(int index) {
+        return assessment.getPartialAssessments().get(index);
+    }
+    
+    /**
+     * Returns a summary in list format of the partial assessments as a string.
+     * @return A bullet list of the partial assessments of an empty String if there is no partial assessment available.
+     */
+    public String summerizePartialAssessments() {
+        StringBuffer result = new StringBuffer();
+        
+        if (partialAsssesmentSize() > 0) {
+            assessment.getPartialAssessments().stream()
+                .sorted(Assessment::compare)
+                .map(a -> " - " + a.getType() + " (" + a.getSeverity() + "):\t" + a.getComment() + "\n")
+                .forEach(result::append);
+        }
+        
+        return result.toString();
+    }
+    
+    /**
+     * Sorting method to sort {@link PartialAssessmentDto}s.
+     * Sorts first be the tool/type and if they are equal then by their severity (cirtical first)
+     * @param partial1 The first element so sort
+     * @param partial2 The second element to sort
+     * @return  the value <tt>0</tt> if both elements are equal;
+     *     a value less than <tt>0</tt> if <tt>partial1</tt> is smaller than <tt>partial2</tt>;
+     *     and a value greater than <tt>0</tt> <tt>partial1</tt> is bigger than <tt>partial2</tt>;
+     */
+    private static int compare(PartialAssessmentDto partial1, PartialAssessmentDto partial2) {
+        int result;
+        if (partial1.getType().equals(partial2.getType())) {
+            // Critical first -> Reverse order of ordinal definition
+            result = -1 * partial1.getSeverity().compareTo(partial2.getSeverity());
+        } else {
+            result =  partial1.getType().compareTo(partial2.getType());                    
+        }
+        
+        return result;
     }
     
     @Override
