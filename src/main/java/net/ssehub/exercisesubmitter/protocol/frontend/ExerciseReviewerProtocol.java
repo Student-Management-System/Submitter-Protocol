@@ -1,7 +1,9 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
@@ -45,6 +47,15 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
     @Override
     protected ReviewerProtocol getProtocol() {
         return (ReviewerProtocol) super.getProtocol();
+    }
+    
+    /**
+     * Returns the currently reviewed assignment.
+     * @return The currently reviewed assignment or <tt>null</tt> if {@link #loadAssessments(Assignment)} was not
+     *     called before.
+     */
+    public Assignment getReviewedAssignment() {
+        return assignment;
     }
     
     /**
@@ -178,17 +189,40 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
     
     /**
      * Returns all participating students of the course.
+     * Will also store the current group name for each user if an {@link Assignment} is currently reviewed.
      * @return All participants of the course.
      * @throws NetworkException when network problems occur.
      */
     public List<User> loadParticipants() throws NetworkException {
         List<User> participants = new ArrayList<>();
+        Map<String, String> groupParticipations = loadGroupNames();
+        
         getProtocol().getUsersOfCourse(CourseRoleEnum.STUDENT).stream()
             .map(u -> new User(u.getUsername(), u.getRzName(), u.getEmail()))
-            .forEach(participants::add);
+            .forEach(u -> {
+                u.setGroupName(groupParticipations.get(u.getFullName()));
+                participants.add(u);
+            });
         return participants;
     }
 
+    /**
+     * Returns a map that stores for each {@link User} its current group name or <tt>null</tt> in case of a single
+     * user assignment.
+     * @return A potential empty map in form of (username / full name, group name).
+     * @throws NetworkException If network problems occur.
+     */
+    private Map<String, String> loadGroupNames() throws NetworkException {
+        Map<String, String> groupParticipations = new HashMap<>();
+        if (null != assignment && assignment.isGroupWork()) {
+            List<GroupDto> groups = getProtocol().getGroupsAtAssignmentEnd(assignment.getID());
+            for (GroupDto group : groups) {
+                group.getUsers().stream()
+                    .forEach(u -> groupParticipations.put(u.getUsername(), group.getName()));
+            }
+        }
+        return groupParticipations;
+    }
     
     /**
      * Returns a formated String with all users and their points to an assignment.
