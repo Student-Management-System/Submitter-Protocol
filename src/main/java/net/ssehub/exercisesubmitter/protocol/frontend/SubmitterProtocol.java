@@ -85,6 +85,7 @@ public class SubmitterProtocol {
      */
     public void setSemester(String semester) {
         protocol.setSemester(semester);
+        protocol.resetCourseID();
     }
     
     /**

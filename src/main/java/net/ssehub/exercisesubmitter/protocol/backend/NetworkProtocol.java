@@ -122,6 +122,13 @@ public class NetworkProtocol {
     }
     
     /**
+     * Resets the course ID, must be called if the <tt>courseName</tt> <b>or</b> the <tt>semester</tt> was changed.
+     */
+    public void resetCourseID() {
+        courseId = null;
+    }
+    
+    /**
      * Sets the access token after the user has successfully logged in / out.
      * @param accessToken The access token retrieved from the student management system, <tt>null</tt> to log out.
      */
