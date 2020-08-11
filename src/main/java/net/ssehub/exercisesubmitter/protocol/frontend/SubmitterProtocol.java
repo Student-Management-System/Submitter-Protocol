@@ -118,7 +118,7 @@ public class SubmitterProtocol {
     public List<Assignment> getReviewableAssignments() throws NetworkException {
         return protocol.getAssignments(StateEnum.IN_REVIEW);
     }
-
+    
     /**
      * Returns the destination path to a submission.
      * @param assignment An assignment, to be submitted, replayed, or replayed after review.

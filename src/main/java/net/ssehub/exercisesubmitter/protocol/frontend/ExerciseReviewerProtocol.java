@@ -9,9 +9,7 @@ import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
-import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
-import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
@@ -23,7 +21,7 @@ import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
  * @author Kunold
  *
  */
-public class ExerciseReviewerProtocol extends SubmitterProtocol {
+public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
     
 
     private List<Assessment> assessments;
@@ -40,13 +38,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
         String submissionServer) {
         
         super(authenticationURL, stdMgmtURL, courseName, submissionServer);
-        setNetworkComponents(null, new ReviewerProtocol(stdMgmtURL, courseName));
         assessments = new ArrayList<>();
-    }
-    
-    @Override
-    protected ReviewerProtocol getProtocol() {
-        return (ReviewerProtocol) super.getProtocol();
     }
     
     /**
@@ -98,35 +90,7 @@ public class ExerciseReviewerProtocol extends SubmitterProtocol {
      * @throws NetworkException when network problems occur.
      */
     public boolean submitAssessment(Assessment assessment) throws NetworkException {
-        boolean assessmentExists = getProtocol().assessmentExists(assignment.getID(), assessment.getAssessmentID());
-        boolean success = false;
-        
-        if (assessmentExists) {
-            // Assessment exist -> Perform update
-            AssessmentUpdateDto updateDto = new AssessmentUpdateDto();
-            updateDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
-            updateDto.setComment(assessment.getAssessmentDTO().getComment());
-            success = getProtocol().updateAssessment(updateDto, assignment.getID(), assessment.getAssessmentID());
-        } else {
-            // Assessment does not exist -> Create new assessment
-            AssessmentCreateDto createDto = new AssessmentCreateDto();
-            createDto.setAssignmentId(assessment.getAssignmentID());
-            createDto.setComment(assessment.getFullReviewComment());
-            createDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
-            createDto.setCreatorId(getUserID());
-            if (assignment.isGroupWork()) {
-                createDto.setGroupId(assessment.getAssessmentDTO().getGroupId());
-            } else {
-                createDto.setUserId(assessment.getAssessmentDTO().getUserId());
-            }
-            String id = getProtocol().createAssessment(createDto, assessment.getAssignmentID());
-            if (null != id) {
-                assessment.getAssessmentDTO().setId(id);
-                success = true;
-            }
-        }
-        
-        return success;
+        return super.submitAssessment(assignment, assessment);
     }
     
     /**

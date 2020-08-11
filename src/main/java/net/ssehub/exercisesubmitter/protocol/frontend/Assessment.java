@@ -2,12 +2,16 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnum;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
 /**
@@ -25,6 +29,8 @@ public class Assessment implements Iterable<User> {
     private AssessmentDto assessment;
     
     private List<User> participants;
+    
+    private Map<String, PartialAssessmentDto> removalList;
     
     /**
      * Creates a new {@link Assessment} instance storing the review of an assignment for one submission.
@@ -121,6 +127,44 @@ public class Assessment implements Iterable<User> {
     }
     
     /**
+     * Clears the list of partial assessments.
+     * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
+     * if former assignments shall be deleted when submitting the assessment.
+     */
+    public void clearPartialAssessments() {
+        if (partialAsssesmentSize() > 0) {
+            // Avoid that list is multiple times cleared and, thus, data gets lost
+            if (null != removalList) {
+                removalList = new HashMap<>();
+            }
+            
+            for (PartialAssessmentDto partial : assessment.getPartialAssessments()) {
+                // Check that partial exists on server (has an ID assigned by the server)
+                if (partial.getAssessmentId() != null) {
+                    // Do not add elements twice if this method is called multiple times -> each ID only one time
+                    removalList.put(partial.getAssessmentId(), partial);
+                }
+            }
+        }
+        
+        assessment.getPartialAssessments().clear();
+    }
+    
+    /**
+     * Returns the list of {@link PartialAssessmentDto}s that shall be deleted.
+     * @return The list of {@link PartialAssessmentDto}s that shall be deleted or <tt>null</tt> if there are no
+     * {@link PartialAssessmentDto}s to delete.
+     */
+    Collection<PartialAssessmentDto> getRemovedPartialAssessments() {
+        Collection<PartialAssessmentDto> removals = null;
+        if (removalList != null) {
+            removals = removalList.values();
+        }
+        
+        return removals;
+    }
+    
+    /**
      * Returns the number of partial assessments (provided by submission tools) related to this assessment.
      * @return The number of partial assessments (&ge; 0).
      */
@@ -128,6 +172,24 @@ public class Assessment implements Iterable<User> {
         List<PartialAssessmentDto> partials = assessment.getPartialAssessments();
         return partials != null ? partials.size() : 0;
     }
+    
+    /**
+     * Adds an partial assessment created as part of an (automatic) tool review.
+     * @param tool The tool (e.g. compiler, Junit, checkstyle, ...) which created the test
+     * @param severity The severity of the review
+     * @param message A detailed description of the review
+     * @param file Optional the file locating the problem of the review (doesn't work currently)
+     * @param line Optional the line inside the file locating the problem of the review (doesn't work currently)
+     */
+    public void addAutomaticReview(String tool, String severity, String message, String file, String line) {
+        PartialAssessmentDto toolReview = new PartialAssessmentDto();
+        toolReview.setType(tool);
+        SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
+        toolReview.setSeverity(severityType);
+        toolReview.setComment(message);
+        assessment.addPartialAssessmentsItem(toolReview);
+    }
+    
     
     /**
      * Returns the partial assessment at the specified position.
