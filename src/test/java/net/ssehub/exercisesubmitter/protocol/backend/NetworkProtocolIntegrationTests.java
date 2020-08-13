@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
@@ -20,17 +21,17 @@ import net.ssehub.studentmgmt.backend_api.model.GroupDto;
  * These tests communicates with the REST test server.
  * 
  * @author Kunold
+ * @author El-Sharkawy
  *
  */
 public class NetworkProtocolIntegrationTests {
     /**
      * The test data.
      */
-    public static final String TEST_SERVER = "http://147.172.178.30:3000";
-    public static final String TEST_COURSE_ID = "java";
     public static final String TEST_USER_ID = "a019ea22-5194-4b83-8d31-0de0dc9bca53";
     public static final String TEST_ASSIGNMENT_ID = "75b799a1-a406-419b-a448-909aa3d34afa";
-    public static final String TEST_SEMESTER = "wise1920";
+    
+    private static String accessToken;
 
     /**
      * Test if the REST server is not found.
@@ -53,8 +54,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetCourseID() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(false);
         try {
             String course = np.getCourseID();
             Assertions.assertFalse(course.isEmpty(), "No course found");
@@ -68,8 +68,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testListOfCourses() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(false);
         try {
             List<CourseDto> courses = np.getCourses(TEST_USER_ID);
             Assertions.assertNotNull(courses, "Course list was null, but should never be null.");
@@ -84,8 +83,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetAssignments() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(true);
         try {
             List<Assignment> assignments = np.getAssignments((StateEnum[]) null);
             Assertions.assertNotNull(assignments, "Assignment list was null, but should never be null.");
@@ -100,8 +98,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetAssessmentsWithGoups() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(false);
         try {
             List<AssessmentDto> assessments = np.getAssessmentsWithGroups(TEST_USER_ID);
             Assertions.assertNotNull(assessments, "Assessment list was null, but should never be null.");
@@ -116,8 +113,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testReadPermissions() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(true);
         Map <String, State> assignments = np.readPermissions();
         Assertions.assertNotNull(assignments, "Assignment map was null, but should never be null.");
         Assertions.assertFalse(assignments.isEmpty(), "Map of assignments was empty");
@@ -128,8 +124,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetGroupsAtSubmissionEnd() {
-        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-        np.setSemester(TEST_SEMESTER);
+        NetworkProtocol np = initProtocol(true);
         try {
             List<GroupDto> groups = np.getGroupsAtAssignmentEnd(TEST_ASSIGNMENT_ID);
             Assertions.assertNotNull(groups, "Groups list was null, but should never be null.");
@@ -138,13 +133,27 @@ public class NetworkProtocolIntegrationTests {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
     }
-    
-//    @Test
-//    public void testGetPathOfAssessment() throws NetworkException {
-//        NetworkProtocol np = new NetworkProtocol(TEST_SERVER, TEST_COURSE_ID);
-//        np.setSemester(TEST_SEMESTER);
-//        String groupName = np.getGroupForAssignment(TEST_USER_ID, "b2f6c008-b9f7-477f-9e8b-ff34ce339077");
-//        System.out.println(groupName);
-//    }
 
+    /**
+     * Creates an {@link NetworkProtocol} with default settings and logs in a tutor.
+     * Useful for tests of APIs that require an authorized user.
+     * @param requiresLogin <tt>true</tt> tests an authorized API and requires a valid user. In this case,
+     *     {@link TestUtils#retreiveAccessToken()} is used to login a user via VM arguments.
+     * @return {@link NetworkProtocol} usable for testing.
+     */
+    private NetworkProtocol initProtocol(boolean requiresLogin) {
+        // Init protocol
+        NetworkProtocol protocol = new NetworkProtocol(TestUtils.TEST_MANAGEMENT_SERVER,
+            TestUtils.TEST_DEFAULT_JAVA_COURSE);
+        protocol.setSemester(TestUtils.TEST_DEFAULT_SEMESTER);
+        
+        if (requiresLogin) {
+            if (null == accessToken) {
+                // Logs the user in only at the first test and re-uses the token
+                accessToken = TestUtils.retreiveAccessToken();
+            }
+            protocol.setAccessToken(accessToken);
+        }
+        return protocol;
+    }
 }

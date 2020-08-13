@@ -14,6 +14,7 @@ import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
+import net.ssehub.studentmgmt.backend_api.api.AssignmentRegistrationApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
 import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
@@ -55,9 +56,15 @@ public class NetworkProtocol {
     private AssignmentsApi apiAssignments;
     
     /**
+     * Provides information about group/assignment relations.
+     */
+    private AssignmentRegistrationApi apiAssignmentRegistrations;
+    
+    /**
      * The API to get the group informations.
      */
     private GroupsApi apiGroups;
+    
     
     /**
      * The name of the course that uses the exercise submitter.
@@ -91,6 +98,7 @@ public class NetworkProtocol {
         apiUser = new UsersApi(apiClient);
         apiCourse = new CoursesApi(apiClient);
         apiAssignments = new AssignmentsApi(apiClient);
+        apiAssignmentRegistrations = new AssignmentRegistrationApi(apiClient);
         apiGroups = new GroupsApi(apiClient);
         semester = SemesterUtils.getSemester();
         this.courseName = courseName;
@@ -159,6 +167,14 @@ public class NetworkProtocol {
      */
     protected GroupsApi getGroupsApi() {
         return apiGroups;
+    }
+    
+    /**
+     * Returns the API to query for users.
+     * @return The API to query for users.
+     */
+    protected UsersApi getUsersApi() {
+        return apiUser;
     }
     
     /**
@@ -316,7 +332,7 @@ public class NetworkProtocol {
         List<GroupDto> groups = null;
         
         try {
-            groups = apiGroups.getGroupsFromAssignment(getCourseID(), assignmentId);
+            groups = apiAssignmentRegistrations.getRegisteredGroups(getCourseID(), assignmentId, null, null, null);
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("No Groups for the assignment found", assignmentId, 

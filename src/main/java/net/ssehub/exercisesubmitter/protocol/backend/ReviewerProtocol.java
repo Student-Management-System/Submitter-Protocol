@@ -15,8 +15,9 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
-import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
 
 /**
  * Network protocol designed for the &quot;Exercise Reviewer&quot;.
@@ -25,10 +26,6 @@ import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
  *
  */
 public class ReviewerProtocol extends NetworkProtocol {
-    private static final String USER = "user";
-    private static final String MAX_POINTS = "*max*";
-    private static final String SEPARATOR = "\t";
-    private static final String LINE_BREAK = System.lineSeparator();
     
     /**
      * The API to get the assessment informations.
@@ -97,13 +94,13 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @return All participants of the current course or only users that have one of the specified roles.
      * @throws NetworkException when network problems occur.
      */
-    public List<UserDto> getUsersOfCourse(CourseRoleEnum... courseRoles) throws NetworkException {
-        List<UserDto> users = null;
+    public List<ParticipantDto> getUsersOfCourse(RoleEnum... courseRoles) throws NetworkException {
+        List<ParticipantDto> users = null;
         try {
             List<String> roles = null;
             if (null != courseRoles) {
                 roles = new ArrayList<>();
-                for (CourseRoleEnum role : courseRoles) {
+                for (RoleEnum role : courseRoles) {
                     roles.add(role.name());
                 }
             }
@@ -250,145 +247,20 @@ public class ReviewerProtocol extends NetworkProtocol {
     }
     
     /**
-     * Returns a formated String with all users and their points to an assignment.
-     * @param assignmentId The ID of the assignment.
-     * @return All users and their points to an assignment.
-     */
-    public String getSubmissionRealUsersReviews(String assignmentId) throws NetworkException {
-        String userReviews = "";
-        List<AssessmentDto> assessments = null;
-        
-        try {
-            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
-                null, null, null, null, null);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
-        }
-        
-        // counter is used to know when the last line is written, so there won�t be a line break
-        int counter = assessments.size();
-        boolean firstIteration = true;
-        for (AssessmentDto assessment : assessments) {
-            // is only added once to the string at the top of the string
-            if (firstIteration) {
-                //first line: user  taskname    taskname    taskname
-                userReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
-                        + assessment.getAssignment().getName() + LINE_BREAK;
-                //second line: *max*    points  points  points
-                userReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
-                        + assessment.getAssignment().getPoints() + LINE_BREAK;
-                
-                firstIteration = false;
-            }
-            
-            // vollername   punkte  bewertung   upload erfolgreich(momentan nicht abrufbar)
-            for (UserDto user : assessment.getGroup().getUsers()) {
-                if (counter > 1) {
-                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                            + assessment.getComment() + LINE_BREAK;                    
-                } else if (counter == 1 && assessment.getGroup().getUsers().size() > 1) {
-                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                            + assessment.getComment() + LINE_BREAK;
-                } else {
-                    userReviews += user.getUsername() + SEPARATOR + assessment.getAchievedPoints() + SEPARATOR 
-                            + assessment.getComment();
-                }
-            }
-            counter--;
-        }
-        
-        return userReviews;
-    }
-    
-    /**
-     * Returns a formated String with all groups and their users.
-     * @param assignmentId The ID of the assignment.
-     * @return All users whose submission is reviewed.
-     */
-    public String getSubmissionReviewerUsers(String assignmentId) throws NetworkException {
-        String submissionUsers = "";
-        List<AssessmentDto> assessments = null;
-        
-        try {
-            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
-                null, null, null, null, null);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
-        }
-        
-        // counter is used to know when the last line is written, so there won�t be a line break
-        int counter = assessments.size();
-        //gruppenname   vollername    rz-kennung  uni-mail
-        for (AssessmentDto assessment : assessments) {
-            for (UserDto user : assessment.getGroup().getUsers()) {
-                if (counter > 1) {
-                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
-                            + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;                    
-                } else  if (counter == 1 && assessment.getGroup().getUsers().size() > 1) {
-                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
-                            + user.getRzName() + SEPARATOR + user.getEmail() + LINE_BREAK;
-                } else {
-                    submissionUsers += assessment.getGroup().getName() + SEPARATOR + user.getUsername() + SEPARATOR 
-                            + user.getRzName() + SEPARATOR + user.getEmail();
-                }
-            }
-            counter--;
-        }
-        
-        return submissionUsers;
-    }
-    
-    
-    /**
-     * Returns a formated String with all groups and there review.
-     * @param assignmentId The ID of the assignment.
-     * @return All groups whose submission is reviewed.
+     * Returns the user by the specified ID.
+     * @param userID An ID created by the student management system.
+     * @return The specified user.
      * @throws NetworkException when network problems occur.
      */
-    public String getSubmissionReviews(String assignmentId) throws NetworkException {
-        String submissionReviews = "";
-        List<AssessmentDto> assessments = null;
-        
+    public UserDto getUserById(String userID) throws NetworkException {
+        UserDto user = null;
         try {
-            assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
-                null, null, null, null, null);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
+            user = getUsersApi().getUserById(userID);
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
+            throw new DataNotFoundException("User not found", userID, DataType.USER_NOT_FOUND);
         }
         
-        boolean firstIteration = true;
-        // counter is used to know when the last line is written, so there won�t be a line break
-        int counter = assessments.size();
-        for (AssessmentDto assessment : assessments) {
-            // is only added once to the string at the top of the string
-            if (firstIteration) {
-                //first line: user  taskname    taskname    taskname
-                submissionReviews = USER + SEPARATOR + assessment.getAssignment().getName() + SEPARATOR 
-                        + assessment.getAssignment().getName() + LINE_BREAK;
-                //second line: *max*    points  points  points
-                submissionReviews += MAX_POINTS + SEPARATOR + assessment.getAssignment().getPoints() + SEPARATOR 
-                        + assessment.getAssignment().getPoints() + LINE_BREAK;
-                
-                firstIteration = false;
-            }
-            
-            //gruppenname   punkte  kommentar   upload erfolgreich
-            if (counter > 1) {
-                submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
-                    + SEPARATOR + assessment.getComment() + LINE_BREAK;                
-            } else {
-                submissionReviews += assessment.getGroup().getName() + SEPARATOR + assessment.getAchievedPoints() 
-                    + SEPARATOR + assessment.getComment();
-            }
-            counter--;
-        }
-        
-        return submissionReviews;
+        return user;
     }
 }

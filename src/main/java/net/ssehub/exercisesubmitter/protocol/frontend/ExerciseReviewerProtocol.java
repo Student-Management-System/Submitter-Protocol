@@ -11,8 +11,9 @@ import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
-import net.ssehub.studentmgmt.backend_api.model.UserDto.CourseRoleEnum;
 
 /**
  * Network protocol that provides API calls as required by the <b>Eclipse Exercise Reviewer</b>.
@@ -135,14 +136,15 @@ public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
             dto.setGroup(group);
             dto.setGroupId(group.getId());
         } else {
-            UserDto user = getProtocol().getUsersOfCourse(CourseRoleEnum.STUDENT).stream()
+            ParticipantDto participant = getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
                 .filter(u -> name.equals(u.getRzName()))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Could not find user '" + name + "'", name,
                     DataType.USER_NOT_FOUND));
             
+            UserDto user = getProtocol().getUserById(participant.getUserId());
+            dto.setUserId(participant.getUserId());
             dto.setUser(user);
-            dto.setUserId(user.getId());
         }
         
         Assessment assessment = new Assessment(dto, assignment);
@@ -161,8 +163,8 @@ public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
         List<User> participants = new ArrayList<>();
         Map<String, String> groupParticipations = loadGroupNames();
         
-        getProtocol().getUsersOfCourse(CourseRoleEnum.STUDENT).stream()
-            .map(u -> new User(u.getUsername(), u.getRzName(), u.getEmail()))
+        getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
+            .map(u -> new User(u.getUsername(), u.getRzName(),"no mail available"))
             .forEach(u -> {
                 u.setGroupName(groupParticipations.get(u.getFullName()));
                 participants.add(u);
@@ -181,62 +183,11 @@ public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
         if (null != assignment && assignment.isGroupWork()) {
             List<GroupDto> groups = getProtocol().getGroupsAtAssignmentEnd(assignment.getID());
             for (GroupDto group : groups) {
-                group.getUsers().stream()
-                    .forEach(u -> groupParticipations.put(u.getUsername(), group.getName()));
+                group.getMembers().stream()
+                    .forEach(p -> groupParticipations.put(p.getUsername(), group.getName()));
             }
         }
         return groupParticipations;
-    }
-    
-    /**
-     * Returns a formated String with all users and their points to an assignment.
-     * @param assignmentId The ID of the assignment.
-     * @return All users and their points to an assignment.
-     */
-    public String getSubmissionRealUsersReviews(String assignmentId) {
-        String userReviews = "null";
-        
-        try {
-            userReviews = getProtocol().getSubmissionRealUsersReviews(assignmentId);
-        } catch (NetworkException e) {
-            e.printStackTrace();
-        }
-        
-        return userReviews;
-    }
-    
-    /**
-     * Returns a formated String with all groups and their users.
-     * @param assignmentId The ID of the assignment.
-     * @return All users whose submission is reviewed.
-     */
-    public String getSubmissionReviewerUsers(String assignmentId) {
-        String submissionUsers = "null";
-        
-        try {
-            submissionUsers = getProtocol().getSubmissionReviewerUsers(assignmentId);
-        } catch (NetworkException e) {
-            e.printStackTrace();
-        }
-        
-        return submissionUsers;
-    }
-    
-    /**
-     * Returns a formated String with all groups and there review.
-     * @param assignmentId The ID of the assignment.
-     * @return All groups whose submission is reviewed.
-     */
-    public String getSubmissionReviews(String assignmentId) {
-        String submissionReviews = "null";
-        
-        try {
-            submissionReviews = getProtocol().getSubmissionReviews(assignmentId);
-        } catch (NetworkException e) {
-            e.printStackTrace();
-        }
-        
-        return submissionReviews;
     }
     
     @Override

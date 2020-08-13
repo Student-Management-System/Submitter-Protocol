@@ -1,6 +1,12 @@
 package net.ssehub.exercisesubmitter.protocol;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+
+import net.ssehub.exercisesubmitter.protocol.backend.LoginComponent;
 import net.ssehub.exercisesubmitter.protocol.backend.LoginComponentIntegrationTests;
+import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
 
 /**
  * Provides constants and utility functions used by multiple tests.
@@ -34,5 +40,25 @@ public class TestUtils {
         LoginComponentIntegrationTests.assumeSpecified(pw, "test_password", "password");
         
         return new String[] {userName, pw};
+    }
+    
+    /**
+     * Extracts credentials provided via VM arguments and logs in the user.
+     * Useful to test authorized API calls.
+     * @return The access token to access authorized API calls of the student management system.
+     * @see #retreiveCredentialsFormVmArgs()
+     */
+    public static String retreiveAccessToken() {
+        String[] credentials = retreiveCredentialsFormVmArgs();
+        LoginComponent loginComp = new LoginComponent(TEST_AUTH_SERVER, TEST_MANAGEMENT_SERVER);
+        try {
+            Assumptions.assumeTrue(loginComp.login(credentials[0], credentials[1]));
+        } catch (UnknownCredentialsException e) {
+            Assertions.fail("Could not login due to unknown credentials: " + e.getMessage());
+        } catch (ServerNotFoundException e) {
+            Assertions.fail("Could not login due to unknown server specified: " + e.getMessage());
+        }
+        
+        return loginComp.getManagementToken();
     }
 }
