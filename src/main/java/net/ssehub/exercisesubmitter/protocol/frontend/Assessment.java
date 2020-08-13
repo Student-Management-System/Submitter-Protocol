@@ -50,7 +50,7 @@ public class Assessment implements Iterable<User> {
         List<User> participants = new ArrayList<>();
         if (assignment.isGroupWork()) {
             assessment.getGroup().getMembers().stream()
-                .map(p -> new User(p.getUsername(), p.getRzName(),"no mail available"))
+                .map(p -> new User(p.getUsername(), p.getRzName(), p.getEmail()))
                 .forEach(participants::add);
         } else {
             UserDto userDto = assessment.getUser();

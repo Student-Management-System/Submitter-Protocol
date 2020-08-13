@@ -1,7 +1,8 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -115,13 +116,15 @@ public class ExerciseReviewerProtocolIntegrationTests {
             Assessment assessment = reviewer.getAssessmentForSubmission(reviewedGroup);
             Assertions.assertNotNull(assessment);
             Assertions.assertEquals(reviewedGroup, assessment.getSubmitterName());
-            User[] expected = new User[] {new User("elshar", "elshar", "elshar@test.com"),
-                new User("kunold", "kunold", "kunold@test.com")};
-            List<User> actual = new ArrayList<>();
+            Set<User> expected = new HashSet<>();
+            expected.add(new User("elshar", "elshar", "elshar@test.com"));
+            expected.add(new User("kunold", "kunold", "kunold@test.com"));
+            int nElements = 0;
             for (User user : assessment) {
-                actual.add(user);
+                Assertions.assertTrue(expected.contains(user));
+                nElements++;
             }
-            Assertions.assertArrayEquals(expected, actual.toArray());
+            Assertions.assertEquals(expected.size(), nElements);
         } catch (NetworkException e) {
             Assertions.fail("Unexpected exception: Method should return an assessment stub for review", e);
         }
