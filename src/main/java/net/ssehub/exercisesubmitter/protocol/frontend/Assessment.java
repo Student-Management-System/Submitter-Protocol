@@ -145,9 +145,9 @@ public class Assessment implements Iterable<User> {
                     removalList.put(partial.getAssessmentId(), partial);
                 }
             }
+            
+            assessment.getPartialAssessments().clear();
         }
-        
-        assessment.getPartialAssessments().clear();
     }
     
     /**
