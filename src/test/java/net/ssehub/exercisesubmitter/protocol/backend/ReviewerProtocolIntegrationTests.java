@@ -45,7 +45,7 @@ public class ReviewerProtocolIntegrationTests {
         rp.setAccessToken(login.getManagementToken());
         
         try {
-            List <AssessmentDto> assessments = rp.getAssessments(TEST_ASSIGNMENT_ID);
+            List <AssessmentDto> assessments = rp.getAssessments(TEST_ASSIGNMENT_ID, null);
             Assertions.assertNotNull(assessments, "Assessment List was null, but never should be null");
             Assertions.assertFalse(assessments.isEmpty(), "List of Assessments was empty");
         } catch (NetworkException e) {

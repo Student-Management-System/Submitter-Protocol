@@ -206,7 +206,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         Assertions.assertNull(assessment.getAssessmentID());
         
         // Double check that assignment does not exist on server
-        AssessmentDto candiate = rp.getAssessments(assessment.getAssignmentID()).stream()
+        AssessmentDto candiate = rp.getAssessments(assessment.getAssignmentID(), null).stream()
                 .filter(a -> reviewedGroup.equals(a.getGroup().getName()))
                 .findFirst()
                 .orElse(null);
@@ -217,7 +217,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         
         // Test post condition: Assignment as an ID and exist on server
         Assertions.assertNotNull(assessment.getAssessmentID());
-        candiate = rp.getAssessments(assessment.getAssignmentID()).stream()
+        candiate = rp.getAssessments(assessment.getAssignmentID(), null).stream()
                 .filter(a -> reviewedGroup.equals(a.getGroup().getName()))
                 .findFirst()
                 .orElse(null);

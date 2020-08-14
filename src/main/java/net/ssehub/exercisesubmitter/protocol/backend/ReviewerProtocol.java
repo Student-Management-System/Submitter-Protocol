@@ -70,14 +70,16 @@ public class ReviewerProtocol extends NetworkProtocol {
     /**
      * Getter for the Assessments of an Assignment.
      * @param assignmentId the id of the specified assignment.
+     * @param submitterName Optional: The name of the group (in case of group submission) or the user
+     *     (in case of individual submission). If this is <tt>null</tt>, all assessments are returned.
      * @return List of Assessments.
      * @throws NetworkException when network problems occur.
      */
-    public List<AssessmentDto> getAssessments(String assignmentId) throws NetworkException {
+    public List<AssessmentDto> getAssessments(String assignmentId, String submitterName) throws NetworkException {
         List<AssessmentDto> assessments = null;
         try {
             assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
-                null, null, null, null, null);
+                submitterName, null, null, null, null);
         // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
