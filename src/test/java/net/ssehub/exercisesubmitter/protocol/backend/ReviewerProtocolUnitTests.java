@@ -1,6 +1,5 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Assertions;
