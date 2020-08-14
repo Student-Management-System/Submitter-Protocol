@@ -74,7 +74,7 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             // Add new partial assessments
             for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
                 // Check that assessment doesn't belong to downloaded partials -> has no ID given by the server
-                if (assessment.getPartialAssessment(i).getId() != null) {
+                if (assessment.getPartialAssessment(i).getId() == null) {
                     updateDto.addAddPartialAssessmentsItem(assessment.getPartialAssessment(i));
                 }
             }
