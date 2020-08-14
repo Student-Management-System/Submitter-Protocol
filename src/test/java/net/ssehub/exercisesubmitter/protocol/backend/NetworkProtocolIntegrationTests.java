@@ -133,6 +133,20 @@ public class NetworkProtocolIntegrationTests {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
     }
+    
+    /**
+     * Tests if a groupname for an assignment is returned.
+     */
+    @Test
+    public void testGetGroupForAssignment() {
+        NetworkProtocol np = initProtocol(true);
+        try {
+            String groupName = np.getGroupForAssignment(TEST_USER_ID, TEST_ASSIGNMENT_ID);
+            Assertions.assertFalse(groupName.isEmpty(), "Groupname was empty");
+        } catch (NetworkException e) {
+            Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
+        }
+    }
 
     /**
      * Creates an {@link NetworkProtocol} with default settings and logs in a tutor.
