@@ -2,11 +2,18 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.util.Collection;
 
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
+import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
+import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 
 /**
  * Super class for reviewing tools. This class stores functionalities that are used by more than one reviewing tool.
@@ -99,6 +106,43 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
         }
         
         return success;
+    }
+    
+    /**
+     * Creates a new blank {@link Assessment}.
+     * This {@link Assessment} object may be used to review an existent submission.
+     * @param assignment The assignment (exercise, exam, homework) for which the review object shall be created for.
+     * @param submitterName The name of the submitter (group name for group submissions, user account name (RZ name) for
+     *     single user submissions).
+     * @return An {@link Assessment} which may be used to review a submission (will be added to {@link #assessments} as
+     *     side effect).
+     * @throws NetworkException when network problems occur.
+     */
+    protected Assessment createAssessment(Assignment assignment, String submitterName) throws NetworkException {
+        AssessmentDto dto = new AssessmentDto();
+        
+        if (assignment.isGroupWork()) {
+            GroupDto group = getProtocol().getGroupsAtAssignmentEnd(assignment.getID()).stream()
+                .filter(g -> submitterName.equals(g.getName()))
+                .findAny()
+                .orElseThrow(() -> new DataNotFoundException("Could not find group '" + submitterName + "'",
+                    submitterName, DataType.GROUP_NOT_FOUND));
+            
+            dto.setGroup(group);
+            dto.setGroupId(group.getId());
+        } else {
+            ParticipantDto participant = getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
+                .filter(u -> submitterName.equals(u.getRzName()))
+                .findFirst()
+                .orElseThrow(() -> new DataNotFoundException("Could not find user '" + submitterName + "'",
+                    submitterName, DataType.USER_NOT_FOUND));
+            
+            UserDto user = getProtocol().getUserById(participant.getUserId());
+            dto.setUserId(participant.getUserId());
+            dto.setUser(user);
+        }
+        
+        return new Assessment(dto, assignment);
     }
 
 }
