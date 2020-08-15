@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
@@ -242,6 +243,16 @@ public class ExerciseReviewerProtocolIntegrationTests {
         Assertions.assertTrue(participants.contains(new User("Hans Peter", "hpeter", "hans.peter@test.com")));
         Assertions.assertTrue(participants.contains(new User("elshar", "elshar", "elshar@test.com")));
         Assertions.assertTrue(participants.contains(new User("kunold", "kunold", "kunold@test.com")));
+    }
+    
+    /**
+     * Test that {@link ExerciseReviewerProtocol#getPathToSubmission(Assignment, String)} gets the path to submission.
+     */
+    @Test
+    public void testGetPathToSubmission() {
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        Assignment assignment = new Assignment("test", "testID", State.IN_REVIEW , true);
+        Assertions.assertNotNull(reviewer.getPathToSubmission(assignment, "submissionName"));
     }
     
     /**
