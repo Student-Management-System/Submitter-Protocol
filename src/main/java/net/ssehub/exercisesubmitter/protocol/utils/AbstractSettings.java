@@ -1,13 +1,11 @@
 package net.ssehub.exercisesubmitter.protocol.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Writer;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,26 +48,30 @@ public abstract class AbstractSettings<C> {
     public void init() throws IOException {
         // Based on https://www.geeksforgeeks.org/different-ways-reading-text-file-java/
         try {
-            Path pathToSettings;
+            String content;
             File inputFile = new File(getSettingsFileName());
             if (inputFile.exists()) {
                 // Load relative to JAR
-                LOGGER.debug("Loading application settings from {}.", inputFile.getAbsoluteFile());
-                pathToSettings = inputFile.toPath();
+                LOGGER.debug("Loading application settings from file {}.", inputFile.getAbsoluteFile());
+                content = Files.readString(inputFile.toPath());
             } else {
-                // Load from resource folder while developing
-                URL url = AbstractSettings.class.getResource("/" + getSettingsFileName());
-                LOGGER.debug("Loading application settings from {}.", url);
-                pathToSettings = Paths.get(url.toURI());
+                // Load from resource folder (e.g. bundled inside jar)
+                LOGGER.debug("Loading application settings from resource /{}.", getSettingsFileName());
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                        getClass().getResourceAsStream("/" + getSettingsFileName())))) {
+                    
+                    StringBuilder tmp = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        tmp.append(line);
+                    }
+                    content = tmp.toString();
+                }
             }
-            String content = Files.readString(pathToSettings);
             loadConfig(content);
         } catch (IOException e) {
             LOGGER.warn("Could not read configuration from {}, cause {}", getSettingsFileName(), e);
             throw e;
-        } catch (URISyntaxException e) {
-            LOGGER.warn("Could not read configuration from {}, cause {}", getSettingsFileName(), e);
-            throw new IOException(e);
         }
     }
     
