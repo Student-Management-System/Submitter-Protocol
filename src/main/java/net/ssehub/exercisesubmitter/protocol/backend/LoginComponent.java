@@ -1,5 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
+import java.net.ConnectException;
+
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.api.AuthenticationApi;
 import net.ssehub.studentmgmt.backend_api.model.AuthSystemCredentials;
@@ -80,6 +82,9 @@ public class LoginComponent {
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), authenticationURL);
         } catch (ApiException e) {
+            if (e.getCause() instanceof ConnectException) {
+                throw new ServerNotFoundException(e.getMessage(), authenticationURL);
+            }
             throw new UnknownCredentialsException("Could not login \"" + userName
                 + "\", credentials are unknown. Please check that user exist.");
         }
