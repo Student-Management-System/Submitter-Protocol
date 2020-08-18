@@ -230,12 +230,12 @@
 		<dependency>
 			<groupId>net.ssehub.studentmgmt</groupId>
 			<artifactId>backend_api</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.ssehub.studentmgmt</groupId>
 			<artifactId>sparkyservice_api</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Unit / Integration Tests -->
