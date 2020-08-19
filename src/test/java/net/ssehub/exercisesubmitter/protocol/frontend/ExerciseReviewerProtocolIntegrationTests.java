@@ -12,7 +12,6 @@ import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
-import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 
 /**
  * Declares <b>integration</b> tests for the {@link ExerciseReviewerProtocol}.
@@ -58,7 +57,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
     }
     
     /**
-     * Tests that {@link ExerciseReviewerProtocol#getReviewedAssignment()} get an assignment.
+     * Tests that {@link ExerciseReviewerProtocol#getReviewedAssignment()} get a assignment.
      * @throws NetworkException If server, which is used for the integration test,
      *     can not be reached through a network error or miss-configuration.
      */
@@ -67,18 +66,9 @@ public class ExerciseReviewerProtocolIntegrationTests {
         // Init protocol
         ExerciseReviewerProtocol reviewer = initReviewer();
         
-        // Test precondition: no assignment available
+        // Null because loadAssessments(Assignment) wasn´t called
         Assignment assignment = reviewer.getReviewedAssignment();
         Assertions.assertNull(assignment);
-        
-//        AssignmentDto dto = new AssignmentDto();
-//        dto.setName("reviewed Assignment");
-//        Assignment reviewedAssignment = new Assignment(dto);
-//        
-//        reviewer.loadAssessments(reviewedAssignment);
-//        
-//        assignment = reviewer.getReviewedAssignment();
-//        Assertions.assertNotNull(assignment);
     }
     
     /**
