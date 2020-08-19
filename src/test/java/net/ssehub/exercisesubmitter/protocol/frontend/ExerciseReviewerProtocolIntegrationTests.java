@@ -55,7 +55,27 @@ public class ExerciseReviewerProtocolIntegrationTests {
         assessments = reviewer.getAssessments();
         Assertions.assertFalse(assessments.isEmpty());
     }
-
+    
+    /**
+     * Tests that {@link ExerciseReviewerProtocol#getReviewedAssignment()} get an assignment.
+     * @throws NetworkException If server, which is used for the integration test,
+     *     can not be reached through a network error or miss-configuration.
+     */
+    @Test
+    public void testGetReviewedAssignment() throws NetworkException {
+        // Init protocol
+        ExerciseReviewerProtocol reviewer = initReviewer();
+        
+        // Test precondition: No assessments available
+        Assignment assignment = reviewer.getReviewedAssignment();
+        Assertions.assertNull(assignment);
+        
+        reviewer.loadAssessments(assignment);
+        
+        assignment = reviewer.getReviewedAssignment();
+        Assertions.assertNotNull(assignment);
+    }
+    
     /**
      * Tests {@link ExerciseReviewerProtocol#getAssessmentForSubmission(String)}.
      * Method should get an assessment for the given user name.
