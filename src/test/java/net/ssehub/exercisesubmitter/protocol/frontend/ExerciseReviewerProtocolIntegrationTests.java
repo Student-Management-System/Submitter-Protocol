@@ -12,6 +12,7 @@ import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 
 /**
  * Declares <b>integration</b> tests for the {@link ExerciseReviewerProtocol}.
@@ -66,11 +67,15 @@ public class ExerciseReviewerProtocolIntegrationTests {
         // Init protocol
         ExerciseReviewerProtocol reviewer = initReviewer();
         
-        // Test precondition: No assessments available
+        // Test precondition: no assignment available
         Assignment assignment = reviewer.getReviewedAssignment();
         Assertions.assertNull(assignment);
         
-        reviewer.loadAssessments(assignment);
+        AssignmentDto dto = new AssignmentDto();
+        dto.setName("reviewed Assignment");
+        Assignment reviewedAssignment = new Assignment(dto);
+        
+        reviewer.loadAssessments(reviewedAssignment);
         
         assignment = reviewer.getReviewedAssignment();
         Assertions.assertNotNull(assignment);
