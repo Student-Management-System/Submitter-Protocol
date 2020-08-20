@@ -147,7 +147,20 @@ public class NetworkProtocolIntegrationTests {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
     }
-
+    
+    /**
+     * Tests Getter for the base path, course name, and groupsAPI.
+     */
+    @Test
+    public void testGetter( ) {
+        NetworkProtocol np = initProtocol(false);
+        Assertions.assertNotNull(np.getBasePath());
+        Assertions.assertEquals(TestUtils.TEST_MANAGEMENT_SERVER, np.getBasePath());
+        Assertions.assertNotNull(np.getCourseName());
+        Assertions.assertEquals(TestUtils.TEST_DEFAULT_JAVA_COURSE, np.getCourseName());
+        Assertions.assertNotNull(np.getGroupsApi());
+    }
+    
     /**
      * Creates an {@link NetworkProtocol} with default settings and logs in a tutor.
      * Useful for tests of APIs that require an authorized user.
