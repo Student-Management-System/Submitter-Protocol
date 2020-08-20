@@ -21,7 +21,7 @@ public class AssessmentUnitTests {
      * Tests the correct creation (especially ordering) of {@link Assessment#summerizePartialAssessments()}.
      */
     @Test
-    public void testEquals() {
+    public void testSummerizePartialAssessments() {
         Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
         UserDto user = new UserDto();
         user.setUsername("a user");

@@ -181,12 +181,17 @@ public class Assessment implements Iterable<User> {
      * @param file Optional the file locating the problem of the review (doesn't work currently)
      * @param line Optional the line inside the file locating the problem of the review (doesn't work currently)
      */
-    public void addAutomaticReview(String tool, String severity, String message, String file, String line) {
+    public void addAutomaticReview(String tool, String severity, String message, String file, Integer line) {
         PartialAssessmentDto toolReview = new PartialAssessmentDto();
         toolReview.setType(tool);
         SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
         toolReview.setSeverity(severityType);
         toolReview.setComment(message);
+        toolReview.setPath(file);
+        if (null != line) {
+            BigDecimal number = new BigDecimal(line);
+            toolReview.setLine(number);            
+        }
         assessment.addPartialAssessmentsItem(toolReview);
     }
     
