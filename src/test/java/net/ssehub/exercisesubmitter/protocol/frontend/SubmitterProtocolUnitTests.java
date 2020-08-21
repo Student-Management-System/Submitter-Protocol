@@ -119,7 +119,41 @@ public class SubmitterProtocolUnitTests {
         
         // Test
         List<Assignment> assignments = protocol.getOpenAssignments();
-        Assertions.assertNotNull(assignments);
+        Assertions.assertFalse(assignments.isEmpty());
+        Assertions.assertEquals(expectedExercise, assignments.get(0).getName());
+    }
+    
+    /**
+     * Test if {@link SubmitterProtocol#getReviewedAssignments()} returns a list of reviewed assignments.
+     * @throws NetworkException Must not occur, is not tested and network is not used. If this occur, internal API of
+     *     {@link SubmitterProtocol} has been changed.
+     */
+    @Test
+    public void testGetReviewedAssignments() throws NetworkException {
+     // Test data
+        String expectedExercise = "Exercise";
+        String usedAssignmentID = "123";
+        BigDecimal maxPoints = new BigDecimal(100);
+        
+        // Single assignment
+        AssignmentDto dto = new AssignmentDto();
+        dto.setName(expectedExercise);
+        dto.setCollaboration(CollaborationEnum.GROUP);
+        dto.setState(StateEnum.EVALUATED);
+        dto.setId(usedAssignmentID);
+        dto.setPoints(maxPoints);
+        Assignment assignment = new Assignment(dto);
+        
+        // Mock of REST calls
+        NetworkProtocol networkMock = Mockito.mock(NetworkProtocol.class);
+        Mockito.when(networkMock.getAssignments(Mockito.any()))
+            .thenReturn(Arrays.asList(assignment));
+        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, "a_url");
+        protocol.setNetworkComponents(null, networkMock);
+        
+        // Test
+        List<Assignment> assignments = protocol.getReviewedAssignments();
+        Assertions.assertFalse(assignments.isEmpty());
         Assertions.assertEquals(expectedExercise, assignments.get(0).getName());
     }
 
