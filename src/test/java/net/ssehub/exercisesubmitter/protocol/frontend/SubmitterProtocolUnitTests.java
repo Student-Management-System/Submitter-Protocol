@@ -1,6 +1,8 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -85,6 +87,39 @@ public class SubmitterProtocolUnitTests {
         // Test: Correct computation of destination path
         SubmissionTarget dest = protocol.getPathToSubmission(assignment);
         Assertions.assertEquals("/" + expectedExercise + "/" + expectedUserOrGroup, dest.getAbsolutePathInRepository());
+    }
+    
+    /**
+     * .
+     * @throws NetworkException
+     */
+    @Test
+    public void testGetOpenAssignments() throws NetworkException {
+     // Test data
+        String expectedExercise = "Exercise";
+        String usedAssignmentID = "123";
+        BigDecimal maxPoints = new BigDecimal(100);
+        
+        // Single assignment
+        AssignmentDto dto = new AssignmentDto();
+        dto.setName(expectedExercise);
+        dto.setCollaboration(CollaborationEnum.GROUP);
+        dto.setState(StateEnum.IN_PROGRESS);
+        dto.setId(usedAssignmentID);
+        dto.setPoints(maxPoints);
+        Assignment assignment = new Assignment(dto);
+        
+        // Mock of REST calls
+        NetworkProtocol networkMock = Mockito.mock(NetworkProtocol.class);
+        Mockito.when(networkMock.getAssignments(Mockito.any()))
+            .thenReturn(Arrays.asList(assignment));
+        SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, "a_url");
+        protocol.setNetworkComponents(null, networkMock);
+        
+        // Test
+        List<Assignment> assignments = protocol.getOpenAssignments();
+        Assertions.assertNotNull(assignments);
+        Assertions.assertEquals(expectedExercise, assignments.get(0).getName());
     }
 
 }
