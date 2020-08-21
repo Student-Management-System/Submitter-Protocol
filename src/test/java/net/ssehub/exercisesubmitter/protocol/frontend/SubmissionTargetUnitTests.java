@@ -53,4 +53,16 @@ public class SubmissionTargetUnitTests {
         target = new SubmissionTarget(url + "/", new String[]{assignmentFolder, submitterName});
         Assertions.assertEquals(url + "/" + assignmentFolder + "/" + submitterName, target.getSubmissionURL());
     }
+    
+    /**
+     * Tests that {@link SubmissionTarget#getSubmissionPath()} returns a valid path.
+     */
+    @Test
+    public void testGetAssignmentName() {
+        String url = "a_url";
+        String assignmentFolder = "root";
+        String submitterName = "a_user";
+        SubmissionTarget target = new SubmissionTarget(url, new String[]{assignmentFolder, submitterName});
+        Assertions.assertEquals(submitterName, target.getSubmissionPath());
+    }
 }
