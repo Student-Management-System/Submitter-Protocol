@@ -90,12 +90,13 @@ public class SubmitterProtocolUnitTests {
     }
     
     /**
-     * .
-     * @throws NetworkException
+     * Test if {@link SubmitterProtocol#getOpenAssignments()} returns a list of open assignments.
+     * @throws NetworkException Must not occur, is not tested and network is not used. If this occur, internal API of
+     *     {@link SubmitterProtocol} has been changed.
      */
     @Test
     public void testGetOpenAssignments() throws NetworkException {
-     // Test data
+        // Test data
         String expectedExercise = "Exercise";
         String usedAssignmentID = "123";
         BigDecimal maxPoints = new BigDecimal(100);
