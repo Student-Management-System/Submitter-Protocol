@@ -7,13 +7,14 @@ import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 
 /**
  * This class declares <b>integration</b> tests for the {@link SubmissionHookProtocol} class.
  * These tests communicates with the REST test server.
- * @author Kunold
  * @author El-Sharkawy
+ * @author Kunold
  *
  */
 public class SubmissionHookProtocolIntegrationTest {
@@ -193,6 +194,68 @@ public class SubmissionHookProtocolIntegrationTest {
         
         Assessment assessment = hook.loadAssessmentByName(assignment, "Testgroup 1");
         assertAssessment(assessment, true);
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can create and submit
+     * a <b>new</b> {@link Assessment}.
+     */
+    @Test
+    public void testSubmitAssessmentNewAssessment() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        ReviewerProtocol rp = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server
+        assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, true);
+        
+        // All good, clean up -> remove newly created assessment
+        rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can modify and submit
+     * an <b>existent</b> {@link Assessment}.
+     */
+    @Test
+    public void testSubmitAssessmentExistentAssessment() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 1";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, true);
+        
+        // Modify assessment (will change values on server, however exact value is never used in test cases)
+        double points = (assessment.getAchievedPoints() + 1) % assignment.getPoints();
+        assessment.setAchievedPoints(points);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server
+        assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, true);
+        Assertions.assertEquals(points, assessment.getAchievedPoints());
     }
     
     /**
