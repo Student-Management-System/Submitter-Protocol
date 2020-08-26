@@ -26,8 +26,12 @@ public class TestUtils {
      */
     public static final String TEST_DEFAULT_JAVA_COURSE = "java";
     public static final String TEST_DEFAULT_SEMESTER = "wise1920";
+    public static final String TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE = "5b69db81-edbd-4f73-8928-1450036a75cb";
+    public static final String TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_GROUP = "b2f6c008-b9f7-477f-9e8b-ff34ce339077";
     public static final String TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE = "993b3cd0-6207-11ea-bc55-0242ac130003";
     public static final String TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP = "f50b8474-1fb9-4d69-85a2-76648d0fd3f9";
+    
+    public static final String[] TEST_USERS_OF_JAVA = {"elshar", "hpeter", "kunold", "mmustermann", "user"};
 
     /**
      * Extracts user name and password from the VM args and aborts the test if they are not provided.

@@ -1,6 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
@@ -66,9 +67,29 @@ public class SubmissionHookProtocol extends AbstractReviewerProtocol {
                     || (!assignment.isGroupWork() && submitterName.equals(a.getUser().getRzName())))
             .findAny()
             .orElse(null);
-        // In case there wasn't a previous assessment, there won't be a valid match and a new one must be created.
-        Assessment assessment = (null != assessmentDto) ? new Assessment(assessmentDto, assignment)
-            : createAssessment(assignment, submitterName);
+        
+        Assessment assessment;
+        if (null != assessmentDto) {
+            // Convert dto into frontend object
+            assessment = new Assessment(assessmentDto, assignment);
+        } else {
+            // In case there wasn't a previous assessment, there won't be a valid match and a new one must be created.
+
+            // First check if submitter exists
+            if (assignment.isGroupWork()) {
+                if (!super.groupExists(submitterName, assignment.getID())) {
+                    throw new DataNotFoundException("No group registered with the specified group name: "
+                        + submitterName, submitterName, DataType.GROUP_NOT_FOUND);
+                }
+            } else {
+                if (!super.studentExists(submitterName)) {
+                    throw new DataNotFoundException("No user registered with the specified user name: " + submitterName,
+                        submitterName, DataType.USER_NOT_FOUND);
+                }
+            }
+            
+            assessment = createAssessment(assignment, submitterName);
+        }
         
         return assessment;
     }

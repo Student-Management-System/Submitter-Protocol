@@ -4,12 +4,16 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 
 /**
  * This class declares <b>integration</b> tests for the {@link SubmissionHookProtocol} class.
  * These tests communicates with the REST test server.
  * @author Kunold
+ * @author El-Sharkawy
  *
  */
 public class SubmissionHookProtocolIntegrationTest {
@@ -19,12 +23,139 @@ public class SubmissionHookProtocolIntegrationTest {
      */
     @Test
     public void testGetAssignmentByName() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
+        Assertions.assertEquals(expectedAssignment, assignment.getName());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameCreateDuringSubmission() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
+        
+        Assessment assessment = hook.loadAssessmentByName(assignment, TestUtils.TEST_USERS_OF_JAVA[0]);
+        
+        Assertions.assertNotNull(assessment);
+        Assertions.assertNull(assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameCreateDuringReview() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE);
+        
+        Assessment assessment = hook.loadAssessmentByName(assignment, TestUtils.TEST_USERS_OF_JAVA[1]);
+        Assertions.assertNotNull(assessment);
+        Assertions.assertNull(assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an <b>invalid</b> existent user</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameCreateDuringSubmissionInvalidUser() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
+        
+        try {
+            hook.loadAssessmentByName(assignment, "A non existent user");
+            Assertions.fail("Expected to fail since user does not exist");
+        } catch (DataNotFoundException e) {
+            Assertions.assertEquals(DataType.USER_NOT_FOUND, e.getType());
+        }
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an existent group (for a group submission)</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameCreateDuringSubmissionGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 01 (Java)";
         
         SubmissionHookProtocol hook = initProtocol();
         Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_GROUP);
+        
+        Assessment assessment = hook.loadAssessmentByName(assignment, "Testgroup 1");
+        
+        Assertions.assertNotNull(assessment);
+        Assertions.assertNull(assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an <b>invalid</b> existent user</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameCreateDuringSubmissionInvalidGroup() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 01 (Java)";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_GROUP);
+        
+        try {
+            hook.loadAssessmentByName(assignment, "A non existent group");
+            Assertions.fail("Expected to fail since group does not exist");
+        } catch (DataNotFoundException e) {
+            Assertions.assertEquals(DataType.GROUP_NOT_FOUND, e.getType());
+        }
+    }
+    
+    /**
+     * Asserts an {@link Assignment}.
+     * @param assignment An assignment returned via {@link SubmissionHookProtocol#getAssignmentByName(String)}.
+     * @param expectedState The expected state of the assignment.
+     * @param expectedID Optional: The expected ID at the server.
+     */
+    private static void assertAssignment(Assignment assignment, State expectedState, String expectedID) {
         Assertions.assertNotNull(assignment);
-        Assertions.assertEquals(expectedAssignment, assignment.getName());
+        Assertions.assertEquals(expectedState, assignment.getState());
+        if (null != expectedID) {
+            Assertions.assertEquals(expectedID, assignment.getID());
+        }
     }
     
     /**

@@ -144,5 +144,30 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
         
         return new Assessment(dto, assignment);
     }
+    
+    /**
+     * Checks if a given user name is registered as a student at the course.
+     * @param userName The expected user name (RZ name) of the user to search for.
+     * @return <tt>true</tt> the student exists, <tt>false</tt> no student found with the given name.
+     * @throws NetworkException when network problems occur.
+     */
+    protected boolean studentExists(String userName) throws NetworkException {
+        return getProtocol().getStudentByName(userName) != null;
+    }
+    
+    /**
+     * Checks if a given group name is registered for the specified assignment.
+     * @param groupName The expected group name to search for.
+     * @param assignmentID The assignmentID for which the group is searched.
+     * @return <tt>true</tt> the group exists, <tt>false</tt> no group was found for the specified assignment.
+     * @throws NetworkException when network problems occur.
+     */
+    protected boolean groupExists(String groupName, String assignmentID) throws NetworkException {
+        GroupDto group = getProtocol().getGroupsAtAssignmentEnd(assignmentID).stream()
+            .filter(g -> g.getName().equals(groupName))
+            .findAny()
+            .orElse(null);
+        return group != null;
+    }
 
 }

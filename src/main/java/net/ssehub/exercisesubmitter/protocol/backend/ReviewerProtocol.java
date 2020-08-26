@@ -1,6 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
@@ -264,5 +265,27 @@ public class ReviewerProtocol extends NetworkProtocol {
         }
         
         return user;
+    }
+    
+    /**
+     * Returns a user that is a <tt>student</tt> by the specified name.
+     * @param userName The expected user name (RZ name) of the user to search for.
+     * @return The specified user or <tt>null</tt> if it could not be found.
+     * @throws NetworkException when network problems occur.
+     */
+    public ParticipantDto getStudentByName(String userName) throws NetworkException {
+        ParticipantDto participant = null;
+        try {
+            List<String> roles = Arrays.asList(ParticipantDto.RoleEnum.STUDENT.getValue());
+            participant = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null).stream()
+                .filter(p -> p.getRzName().equals(userName))
+                .findAny()
+                .orElse(null);
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
+            throw new DataNotFoundException("User not found", userName, DataType.USER_NOT_FOUND);
+        }
+        
+        return participant;
     }
 }
