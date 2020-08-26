@@ -32,6 +32,22 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
+     * Test if {link {@link SubmissionHookProtocol#getAssignmentByName(String)} returns the specified assignment.
+     */
+    @Test
+    public void testGetAssignmentByNameThrowException() throws NetworkException {
+        String expectedAssignment = "Non existent Assignment";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        try {
+            hook.getAssignmentByName(expectedAssignment);
+            Assertions.fail("Expected to fail since assignment does not exist");
+        } catch (DataNotFoundException e) {
+            Assertions.assertEquals(DataType.ASSIGNMENTS_NOT_FOUND, e.getType());
+        }
+    }
+    
+    /**
      * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
      * <ul>
      *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
@@ -51,6 +67,27 @@ public class SubmissionHookProtocolIntegrationTest {
         
         Assertions.assertNotNull(assessment);
         Assertions.assertNull(assessment.getAssessmentID());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt> (while students submit)</li>
+     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameExistingAssessment() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE);
+        
+        Assessment assessment = hook.loadAssessmentByName(assignment, "mmustermann");
+        Assertions.assertNotNull(assessment);
+        Assertions.assertNotNull(assessment.getAssessmentID());
     }
     
     /**
