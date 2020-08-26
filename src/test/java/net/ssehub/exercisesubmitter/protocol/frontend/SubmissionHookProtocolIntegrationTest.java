@@ -72,8 +72,8 @@ public class SubmissionHookProtocolIntegrationTest {
     /**
      * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
      * <ul>
-     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt> (while students submit)</li>
-     *   <li><b>Assessment state:</b> No assessment on server so far</li>
+     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt></li>
+     *   <li><b>Assessment state:</b> Existing Assessment</li>
      *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
      * </ul>
      */
@@ -93,7 +93,7 @@ public class SubmissionHookProtocolIntegrationTest {
     /**
      * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
      * <ul>
-     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt> (while students submit)</li>
+     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt></li>
      *   <li><b>Assessment state:</b> No assessment on server so far</li>
      *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
      * </ul>
@@ -179,6 +179,27 @@ public class SubmissionHookProtocolIntegrationTest {
         } catch (DataNotFoundException e) {
             Assertions.assertEquals(DataType.GROUP_NOT_FOUND, e.getType());
         }
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
+     * <ul>
+     *   <li><b>Submission state:</b> <tt>IN_REVIEW</tt></li>
+     *   <li><b>Assessment state:</b> Existing Assessment</li>
+     *   <li><b>Submitter:</b> an existent group (for a group submission)</li>
+     * </ul>
+     */
+    @Test
+    public void testLoadAssessmentByNameExistingAssessmentGroup() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        
+        Assessment assessment = hook.loadAssessmentByName(assignment, "Testgroup 1");
+        Assertions.assertNotNull(assessment);
+        Assertions.assertNotNull(assessment.getAssessmentID());
     }
     
     /**
