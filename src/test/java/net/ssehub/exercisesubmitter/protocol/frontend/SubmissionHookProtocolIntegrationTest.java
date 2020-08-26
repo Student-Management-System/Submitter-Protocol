@@ -64,9 +64,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
         
         Assessment assessment = hook.loadAssessmentByName(assignment, TestUtils.TEST_USERS_OF_JAVA[0]);
-        
-        Assertions.assertNotNull(assessment);
-        Assertions.assertNull(assessment.getAssessmentID());
+        assertAssessment(assessment, false);
     }
     
     /**
@@ -86,8 +84,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE);
         
         Assessment assessment = hook.loadAssessmentByName(assignment, "mmustermann");
-        Assertions.assertNotNull(assessment);
-        Assertions.assertNotNull(assessment.getAssessmentID());
+        assertAssessment(assessment, true);
     }
     
     /**
@@ -107,8 +104,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE);
         
         Assessment assessment = hook.loadAssessmentByName(assignment, TestUtils.TEST_USERS_OF_JAVA[1]);
-        Assertions.assertNotNull(assessment);
-        Assertions.assertNull(assessment.getAssessmentID());
+        assertAssessment(assessment, false);
     }
     
     /**
@@ -152,9 +148,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_GROUP);
         
         Assessment assessment = hook.loadAssessmentByName(assignment, "Testgroup 1");
-        
-        Assertions.assertNotNull(assessment);
-        Assertions.assertNull(assessment.getAssessmentID());
+        assertAssessment(assessment, false);
     }
     
     /**
@@ -198,8 +192,22 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
         
         Assessment assessment = hook.loadAssessmentByName(assignment, "Testgroup 1");
+        assertAssessment(assessment, true);
+    }
+    
+    /**
+     * Asserts an {@link Assessment}.
+     * @param assessment The assessment to test.
+     * @param expectedOnServer <tt>true</tt> expected that assessment exists on server, <tt>false</tt> a new one shall
+     *     be created on the fly.
+     */
+    private static void assertAssessment(Assessment assessment, boolean expectedOnServer) {
         Assertions.assertNotNull(assessment);
-        Assertions.assertNotNull(assessment.getAssessmentID());
+        if (expectedOnServer) {
+            Assertions.assertNotNull(assessment.getAssessmentID());
+        } else {
+            Assertions.assertNull(assessment.getAssessmentID());
+        }
     }
     
     /**
