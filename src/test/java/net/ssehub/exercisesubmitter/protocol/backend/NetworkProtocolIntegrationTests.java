@@ -1,5 +1,6 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,19 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetCourseID() {
-        NetworkProtocol np = initProtocol(false);
+        // Init protocol
+        NetworkProtocol np = new NetworkProtocol(TestUtils.TEST_MANAGEMENT_SERVER,
+            TestUtils.TEST_DEFAULT_JAVA_COURSE);
+        // set not existing semester
+        np.setSemester("not_existing_semester");
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> np.getCourseID());
+        Assertions.assertEquals("Course not found", exception.getMessage());
+        
+        // set correct semester
+        np.setSemester(TestUtils.TEST_DEFAULT_SEMESTER);
         try {
             String course = np.getCourseID();
             Assertions.assertFalse(course.isEmpty(), "No course found");
@@ -69,6 +82,12 @@ public class NetworkProtocolIntegrationTests {
     @Test
     public void testListOfCourses() {
         NetworkProtocol np = initProtocol(false);
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> np.getCourses("no_ID"));
+        Assertions.assertEquals("User not found", exception.getMessage());
+        
         try {
             List<CourseDto> courses = np.getCourses(TEST_USER_ID);
             Assertions.assertNotNull(courses, "Course list was null, but should never be null.");
@@ -83,7 +102,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetAssignments() {
-        NetworkProtocol np = initProtocol(true);
+        NetworkProtocol np = initProtocol(true);      
         try {
             List<Assignment> assignments = np.getAssignments((StateEnum[]) null);
             Assertions.assertNotNull(assignments, "Assignment list was null, but should never be null.");
@@ -99,6 +118,12 @@ public class NetworkProtocolIntegrationTests {
     @Test
     public void testGetAssessmentsWithGoups() {
         NetworkProtocol np = initProtocol(false);
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> np.getAssessmentsWithGroups("no_ID"));
+        Assertions.assertEquals("Assessments not found", exception.getMessage());
+        
         try {
             List<AssessmentDto> assessments = np.getAssessmentsWithGroups(TEST_USER_ID);
             Assertions.assertNotNull(assessments, "Assessment list was null, but should never be null.");
@@ -125,6 +150,12 @@ public class NetworkProtocolIntegrationTests {
     @Test
     public void testGetGroupsAtSubmissionEnd() {
         NetworkProtocol np = initProtocol(true);
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> np.getGroupsAtAssignmentEnd("no_ID"));
+        Assertions.assertEquals("No Groups for the assignment found", exception.getMessage());
+        
         try {
             List<GroupDto> groups = np.getGroupsAtAssignmentEnd(TEST_ASSIGNMENT_ID);
             Assertions.assertNotNull(groups, "Groups list was null, but should never be null.");
@@ -140,6 +171,12 @@ public class NetworkProtocolIntegrationTests {
     @Test
     public void testGetGroupForAssignment() {
         NetworkProtocol np = initProtocol(true);
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> np.getGroupForAssignment("no_ID", "no_ID"));
+        Assertions.assertEquals("No assignment related group information found", exception.getMessage());
+        
         try {
             String groupName = np.getGroupForAssignment(TEST_USER_ID, TEST_ASSIGNMENT_ID);
             Assertions.assertFalse(groupName.isEmpty(), "Groupname was empty");
