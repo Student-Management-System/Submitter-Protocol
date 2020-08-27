@@ -1,5 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -43,6 +45,11 @@ public class ReviewerProtocolIntegrationTests {
         ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
         rp.setSemester(TEST_SEMESTER);
         rp.setAccessToken(login.getManagementToken());
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> rp.getAssessments("noID", null));
+        Assertions.assertEquals("Assessments not found", exception.getMessage());
         
         try {
             List <AssessmentDto> assessments = rp.getAssessments(TEST_ASSIGNMENT_ID, null);
