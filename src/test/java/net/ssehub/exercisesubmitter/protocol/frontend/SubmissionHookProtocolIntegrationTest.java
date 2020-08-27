@@ -2,7 +2,10 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
@@ -15,11 +18,15 @@ import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnu
 
 /**
  * This class declares <b>integration</b> tests for the {@link SubmissionHookProtocol} class.
- * These tests communicates with the REST test server.
+ * These tests communicates with the REST test server.<br/>
+ * Used ordered tests: Tests are <b>not</b> dependent or each other.
+ * However, order should simplify synopsis, if tests crash because later tests assume that previous tests were
+ * successful.
  * @author El-Sharkawy
  * @author Kunold
  *
  */
+@TestMethodOrder(OrderAnnotation.class)
 public class SubmissionHookProtocolIntegrationTest {
     private ReviewerProtocol protocol;
     private Assessment assessment;
@@ -27,6 +34,7 @@ public class SubmissionHookProtocolIntegrationTest {
     /**
      * Test if {link {@link SubmissionHookProtocol#getAssignmentByName(String)} returns the specified assignment.
      */
+    @Order(1)
     @Test
     public void testGetAssignmentByName() throws NetworkException {
         String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
@@ -40,6 +48,7 @@ public class SubmissionHookProtocolIntegrationTest {
     /**
      * Test if {link {@link SubmissionHookProtocol#getAssignmentByName(String)} returns the specified assignment.
      */
+    @Order(2)
     @Test
     public void testGetAssignmentByNameThrowException() throws NetworkException {
         String expectedAssignment = "Non existent Assignment";
@@ -54,6 +63,50 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
+     * Tests that {@link SubmissionHookProtocol#createAssessment(Assignment, String)} throws and exception if an
+     * {@link Assessment} shall be created for a group and an user-{@link Assignment}.
+     * @throws NetworkException
+     */
+    @Order(3)
+    @Test
+    public void testCreateAssessmentInvalidUser() throws NetworkException {
+        // User assignment
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        
+        try {
+            hook.createAssessment(assignment, "Testgroup 1");
+            Assertions.fail("Expected to fail since user assessment should be created for a group assignment");
+        } catch (DataNotFoundException e) {
+            Assertions.assertEquals(DataType.USER_NOT_FOUND, e.getType());
+        }
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#createAssessment(Assignment, String)} throws and exception if an
+     * {@link Assessment} shall be created for an user and a group-{@link Assignment}.
+     * @throws NetworkException
+     */
+    @Order(3)
+    @Test
+    public void testCreateAssessmentInvalidGroup() throws NetworkException {
+        // User assignment
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        
+        try {
+            hook.createAssessment(assignment, TestUtils.TEST_USERS_OF_JAVA[3]);
+            Assertions.fail("Expected to fail since group assessment should be created for an user assignment");
+        } catch (DataNotFoundException e) {
+            Assertions.assertEquals(DataType.GROUP_NOT_FOUND, e.getType());
+        }
+    }
+    
+    /**
      * Tests that {@link SubmissionHookProtocol#getAssignmentByName(String)}. With the following parameters:
      * <ul>
      *   <li><b>Submission state:</b> <tt>IN_PROGRESS</tt> (while students submit)</li>
@@ -61,6 +114,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
      * </ul>
      */
+    @Order(10)
     @Test
     public void testLoadAssessmentByNameCreateDuringSubmission() throws NetworkException {
         String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
@@ -81,6 +135,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
      * </ul>
      */
+    @Order(10)
     @Test
     public void testLoadAssessmentByNameExistingAssessment() throws NetworkException {
         String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
@@ -101,6 +156,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an existent user (for a single submission)</li>
      * </ul>
      */
+    @Order(10)
     @Test
     public void testLoadAssessmentByNameCreateDuringReview() throws NetworkException {
         String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
@@ -121,6 +177,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an <b>invalid</b> existent user</li>
      * </ul>
      */
+    @Order(10)
     @Test
     public void testLoadAssessmentByNameCreateDuringSubmissionInvalidUser() throws NetworkException {
         String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
@@ -145,6 +202,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an existent group (for a group submission)</li>
      * </ul>
      */
+    @Order(20)
     @Test
     public void testLoadAssessmentByNameCreateDuringSubmissionGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 01 (Java)";
@@ -165,6 +223,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an <b>invalid</b> existent user</li>
      * </ul>
      */
+    @Order(20)
     @Test
     public void testLoadAssessmentByNameCreateDuringSubmissionInvalidGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 01 (Java)";
@@ -189,6 +248,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li><b>Submitter:</b> an existent group (for a group submission)</li>
      * </ul>
      */
+    @Order(20)
     @Test
     public void testLoadAssessmentByNameExistingAssessmentGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
@@ -210,6 +270,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>No partials</li>
      * </ul>
      */
+    @Order(30)
     @Test
     public void testSubmitAssessmentNewAssessmentUser() throws NetworkException {
         String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
@@ -245,6 +306,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>No partials</li>
      * </ul>
      */
+    @Order(30)
     @Test
     public void testSubmitAssessmentNewAssessmentGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
@@ -280,6 +342,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>No partials</li>
      * </ul>
      */
+    @Order(30)
     @Test
     public void testSubmitAssessmentExistentAssessment() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
@@ -294,7 +357,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssessment(assessment, true);
         
         // Modify assessment (will change values on server, however exact value is never used in test cases)
-        double points = (assessment.getAchievedPoints() + 1) % assignment.getPoints();
+        double points = ((assessment.getAchievedPoints() + 1) % assignment.getPoints());
         assessment.setAchievedPoints(points);
         
         // Upload assessment
@@ -315,6 +378,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>New partials</li>
      * </ul>
      */
+    @Order(40)
     @Test
     public void testSubmitAssessmentNewPartials() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
@@ -365,6 +429,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>Modify partial</li>
      * </ul>
      */
+    @Order(41)
     @Test
     public void testSubmitAssessmentModifyPartial() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
