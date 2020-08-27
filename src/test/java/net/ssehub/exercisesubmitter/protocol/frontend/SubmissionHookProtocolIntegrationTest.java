@@ -205,13 +205,48 @@ public class SubmissionHookProtocolIntegrationTest {
      * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
      * an {@link Assessment}. Parameters:
      * <ul>
+     *   <li>Single assignment</li>
+     *   <li>New assessment</li>
+     *   <li>No partials</li>
+     * </ul>
+     */
+    @Test
+    public void testSubmitAssessmentNewAssessmentUser() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 03 (Java) - SINGLE - IN_REVIEW";
+        String group = "elshar";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(42);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
      *   <li>Group assignment</li>
      *   <li>New assessment</li>
      *   <li>No partials</li>
      * </ul>
      */
     @Test
-    public void testSubmitAssessmentNewAssessment() throws NetworkException {
+    public void testSubmitAssessmentNewAssessmentGroup() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
         String group = "Testgroup 3";
         
