@@ -133,7 +133,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         } catch (IllegalArgumentException e) {
             throw new ServerNotFoundException(e.getMessage(), getBasePath());
         } catch (ApiException e) {
-            throw new DataNotFoundException("Assessments for the specified assignement not found", getCourseName(),
+            throw new DataNotFoundException("Assessments for the specified assignment not found", getCourseName(),
                     DataType.ASSESSMENTS_NOT_FOUND);
         }
         return singleAssessment;
