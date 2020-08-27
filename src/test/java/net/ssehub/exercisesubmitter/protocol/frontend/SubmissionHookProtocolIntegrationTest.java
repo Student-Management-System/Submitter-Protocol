@@ -217,7 +217,7 @@ public class SubmissionHookProtocolIntegrationTest {
         
         SubmissionHookProtocol hook = initProtocol();
         Assignment assignment = hook.getAssignmentByName(expectedAssignment);
-        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_SINGLE);
         // Marks this.this.assessment for removal via the cleanUp-Method
         protocol = hook.getProtocol();
         
