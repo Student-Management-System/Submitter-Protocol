@@ -259,6 +259,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         Assertions.assertTrue(participants.contains(new User("elshar", "elshar", "elshar@test.com")));
         Assertions.assertTrue(participants.contains(new User("kunold", "kunold", "kunold@test.com")));
         Assertions.assertTrue(participants.get(0).getEMail().equals("elshar@test.com"));
+        Assertions.assertNull(participants.get(0).getGroupName());
     }
     
     /**
