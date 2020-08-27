@@ -1,5 +1,6 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,8 @@ import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataT
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
+import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnum;
 
 /**
  * This class declares <b>integration</b> tests for the {@link SubmissionHookProtocol} class.
@@ -18,6 +21,8 @@ import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
  *
  */
 public class SubmissionHookProtocolIntegrationTest {
+    private ReviewerProtocol protocol;
+    private Assessment assessment;
     
     /**
      * Test if {link {@link SubmissionHookProtocol#getAssignmentByName(String)} returns the specified assignment.
@@ -197,8 +202,13 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
-     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can create and submit
-     * a <b>new</b> {@link Assessment}.
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
+     *   <li>New assessment</li>
+     *   <li>No partials</li>
+     * </ul>
      */
     @Test
     public void testSubmitAssessmentNewAssessment() throws NetworkException {
@@ -229,8 +239,13 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
-     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can modify and submit
-     * an <b>existent</b> {@link Assessment}.
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
+     *   <li>Update of an existing assessment</li>
+     *   <li>No partials</li>
+     * </ul>
      */
     @Test
     public void testSubmitAssessmentExistentAssessment() throws NetworkException {
@@ -256,6 +271,74 @@ public class SubmissionHookProtocolIntegrationTest {
         assessment = hook.loadAssessmentByName(assignment, group);
         assertAssessment(assessment, true);
         Assertions.assertEquals(points, assessment.getAchievedPoints());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
+     *   <li>New assessment</li>
+     *   <li>New partials</li>
+     * </ul>
+     */
+    @Test
+    public void testSubmitAssessmentNewPartials() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        ReviewerProtocol rp = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        String description = "Classes do not compile";
+        String file = "File.java";
+        Integer line = 42;
+        assessment.addAutomaticReview(tool, severity, description, file, line);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server -> Read from server
+        assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, true);
+        Assertions.assertEquals(1, assessment.partialAsssesmentSize());
+        
+        // Test partial assessment
+        PartialAssessmentDto partial = assessment.getPartialAssessment(0);
+        Assertions.assertNotNull(partial.getId());
+        Assertions.assertEquals(tool, partial.getTitle());
+        Assertions.assertEquals(severity, partial.getSeverity().name());
+        Assertions.assertEquals(file, partial.getPath());
+        Assertions.assertEquals(line.intValue(), partial.getLine().intValue());
+        
+        // All good, clean up -> remove newly created assessment
+        rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+    }
+    
+    /**
+     * Cleans up temporarily created objects if necessary.
+     * Requires that the protocol and the newly created {@link Assessment} was saved during the test.
+     * This is done outside of the test to ensure deletion even if tests stops during its execution.
+     */
+    @AfterEach
+    public void cleanup() {
+        if (null != protocol && null != assessment) {
+            try {
+                protocol.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+            } catch (NetworkException e) {
+                Assertions.fail("Could not delete newly created assessment due to " + e.getMessage());
+            }
+        }
     }
     
     /**

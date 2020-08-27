@@ -183,6 +183,8 @@ public class Assessment implements Iterable<User> {
      */
     public void addAutomaticReview(String tool, String severity, String message, String file, Integer line) {
         PartialAssessmentDto toolReview = new PartialAssessmentDto();
+        // Tile must not be null -> We use the tool as type and title
+        toolReview.setTitle(tool);
         toolReview.setType(tool);
         SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
         toolReview.setSeverity(severityType);
