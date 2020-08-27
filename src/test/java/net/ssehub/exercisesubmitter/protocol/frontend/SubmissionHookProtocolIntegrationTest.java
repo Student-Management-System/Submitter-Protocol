@@ -218,7 +218,8 @@ public class SubmissionHookProtocolIntegrationTest {
         SubmissionHookProtocol hook = initProtocol();
         Assignment assignment = hook.getAssignmentByName(expectedAssignment);
         assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
-        ReviewerProtocol rp = hook.getProtocol();
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
         
         // Test that assessment does not exist on server
         Assessment assessment = hook.loadAssessmentByName(assignment, group);
@@ -231,11 +232,8 @@ public class SubmissionHookProtocolIntegrationTest {
         Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
         
         // Test that assessment does now exist on server
-        assessment = hook.loadAssessmentByName(assignment, group);
-        assertAssessment(assessment, true);
-        
-        // All good, clean up -> remove newly created assessment
-        rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
     }
     
     /**
@@ -290,7 +288,8 @@ public class SubmissionHookProtocolIntegrationTest {
         SubmissionHookProtocol hook = initProtocol();
         Assignment assignment = hook.getAssignmentByName(expectedAssignment);
         assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
-        ReviewerProtocol rp = hook.getProtocol();
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
         
         // Test that assessment does not exist on server
         Assessment assessment = hook.loadAssessmentByName(assignment, group);
@@ -309,20 +308,17 @@ public class SubmissionHookProtocolIntegrationTest {
         Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
         
         // Test that assessment does now exist on server -> Read from server
-        assessment = hook.loadAssessmentByName(assignment, group);
-        assertAssessment(assessment, true);
-        Assertions.assertEquals(1, assessment.partialAsssesmentSize());
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
         
         // Test partial assessment
-        PartialAssessmentDto partial = assessment.getPartialAssessment(0);
+        PartialAssessmentDto partial = this.assessment.getPartialAssessment(0);
         Assertions.assertNotNull(partial.getId());
         Assertions.assertEquals(tool, partial.getTitle());
         Assertions.assertEquals(severity, partial.getSeverity().name());
         Assertions.assertEquals(file, partial.getPath());
         Assertions.assertEquals(line.intValue(), partial.getLine().intValue());
-        
-        // All good, clean up -> remove newly created assessment
-        rp.deleteAssessment(assessment.getAssignmentID(), assessment.getAssessmentID());
     }
     
     /**
