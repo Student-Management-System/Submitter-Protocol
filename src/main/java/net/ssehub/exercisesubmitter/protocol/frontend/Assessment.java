@@ -134,7 +134,7 @@ public class Assessment implements Iterable<User> {
     public void clearPartialAssessments() {
         if (partialAsssesmentSize() > 0) {
             // Avoid that list is multiple times cleared and, thus, data gets lost
-            if (null != removalList) {
+            if (null == removalList) {
                 removalList = new HashMap<>();
             }
             
@@ -193,6 +193,10 @@ public class Assessment implements Iterable<User> {
         if (null != line) {
             BigDecimal number = new BigDecimal(line);
             toolReview.setLine(number);            
+        }
+        if (null != assessment.getId()) {
+            // Update of an existing assessment -> partial needs to refer this assessment
+            toolReview.setAssessmentId(assessment.getId());
         }
         assessment.addPartialAssessmentsItem(toolReview);
     }

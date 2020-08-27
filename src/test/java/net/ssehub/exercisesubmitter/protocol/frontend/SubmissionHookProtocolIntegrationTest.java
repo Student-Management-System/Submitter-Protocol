@@ -357,6 +357,67 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
+     *   <li>Modify assessment</li>
+     *   <li>Modify partial</li>
+     * </ul>
+     */
+    @Test
+    public void testSubmitAssessmentModifyPartial() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        String description = "Classes do not compile";
+        assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
+        
+        // Upload assessment: Basis for the test!
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Read assessment from server and modify the partial
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
+        Assertions.assertNotNull(this.assessment.getPartialAssessment(0).getId());
+        this.assessment.clearPartialAssessments();
+        String file = "Another_File.java";
+        Integer line = 21;
+        this.assessment.addAutomaticReview(tool, severity, description, file, line);
+        
+        // Upload modified assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, this.assessment));
+        
+        // Test that partial was modified
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
+        
+        // Test partial assessment
+        PartialAssessmentDto partial = this.assessment.getPartialAssessment(0);
+        Assertions.assertNotNull(partial.getId());
+        Assertions.assertEquals(tool, partial.getTitle());
+        Assertions.assertEquals(severity, partial.getSeverity().name());
+        Assertions.assertEquals(file, partial.getPath());
+        Assertions.assertEquals(line.intValue(), partial.getLine().intValue());
+    }
+    
+    /**
      * Cleans up temporarily created objects if necessary.
      * Requires that the protocol and the newly created {@link Assessment} was saved during the test.
      * This is done outside of the test to ensure deletion even if tests stops during its execution.
