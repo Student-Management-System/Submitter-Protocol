@@ -48,7 +48,7 @@ public class ReviewerProtocolIntegrationTests {
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
-            () -> rp.getAssessments("noID", null));
+            () -> rp.getAssessments("no_ID", null));
         Assertions.assertEquals("Assessments not found", exception.getMessage());
         
         try {
@@ -72,6 +72,11 @@ public class ReviewerProtocolIntegrationTests {
         rp.setSemester(TEST_SEMESTER);
         rp.setAccessToken(login.getManagementToken());
 
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> rp.getAssessmentForAssignment("no_ID", "no_ID"));
+        Assertions.assertEquals("Assessments for the specified assignement not found", exception.getMessage());
+        
         try {
             AssessmentDto assessment = rp.getAssessmentForAssignment(TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
             Assertions.assertNotNull(assessment, "No Assessment returned");
