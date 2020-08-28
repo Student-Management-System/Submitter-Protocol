@@ -374,6 +374,55 @@ public class SubmissionHookProtocolIntegrationTest {
      * an {@link Assessment}. Parameters:
      * <ul>
      *   <li>Group assignment</li>
+     *   <li>Update of an existing assessment: Delete points during re-correction</li>
+     *   <li>No partials</li>
+     * </ul>
+     */
+    @Order(31)
+    @Test
+    public void testSubmitAssessmentModifyRemovePoints() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Set intial points
+        int initialPoints = 10;
+        assessment.setAchievedPoints(initialPoints);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(initialPoints, this.assessment.getAchievedPoints());
+        
+        // Modify assessment: Delete points as correction wasn't correct
+        this.assessment.setAchievedPoints(0);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, this.assessment));
+        
+        // Test that points were also removed on server
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(0, this.assessment.getAchievedPoints(), "Achieved points were not deleted on server.");
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
      *   <li>New assessment</li>
      *   <li>New partials</li>
      * </ul>
