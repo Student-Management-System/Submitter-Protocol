@@ -21,7 +21,9 @@ import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnu
  * These tests communicates with the REST test server.<br/>
  * Used ordered tests: Tests are <b>not</b> dependent or each other.
  * However, order should simplify synopsis, if tests crash because later tests assume that previous tests were
- * successful.
+ * successful.<p>
+ * This means that first tests test basic functionality and later tests test logically dependent and more complex
+ * functionality. As a consequence, the first tests that fail should be fixed fist.
  * @author El-Sharkawy
  * @author Kunold
  *
