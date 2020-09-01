@@ -34,6 +34,25 @@ public class ReviewerProtocolIntegrationTests {
     public static final String TEST_ASSESSMENT_ID = "680dd44a-93b0-4d1c-a947-9b50a4bbb68e";
     public static final String TEST_SEMESTER = "wise1920";
     
+    
+    /**
+     * Test that {@link DataNotFoundException} is thrown if no assessments are found.
+     */
+    @Test
+    public void testGetAssessmentsDataNotFound() { 
+        // Requires a valid user to be logged in
+        LoginComponent login = LoginComponentIntegrationTests.createLoginForTests();
+        
+        ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
+        rp.setSemester(TEST_SEMESTER);
+        rp.setAccessToken(login.getManagementToken());
+        
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> rp.getAssessments("no_ID", null));
+        Assertions.assertEquals("Assessments not found", exception.getMessage());
+    }
+    
     /**
      * Tests if a List of Assessments for an Assignment is returned.
      */
@@ -46,11 +65,6 @@ public class ReviewerProtocolIntegrationTests {
         rp.setSemester(TEST_SEMESTER);
         rp.setAccessToken(login.getManagementToken());
         
-        // Test that DataNotFoundException is correctly thrown
-        Exception exception = assertThrows(DataNotFoundException.class, 
-            () -> rp.getAssessments("no_ID", null));
-        Assertions.assertEquals("Assessments not found", exception.getMessage());
-        
         try {
             List <AssessmentDto> assessments = rp.getAssessments(TEST_ASSIGNMENT_ID, null);
             Assertions.assertNotNull(assessments, "Assessment List was null, but never should be null");
@@ -58,6 +72,24 @@ public class ReviewerProtocolIntegrationTests {
         } catch (NetworkException e) {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Test that {@link DataNotFoundException} is thrown if no assessments for a assignment are found.
+     */
+    @Test
+    public void testGetAssessmentForAssignmentDataNotFound() {
+        // Requires a valid user to be logged in
+        LoginComponent login = LoginComponentIntegrationTests.createLoginForTests();
+        
+        ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
+        rp.setSemester(TEST_SEMESTER);
+        rp.setAccessToken(login.getManagementToken());
+
+        // Test that DataNotFoundException is correctly thrown
+        Exception exception = assertThrows(DataNotFoundException.class, 
+            () -> rp.getAssessmentForAssignment("no_ID", "no_ID"));
+        Assertions.assertEquals("Assessments for the specified assignment not found", exception.getMessage());
     }
     
     /**
@@ -71,11 +103,6 @@ public class ReviewerProtocolIntegrationTests {
         ReviewerProtocol rp = new ReviewerProtocol(TEST_SERVER, TEST_COURSE_ID);
         rp.setSemester(TEST_SEMESTER);
         rp.setAccessToken(login.getManagementToken());
-
-        // Test that DataNotFoundException is correctly thrown
-        Exception exception = assertThrows(DataNotFoundException.class, 
-            () -> rp.getAssessmentForAssignment("no_ID", "no_ID"));
-        Assertions.assertEquals("Assessments for the specified assignment not found", exception.getMessage());
         
         try {
             AssessmentDto assessment = rp.getAssessmentForAssignment(TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);

@@ -51,10 +51,10 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
-     * Test if a course to a id is found.
+     * Test that {@link DataNotFoundException} is thrown if courseID is not found.
      */
     @Test
-    public void testGetCourseID() {
+    public void testGetCourseIDDataNotFound() {
         // Init protocol
         NetworkProtocol np = new NetworkProtocol(TestUtils.TEST_MANAGEMENT_SERVER,
             TestUtils.TEST_DEFAULT_JAVA_COURSE);
@@ -65,9 +65,14 @@ public class NetworkProtocolIntegrationTests {
         Exception exception = assertThrows(DataNotFoundException.class, 
             () -> np.getCourseID());
         Assertions.assertEquals("Course not found", exception.getMessage());
-        
-        // set correct semester
-        np.setSemester(TestUtils.TEST_DEFAULT_SEMESTER);
+    }
+    
+    /**
+     * Test if a course to a id is found.
+     */
+    @Test
+    public void testGetCourseID() {
+        NetworkProtocol np = initProtocol(false);
         try {
             String course = np.getCourseID();
             Assertions.assertFalse(course.isEmpty(), "No course found");
@@ -77,17 +82,24 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
-     * Test if a List of courses is returned.
+     * Test that {@link DataNotFoundException} is thrown if no list of courses is found.
      */
     @Test
-    public void testListOfCourses() {
+    public void testListOfCoursesDataNotFound() {
         NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
             () -> np.getCourses("no_ID"));
         Assertions.assertEquals("User not found", exception.getMessage());
-        
+    }
+    
+    /**
+     * Test if a List of courses is returned.
+     */
+    @Test
+    public void testListOfCourses() {
+        NetworkProtocol np = initProtocol(true);
         try {
             List<CourseDto> courses = np.getCourses(TEST_USER_ID);
             Assertions.assertNotNull(courses, "Course list was null, but should never be null.");
@@ -113,17 +125,24 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
-     * Test if a List of assessments is returned.
+     * Test that {@link DataNotFoundException} is thrown if no assessment with groups is found.
      */
     @Test
-    public void testGetAssessmentsWithGoups() {
+    public void testGetAssessmentsWithGroupsDataNotFound() {
         NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
             () -> np.getAssessmentsWithGroups("no_ID"));
         Assertions.assertEquals("Assessments not found", exception.getMessage());
-        
+    }
+    
+    /**
+     * Test if a List of assessments is returned.
+     */
+    @Test
+    public void testGetAssessmentsWithGoups() {
+        NetworkProtocol np = initProtocol(true);        
         try {
             List<AssessmentDto> assessments = np.getAssessmentsWithGroups(TEST_USER_ID);
             Assertions.assertNotNull(assessments, "Assessment list was null, but should never be null.");
@@ -145,17 +164,24 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
-     * Tests if a list of groups at submission end is returned.
+     * Test that {@link DataNotFoundException} is thrown if no groups at submission end are found.
      */
     @Test
-    public void testGetGroupsAtSubmissionEnd() {
+    public void testGetGroupsAtSubmissionEndDataNotFound() {
         NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
             () -> np.getGroupsAtAssignmentEnd("no_ID"));
         Assertions.assertEquals("No Groups for the assignment found", exception.getMessage());
-        
+    }
+    
+    /**
+     * Tests if a list of groups at submission end is returned.
+     */
+    @Test
+    public void testGetGroupsAtSubmissionEnd() {
+        NetworkProtocol np = initProtocol(true);    
         try {
             List<GroupDto> groups = np.getGroupsAtAssignmentEnd(TEST_ASSIGNMENT_ID);
             Assertions.assertNotNull(groups, "Groups list was null, but should never be null.");
@@ -166,17 +192,24 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
-     * Tests if a groupname for an assignment is returned.
+     * Test that {@link DataNotFoundException} is thrown if no group for the assignment is found.
      */
     @Test
-    public void testGetGroupForAssignment() {
+    public void testGetGroupForAssignmentDataNotFound() {
         NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
             () -> np.getGroupForAssignment("no_ID", "no_ID"));
         Assertions.assertEquals("No assignment related group information found", exception.getMessage());
-        
+    }
+    
+    /**
+     * Tests if a groupname for an assignment is returned.
+     */
+    @Test
+    public void testGetGroupForAssignment() {
+        NetworkProtocol np = initProtocol(true);
         try {
             String groupName = np.getGroupForAssignment(TEST_USER_ID, TEST_ASSIGNMENT_ID);
             Assertions.assertFalse(groupName.isEmpty(), "Groupname was empty");
