@@ -26,7 +26,7 @@ public class AssessmentUnitTests {
         UserDto user = new UserDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");
-        user.setRzName("auser");
+        user.setUsername("auser");
         
         AssessmentDto dto = new AssessmentDto();
         dto.setId("AssessmentID 1");
@@ -69,7 +69,7 @@ public class AssessmentUnitTests {
         UserDto user = new UserDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");
-        user.setRzName("auser");
+        user.setUsername("auser");
         
         AssessmentDto dto = new AssessmentDto();
         dto.setId("AssessmentID 1");

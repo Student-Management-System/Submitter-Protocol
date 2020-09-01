@@ -132,7 +132,7 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             dto.setGroupId(group.getId());
         } else {
             ParticipantDto participant = getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
-                .filter(u -> submitterName.equals(u.getRzName()))
+                .filter(u -> submitterName.equals(u.getUsername()))
                 .findFirst()
                 .orElseThrow(() -> new DataNotFoundException("Could not find user '" + submitterName + "'",
                     submitterName, DataType.USER_NOT_FOUND));

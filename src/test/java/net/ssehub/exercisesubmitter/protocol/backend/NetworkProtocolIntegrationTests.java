@@ -81,7 +81,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testListOfCourses() {
-        NetworkProtocol np = initProtocol(false);
+        NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 
@@ -117,7 +117,7 @@ public class NetworkProtocolIntegrationTests {
      */
     @Test
     public void testGetAssessmentsWithGoups() {
-        NetworkProtocol np = initProtocol(false);
+        NetworkProtocol np = initProtocol(true);
         
         // Test that DataNotFoundException is correctly thrown
         Exception exception = assertThrows(DataNotFoundException.class, 

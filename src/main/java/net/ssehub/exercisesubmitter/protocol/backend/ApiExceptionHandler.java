@@ -33,12 +33,26 @@ class ApiExceptionHandler {
         }
         if (exc instanceof ApiException) {
             ApiException apiExc = (ApiException) exc;
+            String responseBody = apiExc.getResponseBody();
             
             if (401 == apiExc.getCode()) {
                 throw new UnauthorizedException("User not authorized, but required to query Assessments.");
             }
             
-            String responseBody = apiExc.getResponseBody();
+            if (403 == apiExc.getCode()) {
+                // Try to extract course and provide a more meaningful exception
+                String msg;
+                if (null != responseBody && responseBody.contains("is not a member of course")) {
+                    int start = responseBody.indexOf("is not a member of course (")
+                        + "is not a member of course (".length();
+                    int end = responseBody.indexOf(')', start);
+                    msg = "User is not a member of course '" + responseBody.substring(start, end) + "'";
+                } else {
+                    msg = responseBody;
+                }
+                throw new ForbiddenException(msg);
+            }
+            
             if (responseBody != null && responseBody.contains("\"status\":500")
                 && responseBody.contains("\"message\":\"pre:ZuulAuthorizationFilter\"")) {
                 // Sparky services blocks the route because of access rules

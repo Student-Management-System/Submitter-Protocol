@@ -50,11 +50,12 @@ public class Assessment implements Iterable<User> {
         List<User> participants = new ArrayList<>();
         if (assignment.isGroupWork()) {
             assessment.getGroup().getMembers().stream()
-                .map(p -> new User(p.getUsername(), p.getRzName(), p.getEmail()))
+                // TODO SE: Check if Displayname is required -> This would require an additional query!
+                .map(p -> new User(p.getUsername(), p.getUsername(), p.getEmail()))
                 .forEach(participants::add);
         } else {
             UserDto userDto = assessment.getUser();
-            participants.add(new User(userDto.getUsername(), userDto.getRzName(), userDto.getEmail()));
+            participants.add(new User(userDto.getDisplayName(), userDto.getUsername(), userDto.getEmail()));
         }
         
         this.participants = Collections.unmodifiableList(participants);
@@ -90,7 +91,7 @@ public class Assessment implements Iterable<User> {
      * @return In case of a group work the group name, the user account name (RZ name) otherwise.
      */
     public String getSubmitterName() {
-        return assignment.isGroupWork() ? assessment.getGroup().getName() : assessment.getUser().getRzName();
+        return assignment.isGroupWork() ? assessment.getGroup().getName() : assessment.getUser().getUsername();
     }
     
     /**

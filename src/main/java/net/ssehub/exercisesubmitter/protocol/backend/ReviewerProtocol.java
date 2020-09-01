@@ -130,12 +130,13 @@ public class ReviewerProtocol extends NetworkProtocol {
         AssessmentDto singleAssessment = null;
         try {
             singleAssessment = apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments for the specified assignment not found", getCourseName(),
-                    DataType.ASSESSMENTS_NOT_FOUND);
+                DataType.ASSESSMENTS_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         return singleAssessment;
     }
     
@@ -171,12 +172,13 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             AssessmentDto result = apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
             id = result.getId();
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         return id;
     }
     
@@ -192,15 +194,16 @@ public class ReviewerProtocol extends NetworkProtocol {
             throws NetworkException {
         boolean success = false;
         try {
-            PartialAssessmentDto result =  apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId,
-                    assessmentId);
+            PartialAssessmentDto result = apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId,
+                assessmentId);
             success = result != null;
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
+        // checkstyle: start exception type check
         return success;
     }
     
@@ -279,7 +282,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             List<String> roles = Arrays.asList(ParticipantDto.RoleEnum.STUDENT.getValue());
             participant = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null).stream()
-                .filter(p -> p.getRzName().equals(userName))
+                .filter(p -> p.getUsername().equals(userName))
                 .findAny()
                 .orElse(null);
         } catch (Exception e) {

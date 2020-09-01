@@ -1,6 +1,7 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ public class ReviewerProtocolUnitTests {
         AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
         try {
             Mockito.when(assessmentApiMock.addPartialAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString(),
-                    Mockito.anyString()))
+                Mockito.anyString()))
                 .thenReturn(new PartialAssessmentDto());
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
@@ -167,8 +168,10 @@ public class ReviewerProtocolUnitTests {
         try {
             CourseDto result = new CourseDto();
             result.setId(TEST_COURSE_ID);
-            Mockito.when(courseApiMock.getCourseByNameAndSemester(Mockito.anyString(), Mockito.any()))
-                .thenReturn(result);
+            result.setShortname("java");
+            Mockito.when(courseApiMock.getCourses(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                Mockito.any()))
+                .thenReturn(Arrays.asList(result));
         } catch (ApiException e) {
             Assertions.fail("Should not be thrown " + e.getMessage());
         }

@@ -94,7 +94,7 @@ public class LoginComponent {
             tokenAsJson.setToken(tmpToken);
             try {
                 AuthTokenDto loginData = mgmtAuthApi.loginWithToken(tokenAsJson);
-                userID = loginData.getUserId();
+                userID = loginData.getUser().getId();
                 this.managementToken = loginData.getAccessToken();
             } catch (IllegalArgumentException e) {
                 throw new ServerNotFoundException(e.getMessage(), stdMgmtURL);

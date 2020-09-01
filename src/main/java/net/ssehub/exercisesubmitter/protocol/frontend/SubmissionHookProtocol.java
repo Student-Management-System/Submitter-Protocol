@@ -63,10 +63,10 @@ public class SubmissionHookProtocol extends AbstractReviewerProtocol {
          * No use second filter to restrict it to exact match.
          * Further this won't work for user names (RZ names).
          */
-        String groupName = assignment.isGroupWork() ? submitterName : null;
-        AssessmentDto assessmentDto = getProtocol().getAssessments(assignment.getID(), groupName).stream()
+//        String groupName = assignment.isGroupWork() ? submitterName : null;
+        AssessmentDto assessmentDto = getProtocol().getAssessments(assignment.getID(), submitterName).stream()
             .filter(a -> (assignment.isGroupWork() && submitterName.equals(a.getGroup().getName()))
-                    || (!assignment.isGroupWork() && submitterName.equals(a.getUser().getRzName())))
+                    || (!assignment.isGroupWork() && submitterName.equals(a.getUser().getUsername())))
             .findAny()
             .orElse(null);
         

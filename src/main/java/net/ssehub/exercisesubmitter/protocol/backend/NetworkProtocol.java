@@ -195,7 +195,11 @@ public class NetworkProtocol {
         if (courseId == null || courseId.isEmpty()) {
             
             try {
-                CourseDto course = apiCourse.getCourseByNameAndSemester(courseName, semester);
+                CourseDto course = apiCourse.getCourses(null, null, courseName, semester, null).stream()
+                    .filter(c -> c.getShortname().equals(courseName))
+                    .findAny()
+                    .orElseThrow(() -> new DataNotFoundException("Course not found", courseName,
+                        DataType.COURSE_NOT_FOUND));
                 courseId = course.getId();
             } catch (IllegalArgumentException e) {
                 throw new ServerNotFoundException(e.getMessage(), basePath);
