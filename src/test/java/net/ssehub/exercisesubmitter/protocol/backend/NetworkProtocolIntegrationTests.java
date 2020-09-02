@@ -51,6 +51,24 @@ public class NetworkProtocolIntegrationTests {
     }
     
     /**
+     * Test that {@link ServerNotFoundException} is thrown if server is not found.
+     */
+    @Test
+    public void testGetCourseIDServerNotFound() {
+        // Init protocol
+        NetworkProtocol np = new NetworkProtocol("not_existing_server",
+            "not_existing_course");
+        // set not existing semester
+        np.setSemester("not_existing_semester");
+        
+        // Test that ServerNotFoundException is correctly thrown
+        Exception exception = assertThrows(ServerNotFoundException.class, 
+            () -> np.getCourseID());
+        Assertions.assertEquals("unexpected url: not_existing_server/courses?shortname=not_existing_course&" 
+            + "semester=not_existing_semester", exception.getMessage());
+    }
+    
+    /**
      * Test that {@link DataNotFoundException} is thrown if courseID is not found.
      */
     @Test
