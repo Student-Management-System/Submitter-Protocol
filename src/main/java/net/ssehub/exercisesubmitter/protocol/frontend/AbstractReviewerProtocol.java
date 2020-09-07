@@ -3,16 +3,15 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 import java.util.Collection;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
-import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
-import net.ssehub.studentmgmt.backend_api.model.UserDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 
 /**
@@ -86,7 +85,6 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             createDto.setAssignmentId(assessment.getAssignmentID());
             createDto.setComment(assessment.getFullReviewComment());
             createDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
-            createDto.setCreatorId(getUserID());
             if (assignment.isGroupWork()) {
                 createDto.setGroupId(assessment.getAssessmentDTO().getGroupId());
             } else {
@@ -137,9 +135,8 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
                 .orElseThrow(() -> new DataNotFoundException("Could not find user '" + submitterName + "'",
                     submitterName, DataType.USER_NOT_FOUND));
             
-            UserDto user = getProtocol().getUserById(participant.getUserId());
             dto.setUserId(participant.getUserId());
-            dto.setUser(user);
+            dto.setParticipant(participant);
         }
         
         return new Assessment(dto, assignment);

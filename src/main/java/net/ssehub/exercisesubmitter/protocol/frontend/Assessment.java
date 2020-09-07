@@ -12,7 +12,7 @@ import java.util.Map;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnum;
-import net.ssehub.studentmgmt.backend_api.model.UserDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 
 /**
  * Stores data related to an assessment of a submitted assignment.
@@ -54,8 +54,8 @@ public class Assessment implements Iterable<User> {
                 .map(p -> new User(p.getUsername(), p.getUsername(), p.getEmail()))
                 .forEach(participants::add);
         } else {
-            UserDto userDto = assessment.getUser();
-            participants.add(new User(userDto.getDisplayName(), userDto.getUsername(), userDto.getEmail()));
+            ParticipantDto participant = assessment.getParticipant();
+            participants.add(new User(participant.getDisplayName(), participant.getUsername(), participant.getEmail()));
         }
         
         this.participants = Collections.unmodifiableList(participants);
@@ -91,7 +91,7 @@ public class Assessment implements Iterable<User> {
      * @return In case of a group work the group name, the user account name (RZ name) otherwise.
      */
     public String getSubmitterName() {
-        return assignment.isGroupWork() ? assessment.getGroup().getName() : assessment.getUser().getUsername();
+        return assignment.isGroupWork() ? assessment.getGroup().getName() : assessment.getParticipant().getUsername();
     }
     
     /**

@@ -61,12 +61,10 @@ public class SubmissionHookProtocol extends AbstractReviewerProtocol {
          * Double check to retrieve that assessment that belongs to submission:
          * By passing groupName name to backend API, server filters for the name allowing similar names
          * No use second filter to restrict it to exact match.
-         * Further this won't work for user names (RZ names).
          */
-//        String groupName = assignment.isGroupWork() ? submitterName : null;
         AssessmentDto assessmentDto = getProtocol().getAssessments(assignment.getID(), submitterName).stream()
             .filter(a -> (assignment.isGroupWork() && submitterName.equals(a.getGroup().getName()))
-                    || (!assignment.isGroupWork() && submitterName.equals(a.getUser().getUsername())))
+                    || (!assignment.isGroupWork() && submitterName.equals(a.getParticipant().getUsername())))
             .findAny()
             .orElse(null);
         

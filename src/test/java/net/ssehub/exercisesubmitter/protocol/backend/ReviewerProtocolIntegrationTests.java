@@ -1,7 +1,5 @@
 package net.ssehub.exercisesubmitter.protocol.backend;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;

@@ -7,7 +7,7 @@ import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnum;
-import net.ssehub.studentmgmt.backend_api.model.UserDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 
 /**
  * Tests the correct behavior of the {@link Assessment}, which doesn't need any integration to remote server
@@ -23,14 +23,14 @@ public class AssessmentUnitTests {
     @Test
     public void testSummerizePartialAssessments() {
         Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
-        UserDto user = new UserDto();
+        ParticipantDto user = new ParticipantDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");
         user.setUsername("auser");
         
         AssessmentDto dto = new AssessmentDto();
         dto.setId("AssessmentID 1");
-        dto.setUser(user);
+        dto.setParticipant(user);
         
         PartialAssessmentDto partial1 = new PartialAssessmentDto();
         partial1.setAssessmentId("pAssessment ID 1");
@@ -66,14 +66,14 @@ public class AssessmentUnitTests {
     @Test
     public void testPartialAsssesmentSize() {
         Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
-        UserDto user = new UserDto();
+        ParticipantDto user = new ParticipantDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");
         user.setUsername("auser");
         
         AssessmentDto dto = new AssessmentDto();
         dto.setId("AssessmentID 1");
-        dto.setUser(user);
+        dto.setParticipant(user);
         
         Assessment assessment = new Assessment(dto, assignment);
         
