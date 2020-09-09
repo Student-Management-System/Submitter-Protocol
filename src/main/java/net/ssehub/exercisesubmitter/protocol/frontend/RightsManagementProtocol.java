@@ -32,6 +32,14 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
     }
     
     /**
+     * Sets the access token if already logged in.
+     * @param accessToken The access token to the student management service to use.
+     */
+    public void setAccessToken(String accessToken) {
+        getProtocol().setAccessToken(accessToken);
+    }
+    
+    /**
      * Pulls the list of tutors from the server.
      * @return A group containing all tutors.
      * @throws NetworkException If network problems occur.
