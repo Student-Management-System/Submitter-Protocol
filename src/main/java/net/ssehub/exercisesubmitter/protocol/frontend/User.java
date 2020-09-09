@@ -21,7 +21,7 @@ public class User {
      * @param accountName The account name (RZ name) of the user.
      * @param eMail The e-mail address of the user.
      */
-    protected User(String fullName, String accountName, String eMail) {
+    public User(String fullName, String accountName, String eMail) {
         this.fullName = fullName;
         this.accountName = accountName;
         this.eMail = eMail;
