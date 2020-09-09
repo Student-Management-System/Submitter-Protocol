@@ -66,7 +66,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
         // Init protocol
         ExerciseReviewerProtocol reviewer = initReviewer();
         
-        // Null because loadAssessments(Assignment) wasn´t called
+        // Null because loadAssessments(Assignment) wasnï¿½t called
         Assignment assignment = reviewer.getReviewedAssignment();
         Assertions.assertNull(assignment);
     }
@@ -268,7 +268,7 @@ public class ExerciseReviewerProtocolIntegrationTests {
     @Test
     public void testGetPathToSubmission() {
         ExerciseReviewerProtocol reviewer = initReviewer();
-        Assignment assignment = new Assignment("test", "testID", State.IN_REVIEW , true);
+        Assignment assignment = new Assignment("test", "testID", State.IN_REVIEW , true, 0);
         Assertions.assertNotNull(reviewer.getPathToSubmission(assignment, "submissionName"));
     }
     

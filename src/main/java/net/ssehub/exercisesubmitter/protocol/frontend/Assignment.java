@@ -104,12 +104,14 @@ public class Assignment {
      * @param assignmentID The ID used by the REST system, may be <tt>null</tt> during unit tests
      * @param state The state of the assignment. 
      * @param isGroupwork <tt>true</tt> for groups, <tt>false</tt> for individuals.
+     * @param points The amount of achievable points.
      */
-    public Assignment(String name, String assignmentID, State state, boolean isGroupwork) {
+    public Assignment(String name, String assignmentID, State state, boolean isGroupwork, double points) {
         this.name = name;
         this.assignmentID = assignmentID;
         this.state = state;
         this.isGroupwork = isGroupwork;
+        this.points = points;
     }
     
     /**

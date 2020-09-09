@@ -22,7 +22,7 @@ public class AssessmentUnitTests {
      */
     @Test
     public void testSummerizePartialAssessments() {
-        Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
+        Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false, 0);
         ParticipantDto user = new ParticipantDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");
@@ -65,7 +65,7 @@ public class AssessmentUnitTests {
      */
     @Test
     public void testPartialAsssesmentSize() {
-        Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false);
+        Assignment assignment = new Assignment("Test", "AssignmentID 1", State.SUBMISSION, false, 0);
         ParticipantDto user = new ParticipantDto();
         user.setUsername("a user");
         user.setEmail("a@mail.com");

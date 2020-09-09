@@ -13,6 +13,7 @@ import net.ssehub.studentmgmt.backend_api.model.GroupDto;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
 
 /**
  * Super class for reviewing tools. This class stores functionalities that are used by more than one reviewing tool.
@@ -165,6 +166,15 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             .findAny()
             .orElse(null);
         return group != null;
+    }
+    
+    /**
+     * Converts an {@link UserDto} into an {@link User}.
+     * @param participant The server-side user object to convert.
+     * @return The local equivalent of the DTO.
+     */
+    protected User convertToUser(ParticipantDto participant) {
+        return new User(participant.getDisplayName(), participant.getUsername(), participant.getEmail());
     }
 
 }

@@ -136,7 +136,7 @@ public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
         Map<String, String> groupParticipations = loadGroupNames();
         
         getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
-            .map(u -> new User(u.getDisplayName(), u.getUsername(), u.getEmail()))
+            .map(p -> super.convertToUser(p))
             .forEach(u -> {
                 u.setGroupName(groupParticipations.get(u.getFullName()));
                 participants.add(u);
