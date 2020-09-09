@@ -7,7 +7,7 @@ import java.util.Objects;
  * @author El-Sharkawy
  *
  */
-public class User {
+public class User implements Comparable<User> {
 
     private String fullName;
     private String accountName;
@@ -101,6 +101,11 @@ public class User {
     @Override
     public String toString() {
         return getFullName() + " <" + getEMail() + ">";
+    }
+
+    @Override
+    public int compareTo(User other) {
+        return accountName.compareTo(other.accountName);
     }
     
 }
