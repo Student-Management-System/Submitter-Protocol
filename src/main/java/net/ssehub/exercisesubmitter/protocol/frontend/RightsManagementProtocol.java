@@ -20,15 +20,19 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
 
     /**
      * Creates a new {@link RightsManagementProtocol} instance.
-     * @param authenticationURL The URL of the authentication server (aka Sparky service)
      * @param stdMgmtURL The URL of the student management service
-     * @param courseName The course that is associated with the exercise submitter.
-     * @param submissionServer The root (URL) where to submit assignments (exercises).
+     * @param courseName The course that is associated with the rights management.
+     * @param semester The semester of the course .
+     * @param accessToken The token of an user that is logged in and can be used to query the server.
      */
-    public RightsManagementProtocol(String authenticationURL, String stdMgmtURL, String courseName,
-        String submissionServer) {
-        super(authenticationURL, stdMgmtURL, courseName, submissionServer);
+    public RightsManagementProtocol(String stdMgmtURL, String courseName, String semester, String accessToken) {
+        super(null, stdMgmtURL, courseName, null);
         this.courseName = courseName;
+        
+        if (null != accessToken) {
+            setAccessToken(accessToken);
+        }
+        setSemester(semester);
     }
     
     /**
@@ -77,7 +81,7 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * Pulls the information of configured homework groups from the <b>student management system</b> for an assignment.
      * @param assignment The assignment for which the group shall be loaded from the server.
      * @return The configured homework groups of the <b>student management system</b>.
-     * @throws NetworkException 
+     * @throws NetworkException If network problems occur
      */
     public List<Group> loadGroupsPerAssignment(Assignment assignment) throws NetworkException {
         // Gather all homework groups for an assignment
@@ -101,31 +105,59 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
     /**
      * Pulls the information of configured {@link ManagedAssignment}s from the <b>student management system</b>.
      * @param studentsOfCourse A cached list of known participants of the course, used to reduce traffic.
-     *     Maybe <tt>null</tt>, in this case the list is pulled from the server.
+     *     Maybe <tt>null</tt>, in this case the list is pulled from the server if needed.
      * @return The assignments of the course, containing the participants of the assignments (students in case of
      *     single assignments, otherwise the groups).
+     * @throws NetworkException If network problems occur
      */
     public List<ManagedAssignment> loadAssignments(List<User> studentsOfCourse) throws NetworkException {
         List<ManagedAssignment> assignments = new ArrayList<>();
-        getProtocol().getAssignments((StateEnum) null).stream()
+        getProtocol().getAssignments((StateEnum[]) null).stream()
             .map(a -> new ManagedAssignment(a))
             .forEach(assignments::add);
         
+        if (null == studentsOfCourse) {
+            studentsOfCourse = getStudents();
+        }
+        
         for (ManagedAssignment assignment : assignments) {
-            if (assignment.isGroupWork()) {
-                List<Group> homeworkGroups = loadGroupsPerAssignment(assignment);
-                assignment.addAllGroups(homeworkGroups);   
-            } else {
-                if (null == studentsOfCourse) {
-                    studentsOfCourse = getStudents();
-                }
-                studentsOfCourse.stream()
-                    .map(user -> Group.createSingleStudentGroup(user))
-                    .forEach(group -> assignment.addGroup(group));
-            }            
+            updateAssignment(assignment, studentsOfCourse);          
         }
             
         return assignments;
     }
+    
+    /**
+     * Updates the list of participants (groups or single users) of the specified assignment.
+     * The assignment will be changed as side-effect.
+     * @param assignment The assignment to update after user/group has been changed.
+     * @throws NetworkException If network problems occur
+     */
+    public void updateAssignment(ManagedAssignment assignment) throws NetworkException {
+        updateAssignment(assignment, null);
+    }
 
+    /**
+     * Updates the list of participants (groups or single users) of the specified assignment.
+     * The assignment will be changed as side-effect.
+     * @param assignment The assignment to update after user/group has been changed.
+     * @param studentsOfCourse A cached list of known participants of the course, used to reduce traffic.
+     *     Maybe <tt>null</tt>, in this case the list is pulled from the server if needed.
+     * @throws NetworkException If network problems occur
+     */
+    private void updateAssignment(ManagedAssignment assignment, List<User> studentsOfCourse) throws NetworkException {
+        assignment.clearGoups();
+        if (assignment.isGroupWork()) {
+            List<Group> homeworkGroups = loadGroupsPerAssignment(assignment);
+            assignment.addAllGroups(homeworkGroups);   
+        } else {
+            if (null == studentsOfCourse) {
+                studentsOfCourse = getStudents();
+            }
+            
+            studentsOfCourse.stream()
+                .map(user -> Group.createSingleStudentGroup(user))
+                .forEach(group -> assignment.addGroup(group));
+        }
+    }
 }

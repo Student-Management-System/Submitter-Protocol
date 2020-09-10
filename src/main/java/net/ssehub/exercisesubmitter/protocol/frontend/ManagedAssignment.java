@@ -77,8 +77,16 @@ public class ManagedAssignment extends Assignment implements Iterable<Group> {
      * @param groups The new list of groups
      */
     public void setGroups(List<Group> groups) {
-        this.groups.clear();
+        clearGoups();
         this.groups.addAll(groups);
+    }
+    
+    /**
+     * Clears the stored list of groups.
+     * Should be called <b>before</b> updating this assignment with the current list of groups.
+     */
+    void clearGoups() {
+        this.groups.clear();        
     }
     
     /**
@@ -96,6 +104,12 @@ public class ManagedAssignment extends Assignment implements Iterable<Group> {
     @Override
     public Iterator<Group> iterator() {
         return groups.iterator();
+    }
+    
+    @Override
+    public String getID() {
+        // Need to be public to handle updates via NotificationDto 
+        return super.getID();
     }
 
     @Override
