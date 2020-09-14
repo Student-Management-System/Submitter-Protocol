@@ -37,17 +37,21 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException If network problems occur.
      */
     public Group getTutors() throws NetworkException {
-        String tutorsGroupName = "Tutors_of_Course_" + courseName.substring(0, 1).toUpperCase()
-            + courseName.substring(1);
-        Group tutors = new Group(tutorsGroupName);
-        getProtocol().getUsersOfCourse(RoleEnum.LECTURER, RoleEnum.TUTOR).stream()
-            .map(p -> super.convertToUser(p))
-            .forEach(u -> {
-                u.setGroupName(tutorsGroupName);
-                tutors.addMembers(u);
-            });
+        Action<Group> getTutors = () -> {
+            String tutorsGroupName = "Tutors_of_Course_" + courseName.substring(0, 1).toUpperCase()
+                + courseName.substring(1);
+            Group tutors = new Group(tutorsGroupName);
+            getProtocol().getUsersOfCourse(RoleEnum.LECTURER, RoleEnum.TUTOR).stream()
+                .map(p -> super.convertToUser(p))
+                .forEach(u -> {
+                    u.setGroupName(tutorsGroupName);
+                    tutors.addMembers(u);
+                });
+            
+            return tutors;
+        };
         
-        return tutors;
+        return apply(getTutors);
     }
     
     /**
@@ -57,12 +61,16 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException If network problems occur.
      */
     public List<User> getStudents() throws NetworkException {
-        List<User> students = new ArrayList<User>();
-        getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
-            .map(p -> super.convertToUser(p))
-            .forEach(students::add);
+        Action<List<User>> getStudents = () -> {
+            List<User> students = new ArrayList<User>();
+            getProtocol().getUsersOfCourse(RoleEnum.STUDENT).stream()
+                .map(p -> super.convertToUser(p))
+                .forEach(students::add);
+            
+            return students;
+        };
         
-        return students;
+        return apply(getStudents);
     }
     
     /**
@@ -72,22 +80,26 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException If network problems occur
      */
     public List<Group> loadGroupsPerAssignment(Assignment assignment) throws NetworkException {
-        // Gather all homework groups for an assignment
-        List<Group> homeworkGroups = new ArrayList<>();
-        
-        List<GroupDto> groupsOfServer = getProtocol().getGroupsAtAssignmentEnd(assignment.getID());
-        for (GroupDto groupDto : groupsOfServer) {
-            Group group = new Group(groupDto.getName());
+        Action<List<Group>> loadGroupsPerAssignment = () -> {
+            // Gather all homework groups for an assignment
+            List<Group> homeworkGroups = new ArrayList<>();
             
-            for (ParticipantDto userDto : groupDto.getMembers()) {
-                User user = convertToUser(userDto);
-                user.setGroupName(groupDto.getName());
-                group.addMembers(user);
+            List<GroupDto> groupsOfServer = getProtocol().getGroupsAtAssignmentEnd(assignment.getID());
+            for (GroupDto groupDto : groupsOfServer) {
+                Group group = new Group(groupDto.getName());
+                
+                for (ParticipantDto userDto : groupDto.getMembers()) {
+                    User user = convertToUser(userDto);
+                    user.setGroupName(groupDto.getName());
+                    group.addMembers(user);
+                }
+                homeworkGroups.add(group);
             }
-            homeworkGroups.add(group);
-        }
+            
+            return homeworkGroups;
+        };
         
-        return homeworkGroups;
+        return apply(loadGroupsPerAssignment);
     }
     
     /**
@@ -99,20 +111,22 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException If network problems occur
      */
     public List<ManagedAssignment> loadAssignments(List<User> studentsOfCourse) throws NetworkException {
-        List<ManagedAssignment> assignments = new ArrayList<>();
-        getProtocol().getAssignments((StateEnum[]) null).stream()
-            .map(a -> new ManagedAssignment(a))
-            .forEach(assignments::add);
-        
-        if (null == studentsOfCourse) {
-            studentsOfCourse = getStudents();
-        }
-        
-        for (ManagedAssignment assignment : assignments) {
-            updateAssignment(assignment, studentsOfCourse);          
-        }
+        Action<List<ManagedAssignment>> loadAllAssignments = () -> {
+            List<ManagedAssignment> assignments = new ArrayList<>();
+            getProtocol().getAssignments((StateEnum[]) null).stream()
+                .map(a -> new ManagedAssignment(a))
+                .forEach(assignments::add);
             
-        return assignments;
+            final List<User> students = (null == studentsOfCourse) ? getStudents() : studentsOfCourse;
+            
+            for (ManagedAssignment assignment : assignments) {
+                updateAssignment(assignment, students);          
+            }
+                
+            return assignments;
+        };
+        
+        return apply(loadAllAssignments);
     }
     
     /**
@@ -134,18 +148,23 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException If network problems occur
      */
     private void updateAssignment(ManagedAssignment assignment, List<User> studentsOfCourse) throws NetworkException {
-        assignment.clearGoups();
-        if (assignment.isGroupWork()) {
-            List<Group> homeworkGroups = loadGroupsPerAssignment(assignment);
-            assignment.addAllGroups(homeworkGroups);   
-        } else {
-            if (null == studentsOfCourse) {
-                studentsOfCourse = getStudents();
+        Action<Void> updateAssignment = () -> {
+        
+            assignment.clearGoups();
+            if (assignment.isGroupWork()) {
+                List<Group> homeworkGroups = loadGroupsPerAssignment(assignment);
+                assignment.addAllGroups(homeworkGroups);   
+            } else {
+                final List<User> students = (null == studentsOfCourse) ? getStudents() : studentsOfCourse;
+                
+                students.stream()
+                    .map(user -> Group.createSingleStudentGroup(user))
+                    .forEach(group -> assignment.addGroup(group));
             }
             
-            studentsOfCourse.stream()
-                .map(user -> Group.createSingleStudentGroup(user))
-                .forEach(group -> assignment.addGroup(group));
-        }
+            return null;
+        };
+        
+        apply(updateAssignment);
     }
 }

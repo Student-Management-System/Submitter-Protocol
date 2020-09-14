@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.CollaborationEnum;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
@@ -92,8 +94,14 @@ public class RightsManagementProtocolIntegrationTests {
      */
     private RightsManagementProtocol initProtocol() {
         // Init protocol
-        RightsManagementProtocol protocol = new RightsManagementProtocol(TestUtils.TEST_MANAGEMENT_SERVER,
-                TestUtils.TEST_DEFAULT_JAVA_COURSE, TestUtils.TEST_DEFAULT_SEMESTER, TestUtils.retreiveAccessToken());
+        RightsManagementProtocol protocol = new RightsManagementProtocol(TestUtils.TEST_AUTH_SERVER,
+            TestUtils.TEST_MANAGEMENT_SERVER, TestUtils.TEST_DEFAULT_JAVA_COURSE, TestUtils.TEST_DEFAULT_SEMESTER);
+        String[] credentials = TestUtils.retreiveCredentialsFormVmArgs();
+        try {
+            protocol.login(credentials[0], credentials[1]);
+        } catch (UnknownCredentialsException | ServerNotFoundException e) {
+            Assertions.fail("Could not login for testing due to: " + e.getMessage(), e);
+        }
         
         return protocol;
     }
