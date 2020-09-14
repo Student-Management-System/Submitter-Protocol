@@ -1,11 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.ssehub.studentmgmt</groupId>
 	<artifactId>submitter-protocol</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<name>Submitter-Protocol</name>
-	<description>Java network protocol for the ExerciseSubmitter and ExerciseReviewer tools.</description>
+	<description>Java network protocol for the ExerciseSubmitter and
+		ExerciseReviewer tools.
+	</description>
 
 	<build>
 		<plugins>
@@ -197,6 +200,19 @@
 			<version>1.3.5</version>
 		</dependency>
 
+		<!-- GuardedString -->
+		<dependency>
+			<groupId>org.syncope.identityconnectors</groupId>
+			<artifactId>framework</artifactId>
+			<version>0.4.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.syncope.identityconnectors</groupId>
+			<artifactId>framework-internal</artifactId>
+			<version>0.4.3</version>
+			<scope>runtime</scope>
+		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -267,7 +283,8 @@
 		<repository>
 			<id>student-management-system-github</id>
 			<name>Student-Management-System GitHub Packages</name>
-			<url>https://maven.pkg.github.com/student-management-system/mavenpackages</url>
+			<url>https://maven.pkg.github.com/student-management-system/mavenpackages
+			</url>
 		</repository>
 	</distributionManagement>
 </project>

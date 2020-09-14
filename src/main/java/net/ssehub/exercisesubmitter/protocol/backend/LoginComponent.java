@@ -2,6 +2,9 @@ package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.net.ConnectException;
 
+import org.identityconnectors.common.security.GuardedString;
+import org.identityconnectors.common.security.GuardedString.Accessor;
+
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.api.AuthenticationApi;
 import net.ssehub.studentmgmt.backend_api.model.AuthSystemCredentials;
@@ -39,6 +42,10 @@ public class LoginComponent {
     private String managementToken;
     private String userID;
     
+    // Credentials to allow re-login after time out
+    private String loginUser;
+    private GuardedString loginPasswort;
+    
     /**
      * Instantiates the {@link LoginComponent} by specifying the authentication and student management service to use.
      * @param authenticationURL The URL of the authentication server (aka Sparky service)
@@ -71,6 +78,10 @@ public class LoginComponent {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setUsername(userName);
         credentials.setPassword(password);
+        
+        // Save credentials for re-login
+        loginUser = userName;
+        loginPasswort = new GuardedString(password.toCharArray());
         
         // Login into SparkyService to retrieve usable token
         AuthenticationInfoDto authInfo = null;
@@ -105,6 +116,48 @@ public class LoginComponent {
         }
         
         return userID != null;
+    }
+    
+    /**
+     * Provides an automatic re-login after the session has been expired and only if the user was successfully logged
+     * in before.
+     * @return The new token for the student management server or <tt>null</tt> if this action was not successful.
+     *     In this case, no second re-login will be possible.
+     * @throws UnknownCredentialsException If the credentials are wrong or the user is unknown by the system.
+     * @throws ServerNotFoundException If one of the two servers is unreachable by the specified URLs.
+     */
+    public String reLogin() throws ServerNotFoundException, UnknownCredentialsException {
+        String newToken = null;
+        
+        // Apply re-login only if user was already successfully logged in
+        if (null != userID) {
+            final StringBuffer pw = new StringBuffer();
+            loginPasswort.access(new Accessor() {
+                
+                @Override
+                public void access(char[] clearChars) {
+                    pw.append(clearChars);
+                    
+                }
+            });
+            
+            boolean success;
+            try {
+                success = login(loginUser, pw.toString());
+            } catch (UnknownCredentialsException e) {
+                // Avoid automatic re-login before re-throwing the exception
+                userID = null;
+                throw e;
+            }
+            if (success) {
+                newToken = managementToken;
+            } else {
+                // Avoid automatic re-login
+                userID = null;
+            }
+        }
+        
+        return newToken;
     }
 
     /**

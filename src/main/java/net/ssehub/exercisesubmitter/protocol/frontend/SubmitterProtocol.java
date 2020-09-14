@@ -6,6 +6,7 @@ import net.ssehub.exercisesubmitter.protocol.backend.LoginComponent;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkProtocol;
 import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.UnauthorizedException;
 import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 
@@ -20,6 +21,22 @@ public class SubmitterProtocol {
     private boolean loggedIn;
     private NetworkProtocol protocol;
     private String submissionServer;
+    
+    /**
+     * Realizes a function pointer to implement a function, which re-uses an automatic re-login when the session token
+     * has been expired.
+     * @author El-Sharkawy
+     *
+     * @param <R>
+     */
+    protected static interface Action<R> {
+        /**
+         * Defines the function to be done.
+         * @return The result to be passed outside of the front-end protocol.
+         * @throws NetworkException In case of network problems.
+         */
+        R action() throws NetworkException;
+    }
     
     /**
      * Creates a new {@link SubmitterProtocol} instance for a specific course. This <b>won't</b> login the user,
@@ -94,7 +111,37 @@ public class SubmitterProtocol {
      * @throws NetworkException If network problems occur.
      */
     public List<Assignment> getOpenAssignments() throws NetworkException {
-        return protocol.getAssignments(StateEnum.IN_PROGRESS);
+        return apply(() -> protocol.getAssignments(StateEnum.IN_PROGRESS));
+    }
+    
+    /**
+     * Performs the given function and tries to re-login in case of an {@link UnauthorizedException}, which may happen
+     * after a session token has been expired.
+     * @param function The function to be done.
+     * @param <R> The expected <tt>Result-Type</tt> to be passed outside of the front-end.
+     * @return The expected <tt>Result</tt> to be passed outside of the front-end.
+     * @throws NetworkException
+     */
+    protected <R> R apply(Action<R> function) throws NetworkException {
+        R result;
+        try {
+            result = function.action();
+        } catch (UnauthorizedException e) {
+            // Session maybe expired -> try re-login before throwing exception
+            if (loggedIn) {
+                String newToken = login.reLogin();
+                if (null != newToken) {
+                    protocol.setAccessToken(newToken);
+                    result = function.action();
+                } else {
+                    loggedIn = false;
+                    throw e;
+                }
+            } else {
+                throw e;
+            }
+        }
+        return result;
     }
     
     /**
@@ -104,7 +151,7 @@ public class SubmitterProtocol {
      * @throws NetworkException If network problems occur.
      */
     public List<Assignment> getReviewedAssignments() throws NetworkException {
-        return protocol.getAssignments(StateEnum.EVALUATED, StateEnum.CLOSED);
+        return apply(() -> protocol.getAssignments(StateEnum.EVALUATED, StateEnum.CLOSED));
     }
     
     /**
@@ -116,7 +163,7 @@ public class SubmitterProtocol {
      * @throws NetworkException If network problems occur.
      */
     public List<Assignment> getReviewableAssignments() throws NetworkException {
-        return protocol.getAssignments(StateEnum.IN_REVIEW);
+        return apply(() -> protocol.getAssignments(StateEnum.IN_REVIEW));
     }
     
     /**
@@ -126,16 +173,20 @@ public class SubmitterProtocol {
      * @throws NetworkException If network problems occur.
      */
     public SubmissionTarget getPathToSubmission(Assignment assignment) throws NetworkException {
-        SubmissionTarget target;
-        if (assignment.isGroupWork()) {
-            // Get group for assignment
-            String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
-            target = getPathToSubmission(assignment, groupName);
-        } else {
-            target = getPathToSubmission(assignment, login.getUserName());
-        }
+        Action<SubmissionTarget> function = () -> {
+            SubmissionTarget target;
+            if (assignment.isGroupWork()) {
+                // Get group for assignment
+                String groupName = protocol.getGroupForAssignment(login.getUserID(), assignment.getID());
+                target = getPathToSubmission(assignment, groupName);
+            } else {
+                target = getPathToSubmission(assignment, login.getUserName());
+            }
+            
+            return target;
+        };
         
-        return target;
+        return apply(function);
     }
     
     /**
