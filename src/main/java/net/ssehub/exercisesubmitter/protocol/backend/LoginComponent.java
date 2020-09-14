@@ -81,7 +81,9 @@ public class LoginComponent {
         
         // Save credentials for re-login
         loginUser = userName;
-        loginPasswort = new GuardedString(password.toCharArray());
+        if (null != password) {
+            loginPasswort = new GuardedString(password.toCharArray());
+        }
         
         // Login into SparkyService to retrieve usable token
         AuthenticationInfoDto authInfo = null;
@@ -131,19 +133,23 @@ public class LoginComponent {
         
         // Apply re-login only if user was already successfully logged in
         if (null != userID) {
-            final StringBuffer pw = new StringBuffer();
-            loginPasswort.access(new Accessor() {
-                
-                @Override
-                public void access(char[] clearChars) {
-                    pw.append(clearChars);
+            String usedPW = null;    
+            if (null != loginPasswort) {
+                final StringBuffer pw = new StringBuffer();
+                loginPasswort.access(new Accessor() {
                     
-                }
-            });
+                    @Override
+                    public void access(char[] clearChars) {
+                        pw.append(clearChars);
+                        
+                    }
+                });
+                usedPW = pw.toString();
+            }
             
             boolean success;
             try {
-                success = login(loginUser, pw.toString());
+                success = login(loginUser, usedPW);
             } catch (UnknownCredentialsException e) {
                 // Avoid automatic re-login before re-throwing the exception
                 userID = null;
