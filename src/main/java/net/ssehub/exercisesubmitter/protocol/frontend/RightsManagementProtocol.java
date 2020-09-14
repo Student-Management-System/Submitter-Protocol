@@ -20,27 +20,15 @@ public class RightsManagementProtocol extends AbstractReviewerProtocol {
 
     /**
      * Creates a new {@link RightsManagementProtocol} instance.
+     * @param authenticationURL The URL of the authentication server (aka Sparky service)
      * @param stdMgmtURL The URL of the student management service
      * @param courseName The course that is associated with the rights management.
      * @param semester The semester of the course .
-     * @param accessToken The token of an user that is logged in and can be used to query the server.
      */
-    public RightsManagementProtocol(String stdMgmtURL, String courseName, String semester, String accessToken) {
-        super(null, stdMgmtURL, courseName, null);
+    public RightsManagementProtocol(String authenticationURL, String stdMgmtURL, String courseName, String semester) {
+        super(authenticationURL, stdMgmtURL, courseName, null);
         this.courseName = courseName;
-        
-        if (null != accessToken) {
-            setAccessToken(accessToken);
-        }
         setSemester(semester);
-    }
-    
-    /**
-     * Sets the access token if already logged in.
-     * @param accessToken The access token to the student management service to use.
-     */
-    public void setAccessToken(String accessToken) {
-        getProtocol().setAccessToken(accessToken);
     }
     
     /**
