@@ -1,7 +1,10 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -85,6 +88,40 @@ public class RightsManagementProtocolIntegrationTests {
         List<ManagedAssignment> assignments = protocol.loadAssignments(studentsOfCourse);
         Assertions.assertFalse(assignments.isEmpty());
         Assertions.assertEquals(expectedNumberOfAssignments, assignments.size());
+    }
+    
+    /**
+     * Tests that {@link RightsManagementProtocol#updateAssignment(ManagedAssignment)} sets the groups of a
+     * {@link ManagedAssignment} correctly.
+     * @throws NetworkException Not expected
+     */
+    @Test
+    public void testUpdateAssignment() throws NetworkException {
+        // Test data
+        Set<String> expectedGroupNames = new HashSet<>(Arrays.asList("Testgroup 1", "Testgroup 2", "Testgroup 3"));
+        
+        // Set-up
+        RightsManagementProtocol protocol = initProtocol();
+        Assignment base = protocol.getOpenAssignments().stream()
+            .filter(a -> a.getName().equals("Test_Assignment 01 (Java)"))
+            .findAny()
+            .orElse(null);
+        ManagedAssignment assignment = new ManagedAssignment(base);
+        
+        // Test precondition: Valid assignment, but no groups
+        Assertions.assertNotNull(assignment);
+        Assertions.assertEquals(0, assignment.getAllGroupNames().length);
+        
+        // Action: Do update
+        protocol.updateAssignment(assignment);
+        
+        // Test postcondition: Groups are stored
+        Assertions.assertEquals(expectedGroupNames.size(), assignment.getAllGroupNames().length);
+        String[] actualGroups = assignment.getAllGroupNames();
+        for (int i = 0; i < actualGroups.length; i++) {
+            Assertions.assertTrue(expectedGroupNames.contains(actualGroups[i]), "'" + actualGroups[i]
+                + "' was managed as group of assignment '" + assignment.getName() + "', but not expected.");
+        }
     }
     
     /**
