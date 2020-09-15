@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
-import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CourseParticipantsApi;
@@ -26,6 +25,7 @@ import net.ssehub.studentmgmt.backend_api.model.UserDto;
  * @author Kunold
  *
  */
+//checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
 public class ReviewerProtocol extends NetworkProtocol {
     
     /**
@@ -82,12 +82,10 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             assessments = apiAssessments.getAssessmentsForAssignment(super.getCourseID(), assignmentId, null, null,
                 groupName, null, null, null, null);
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
-        // checkstyle: start exception type check
         
         return assessments;
     }
@@ -130,13 +128,12 @@ public class ReviewerProtocol extends NetworkProtocol {
         AssessmentDto singleAssessment = null;
         try {
             singleAssessment = apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments for the specified assignment not found", getCourseName(),
                 DataType.ASSESSMENTS_NOT_FOUND);
         }
-        // checkstyle: start exception type check
+        
         return singleAssessment;
     }
     
@@ -152,11 +149,11 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             apiAssessments.getAssessmentById(super.getCourseID(), assignmentId, assessmentId);
             exists = true;
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             // No action needed -> exists = false
         }
+        
         return exists;
     }
     
@@ -172,13 +169,12 @@ public class ReviewerProtocol extends NetworkProtocol {
         try {
             AssessmentDto result = apiAssessments.createAssessment(body, super.getCourseID(), assignmentId);
             id = result.getId();
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
-        // checkstyle: start exception type check
+        
         return id;
     }
     
@@ -197,13 +193,12 @@ public class ReviewerProtocol extends NetworkProtocol {
             PartialAssessmentDto result = apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId,
                 assessmentId);
             success = result != null;
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
-        // checkstyle: start exception type check
+        
         return success;
     }
     
@@ -223,9 +218,8 @@ public class ReviewerProtocol extends NetworkProtocol {
             AssessmentDto result = apiAssessments.updateAssessment(body, super.getCourseID(), assignmentId, 
                 assessmentId);
             success = result != null;
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
@@ -245,11 +239,11 @@ public class ReviewerProtocol extends NetworkProtocol {
             apiAssessments.deleteAssessment(super.getCourseID(), assignmentId, assessmentId);
             // API definition: This method was successful iff no exception was thrown
             success = true;
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), getBasePath());
-        } catch (ApiException e) {
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessment not found", getCourseName(), DataType.ASSESSMENTS_NOT_FOUND);
         }
+        
         return success;
     }
     
@@ -293,3 +287,4 @@ public class ReviewerProtocol extends NetworkProtocol {
         return participant;
     }
 }
+//checkstyle: start exception type check
