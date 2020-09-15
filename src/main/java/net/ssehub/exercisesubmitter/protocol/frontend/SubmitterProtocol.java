@@ -120,7 +120,7 @@ public class SubmitterProtocol {
      * @param function The function to be done.
      * @param <R> The expected <tt>Result-Type</tt> to be passed outside of the front-end.
      * @return The expected <tt>Result</tt> to be passed outside of the front-end.
-     * @throws NetworkException
+     * @throws NetworkException In case of network problems
      */
     protected <R> R apply(Action<R> function) throws NetworkException {
         R result;
@@ -129,13 +129,22 @@ public class SubmitterProtocol {
         } catch (UnauthorizedException e) {
             // Session maybe expired -> try re-login before throwing exception
             if (loggedIn) {
-                String newToken = login.reLogin();
-                if (null != newToken) {
-                    protocol.setAccessToken(newToken);
-                    result = function.action();
-                } else {
-                    loggedIn = false;
-                    throw e;
+                String oldToken = getProtocol().getAccessToken();
+                synchronized (this) {
+                    // Check that automatic re-login wasn't done in a separate thread
+                    if (oldToken.equals(getProtocol().getAccessToken())) {
+                        String newToken = login.reLogin();
+                        if (null != newToken) {
+                            protocol.setAccessToken(newToken);
+                            result = function.action();
+                        } else {
+                            loggedIn = false;
+                            throw e;
+                        }
+                    } else {
+                        // Automatic re-login was done in a separate thread
+                        result = function.action();
+                    }
                 }
             } else {
                 throw e;
@@ -143,7 +152,7 @@ public class SubmitterProtocol {
         }
         return result;
     }
-    
+
     /**
      * Returns the list of reviewed assignments, for the user.
      * @return The list of assignments, which are reviewed by the tutors.

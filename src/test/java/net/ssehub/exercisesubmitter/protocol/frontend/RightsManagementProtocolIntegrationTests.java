@@ -7,15 +7,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.backend.ReviewerProtocol;
 import net.ssehub.exercisesubmitter.protocol.backend.ServerNotFoundException;
+import net.ssehub.exercisesubmitter.protocol.backend.UnauthorizedException;
 import net.ssehub.exercisesubmitter.protocol.backend.UnknownCredentialsException;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.CollaborationEnum;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
+import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 
 /**
  * This class declares <b>integration</b> tests for the {@link RightsManagementProtocol} class.
@@ -122,6 +127,64 @@ public class RightsManagementProtocolIntegrationTests {
             Assertions.assertTrue(expectedGroupNames.contains(actualGroups[i]), "'" + actualGroups[i]
                 + "' was managed as group of assignment '" + assignment.getName() + "', but not expected.");
         }
+    }
+    
+    /**
+     * Tests the automatic re-login based on {@link RightsManagementProtocol#getStudents()}.
+     * @throws NetworkException Not expected
+     * @throws InterruptedException Not expected
+     */
+    @Test
+    public void testReLoginOnGetTutors() throws NetworkException, InterruptedException {
+        /**
+         * Mocks the ReviewerProtocol to simulate an UnauthorizedException.
+         * Will throw an exception only at the very first call.
+         * @author El-Sharkawy
+         *
+         */
+        class ReviewerProtocolMock extends ReviewerProtocol {
+            private boolean shouldFail = true;
+            
+            /**
+             * Sole constructor.
+             */
+            public ReviewerProtocolMock() {
+                super(TestUtils.TEST_MANAGEMENT_SERVER, TestUtils.TEST_DEFAULT_JAVA_COURSE);
+            }
+            
+            @Override
+            public List<ParticipantDto> getUsersOfCourse(RoleEnum... courseRoles) throws NetworkException {
+                if (shouldFail) {
+                    shouldFail = false;
+                    throw new UnauthorizedException("Simulated time out occured.");
+                }
+                return super.getUsersOfCourse(courseRoles);
+            }
+            
+        }
+        
+        // Configure protocol: Use mock that fails at first call
+        RightsManagementProtocol protocol = new RightsManagementProtocol(TestUtils.TEST_AUTH_SERVER,
+            TestUtils.TEST_MANAGEMENT_SERVER, TestUtils.TEST_DEFAULT_JAVA_COURSE, TestUtils.TEST_DEFAULT_SEMESTER);
+        protocol.setNetworkComponents(null, new ReviewerProtocolMock());
+        protocol.setSemester(TestUtils.TEST_DEFAULT_SEMESTER);
+        String[] credentials = TestUtils.retreiveCredentialsFormVmArgs();
+        try {
+            protocol.login(credentials[0], credentials[1]);
+        } catch (UnknownCredentialsException | ServerNotFoundException e) {
+            Assumptions.assumeFalse(true, "Could not login for testing due to: " + e.getMessage());
+        }
+        
+        // Get first token, which should change after performing the action
+        String firstToken = protocol.getProtocol().getAccessToken();
+        // Ensure that new token will contain new content, otherwise new token will be equal -> Timestamp: + 1 sec
+        Thread.sleep(1000);
+        
+        // Perform the action, which requires an automatic re-login
+        protocol.getStudents();
+        String secondToken = protocol.getProtocol().getAccessToken();
+        
+        Assertions.assertNotEquals(firstToken, secondToken, "No automatic re-login was performed.");
     }
     
     /**

@@ -19,6 +19,8 @@ import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
 import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
 import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.auth.Authentication;
+import net.ssehub.studentmgmt.backend_api.auth.OAuth;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
@@ -135,6 +137,23 @@ public class NetworkProtocol {
      */
     public void setAccessToken(String accessToken) {
         apiClient.setAccessToken(accessToken);
+    }
+    
+    /**
+     * <font color="red"><b>Designed for testing only.</b></font>
+     * Returns the currently used access token to the <b>student management service</b>.
+     * Reversed engineered method, not very stable and, thus, should not be used in productive code.
+     * @return The access token or <tt>null</tt> if not set.
+     */
+    public String getAccessToken() {
+        OAuth usedAuth = null;
+        for (Authentication auth : apiClient.getAuthentications().values()) {
+            if (auth instanceof OAuth) {
+                usedAuth = (OAuth) auth;
+            }
+        }
+        
+        return null != usedAuth ? usedAuth.getAccessToken() : null;
     }
     
     /**
