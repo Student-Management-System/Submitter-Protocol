@@ -13,7 +13,6 @@ import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataT
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
-import net.ssehub.studentmgmt.backend_api.ApiException;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentRegistrationApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
 import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
@@ -33,6 +32,7 @@ import net.ssehub.studentmgmt.backend_api.model.GroupDto;
  * @author El-Sharkawy
  *
  */
+//checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
 public class NetworkProtocol {
     private static final Logger LOGGER = LogManager.getLogger(NetworkProtocol.class); 
     
@@ -220,9 +220,8 @@ public class NetworkProtocol {
                     .orElseThrow(() -> new DataNotFoundException("Course not found", courseName,
                         DataType.COURSE_NOT_FOUND));
                 courseId = course.getId();
-            } catch (IllegalArgumentException e) {
-                throw new ServerNotFoundException(e.getMessage(), basePath);
-            } catch (ApiException e) {
+            } catch (Exception e) {
+                ApiExceptionHandler.handleException(e, getBasePath());
                 throw new DataNotFoundException("Course not found", courseName, DataType.COURSE_NOT_FOUND);
             }
         }
@@ -240,9 +239,8 @@ public class NetworkProtocol {
         List<CourseDto> courses = null;
         try {
             courses = apiUser.getCoursesOfUser(userID);
-        } catch (IllegalArgumentException e) {
-            throw new ServerNotFoundException(e.getMessage(), basePath);
-        } catch (ApiException e) {
+        } catch (Exception e) {
+            ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("User not found", userID, DataType.USER_NOT_FOUND);
         }
         
@@ -270,12 +268,10 @@ public class NetworkProtocol {
                 .map(a -> toAssignment(a))
                 .filter(a -> null != a)
                 .forEach(assignments::add);
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assignment not found", getCourseID(), DataType.ASSIGNMENTS_NOT_FOUND);
         }
-        // checkstyle: start exception type check
         
         return assignments;
     }
@@ -306,12 +302,10 @@ public class NetworkProtocol {
         List<AssessmentDto> assessments = null;
         try {
             assessments = apiUser.getAssessmentsOfUserForCourse(userId, getCourseID());
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("Assessments not found", userId, DataType.ASSESSMENTS_NOT_FOUND);
         }
-        // checkstyle: start exception type check
         
         if (null == assessments) {
             assessments = new ArrayList<>();
@@ -334,13 +328,11 @@ public class NetworkProtocol {
         try {
             GroupDto groupDto = apiUser.getGroupOfAssignment(userID, getCourseID(), assignmentID);
             groupName = groupDto.getName();
-        // checkstyle: stop exception type check: Multiple exceptions handles by ApiExceptionHandler
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("No assignment related group information found", assignmentID,
                DataType.GROUP_NOT_FOUND);
         }
-        // checkstyle: start exception type check
         
         return groupName;
     }
@@ -391,3 +383,4 @@ public class NetworkProtocol {
         return assignments;
     }
 }
+// checkstyle: start exception type check
