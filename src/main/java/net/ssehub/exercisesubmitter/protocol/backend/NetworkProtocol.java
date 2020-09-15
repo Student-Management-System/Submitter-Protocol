@@ -2,16 +2,13 @@ package net.ssehub.exercisesubmitter.protocol.backend;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
-import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentRegistrationApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
@@ -359,28 +356,6 @@ public class NetworkProtocol {
         }
         
         return groups;
-    }
-    
-    /**
-     * Returns a map of all specified submissions and their permissions.<br>
-     * This is a 2-tuple in the form of <tt>(assignment name, permission)</tt>.
-     * The <tt>assignment name</tt> is also used as top level folder inside the repository to store all submissions
-     * related to the assignment.
-     * @return A map of all <tt>(assignment name, permission)</tt>s, won't be <tt>null</tt>.
-     */
-    public Map<String, State> readPermissions() {
-        Map<String, State> assignments = new HashMap<>();
-        
-        try {
-            for (Assignment assignment : getAssignments((AssignmentDto.StateEnum[]) null)) {
-                assignments.put(assignment.getName(), assignment.getState());
-            }
-        } catch (NetworkException e) {
-            // TODO Auto-generated catch block 
-            e.printStackTrace();
-        }
-        
-        return assignments;
     }
 }
 // checkstyle: start exception type check

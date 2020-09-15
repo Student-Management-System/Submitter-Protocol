@@ -3,7 +3,6 @@ package net.ssehub.exercisesubmitter.protocol.backend;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
-import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssignmentDto.StateEnum;
 import net.ssehub.studentmgmt.backend_api.model.CourseDto;
@@ -182,17 +180,6 @@ public class NetworkProtocolIntegrationTests {
         } catch (NetworkException e) {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
         }
-    }
-    
-    /**
-     * Test if a Map of assignments of all specified submissions and their permissions is returned.
-     */
-    @Test
-    public void testReadPermissions() {
-        NetworkProtocol np = initProtocol(true);
-        Map <String, State> assignments = np.readPermissions();
-        Assertions.assertNotNull(assignments, "Assignment map was null, but should never be null.");
-        Assertions.assertFalse(assignments.isEmpty(), "Map of assignments was empty");
     }
     
     /**
