@@ -9,6 +9,12 @@
 		ExerciseReviewer tools.
 	</description>
 
+	<scm>
+		<connection>scm:git:https://github.com/Student-Management-System/Submitter-Protocol.git</connection>
+		<developerConnection>scm:git:https://github.com/Student-Management-System/Submitter-Protocol.git</developerConnection>
+		<url>https://github.com/Student-Management-System/Submitter-Protocol</url>
+	</scm>
+
 	<build>
 	 <pluginManagement>
 		<plugins>
