@@ -1,8 +1,11 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
+import java.math.BigDecimal;
+
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
+import net.ssehub.exercisesubmitter.protocol.frontend.Assignment.State;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 
 /**
@@ -96,6 +99,10 @@ public class SubmissionHookProtocol extends AbstractReviewerProtocol {
     
     @Override
     public boolean submitAssessment(Assignment assignment, Assessment assessment) throws NetworkException {
+        if (null == assessment.getAssessmentDTO().getAchievedPoints() && assignment.getState() == State.SUBMISSION) {
+            // Assessments do not have points during submission -> Set to 0 points to avoid exception on server
+            assessment.getAssessmentDTO().setAchievedPoints(new BigDecimal(0));
+        }
         return super.submitAssessment(assignment, assessment);
     }
 

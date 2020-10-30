@@ -171,7 +171,7 @@ public class ReviewerProtocol extends NetworkProtocol {
             id = result.getId();
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
-            throw new DataNotFoundException("Assessmentbody not found", getCourseName(),
+            throw new DataNotFoundException("Cannot create Assessment for " + assignmentId, getCourseName(),
                 DataType.ASSESSMENT_BODY_NOT_FOUND);
         }
         

@@ -534,6 +534,33 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
+     * Tests that <b>Partial</b>Assessments can be created during the submission on the fly.
+     */
+    @Order(50)
+    @Test
+    public void testCreatePartialDuringSubmission() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        String user = "elshar";
+        
+        // Load Assignment data
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
+        // Marks this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Create Assessment data
+        this.assessment = hook.loadAssessmentByName(assignment, user);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        String description = "Classes do not compile";
+        assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
+        
+        // Upload assessment (during submission to upload partial assessment)
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+    }
+    
+    /**
      * Cleans up temporarily created objects if necessary.
      * Requires that the protocol and the newly created {@link Assessment} was saved during the test.
      * This is done outside of the test to ensure deletion even if tests stops during its execution.
