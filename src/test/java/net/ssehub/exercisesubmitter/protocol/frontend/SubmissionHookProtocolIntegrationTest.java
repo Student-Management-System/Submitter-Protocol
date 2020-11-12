@@ -534,6 +534,62 @@ public class SubmissionHookProtocolIntegrationTest {
     }
     
     /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment}. Parameters:
+     * <ul>
+     *   <li>Group assignment</li>
+     *   <li>Modify assessment</li>
+     *   <li>Delete all partials (students fixed all problems)</li>
+     * </ul>
+     */
+    @Order(41)
+    @Test
+    public void testSubmitAssessmentDeletePartials() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        String description = "Classes do not compile";
+        assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
+        String tool2 = "Checkstyle";
+        String severity2 = SeverityEnum.ERROR.name();
+        String description2 = "Classes are not well structured";
+        assessment.addAutomaticReview(tool2, severity2, description2, "File.java", 21);
+        
+        // Upload assessment: Basis for the test!
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Read assessment from server and clear the partials
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(2, this.assessment.partialAsssesmentSize());
+        Assertions.assertNotNull(this.assessment.getPartialAssessment(0).getId());
+        Assertions.assertNotNull(this.assessment.getPartialAssessment(1).getId());
+        this.assessment.clearPartialAssessments();
+        
+        // Upload modified assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, this.assessment));
+        
+        // Test that partials were deleted
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(0, this.assessment.partialAsssesmentSize());
+    }
+    
+    /**
      * Tests that <b>Partial</b>Assessments can be created during the submission on the fly.
      */
     @Order(50)

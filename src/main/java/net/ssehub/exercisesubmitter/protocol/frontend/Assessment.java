@@ -30,7 +30,7 @@ public class Assessment implements Iterable<User> {
     
     private List<User> participants;
     
-    private Map<String, PartialAssessmentDto> removalList;
+    private Map<BigDecimal, PartialAssessmentDto> removalList;
     
     /**
      * Creates a new {@link Assessment} instance storing the review of an assignment for one submission.
@@ -141,9 +141,9 @@ public class Assessment implements Iterable<User> {
             
             for (PartialAssessmentDto partial : assessment.getPartialAssessments()) {
                 // Check that partial exists on server (has an ID assigned by the server)
-                if (partial.getAssessmentId() != null) {
+                if (partial.getId() != null) {
                     // Do not add elements twice if this method is called multiple times -> each ID only one time
-                    removalList.put(partial.getAssessmentId(), partial);
+                    removalList.put(partial.getId(), partial);
                 }
             }
             
