@@ -22,14 +22,6 @@ import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
  */
 public class Assessment implements Iterable<User> {
     
-//    /**
-//     * The list of tools handled by the SubmissionCheck.
-//     * Reports by these tools will be automatically cleared before each new submission to remove potentially fixed
-//     * issues.
-//     */
-//    private static final String[] MANAGED_TOOLS = {"checkstyle", "eclipse-configuration", "encoding", "file-size",
-//        "javac"};
-    
     /**
      * Reference to the assignment (name of the exercise, points, ID for queries, ...).
      */
@@ -151,12 +143,10 @@ public class Assessment implements Iterable<User> {
      * @param toolsToRemove The list of tool reports to delete.
      */
     public void clearPartialAssessments(String... toolsToRemove) {
-        if (null != toolsToRemove && toolsToRemove.length > 0) {
+        if (null != assessment.getPartialAssessments() && null != toolsToRemove && toolsToRemove.length > 0) {
             Set<String> removalList = new HashSet<>(Arrays.asList(toolsToRemove));
             assessment.getPartialAssessments().removeIf(p -> removalList.contains(p.getKey()));
-            
         }
-        
     }
     
     /**
