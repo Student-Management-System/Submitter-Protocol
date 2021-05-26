@@ -236,11 +236,54 @@ public class Assessment implements Iterable<User> {
         if (partialAsssesmentSize() > 0) {
             assessment.getPartialAssessments().stream()
                 .sorted(Assessment::compare)
-                .map(a -> " - " + a.getKey() + "\n")
-                .forEach(result::append);
+                .forEach(a -> printSummary(result, a));
         }
         
         return result.toString();
+    }
+    
+    /**
+     * ToString-method to create a nice summary for each marker of a partial assessment. If no markers are specified,
+     * it will print only the name of the {@link PartialAssessmentDto}.
+     * @param result The output (will be changed as side effect).
+     * @param partial The {@link PartialAssessmentDto} to add to the <tt>result</tt>
+     */
+    private void printSummary(StringBuffer result, PartialAssessmentDto partial) {
+        // Sort markers by severity
+        List<MarkerDto> markers = partial.getMarkers();
+        if (null != markers && !markers.isEmpty()) {
+            Collections.sort(markers, (m1, m2) -> (-1 * m1.getSeverity().compareTo(m2.getSeverity())));
+            for (MarkerDto marker : markers) {
+                result.append(" - " + partial.getTitle());
+                
+                // Severity
+                if (null != marker.getSeverity()) {
+                    result.append(" (" + marker.getSeverity().name() + ")");
+                }
+                
+                // Location
+                if (null != marker.getPath()) {
+                    result.append(" " + marker.getSeverity().name());    
+                    if (null != marker.getStartLineNumber()) {
+                        result.append(" " + marker.getStartLineNumber());                            
+                        if (null != marker.getEndLineNumber()) {
+                            result.append("-" + marker.getEndLineNumber());                            
+                        }
+                    }
+                }
+                
+                // Synopsis
+                if (null != marker.getComment()) {
+                    result.append(":\t" + marker.getComment());    
+                }
+                
+                result.append("\n");
+            }
+        } else {
+            result.append(" - " + partial.getTitle() + "\n");
+        }
+        
+        System.out.println(partial);
     }
     
     /**
