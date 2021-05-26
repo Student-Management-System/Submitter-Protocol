@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import net.ssehub.studentmgmt.backend_api.ApiException;
-import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
-import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
+import net.ssehub.studentmgmt.backend_api.api.AssessmentApi;
+import net.ssehub.studentmgmt.backend_api.api.CourseApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
@@ -40,7 +40,7 @@ public class ReviewerProtocolUnitTests {
         body.setAchievedPoints(new BigDecimal(10));
         
         // Mock: Simulate creation of an assessment on server
-        AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
+        AssessmentApi assessmentApiMock = Mockito.mock(AssessmentApi.class);
         try {
             AssessmentDto newAssessment = new AssessmentDto();
             newAssessment.setId("A-ID");
@@ -74,9 +74,9 @@ public class ReviewerProtocolUnitTests {
         body.setPoints(new BigDecimal(10));
         
         // Mock: Simulate creation of an partial assessment on server
-        AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
+        AssessmentApi assessmentApiMock = Mockito.mock(AssessmentApi.class);
         try {
-            Mockito.when(assessmentApiMock.addPartialAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString(),
+            Mockito.when(assessmentApiMock.setPartialAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString(),
                 Mockito.anyString()))
                 .thenReturn(new PartialAssessmentDto());
         } catch (ApiException e) {
@@ -90,7 +90,7 @@ public class ReviewerProtocolUnitTests {
             boolean check = rp.createPartialAssessment(body, TEST_ASSIGNMENT_ID, TEST_ASSESSMENT_ID);
             Assertions.assertTrue(check);
             // Check if server mock was used
-            Mockito.verify(assessmentApiMock).addPartialAssessment(body, TEST_COURSE_ID, TEST_ASSIGNMENT_ID,
+            Mockito.verify(assessmentApiMock).setPartialAssessment(body, TEST_COURSE_ID, TEST_ASSIGNMENT_ID,
                     TEST_ASSESSMENT_ID);
         } catch (NetworkException | ApiException e) {
             Assertions.fail("Unexpected NetworkException returned: " + e.getMessage());
@@ -106,7 +106,7 @@ public class ReviewerProtocolUnitTests {
         body.setAchievedPoints(new BigDecimal(10));
         
         // Mock: Simulate update of an assessment on server
-        AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
+        AssessmentApi assessmentApiMock = Mockito.mock(AssessmentApi.class);
         try {
             Mockito.when(assessmentApiMock.updateAssessment(Mockito.any(), Mockito.anyString(), Mockito.anyString(),
                     Mockito.anyString()))
@@ -137,7 +137,7 @@ public class ReviewerProtocolUnitTests {
 
         
         // Mock: Simulate deletion of an assessment on server
-        AssessmentsApi assessmentApiMock = Mockito.mock(AssessmentsApi.class);
+        AssessmentApi assessmentApiMock = Mockito.mock(AssessmentApi.class);
         try {
             Mockito.doNothing().when(assessmentApiMock).deleteAssessment(Mockito.anyString(), Mockito.anyString(), 
                     Mockito.anyString());
@@ -163,8 +163,8 @@ public class ReviewerProtocolUnitTests {
      * Creates an mock for the CoursesApi.
      * @return the mocked CoursesApi.
      */
-    private CoursesApi createCourseMock() {
-        CoursesApi courseApiMock = Mockito.mock(CoursesApi.class);
+    private CourseApi createCourseMock() {
+        CourseApi courseApiMock = Mockito.mock(CourseApi.class);
         try {
             CourseDto result = new CourseDto();
             result.setId(TEST_COURSE_ID);

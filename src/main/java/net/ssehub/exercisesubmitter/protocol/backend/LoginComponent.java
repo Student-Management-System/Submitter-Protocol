@@ -7,8 +7,7 @@ import org.identityconnectors.common.security.GuardedString.Accessor;
 
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.api.AuthenticationApi;
-import net.ssehub.studentmgmt.backend_api.model.AuthSystemCredentials;
-import net.ssehub.studentmgmt.backend_api.model.AuthTokenDto;
+import net.ssehub.studentmgmt.backend_api.model.UserDto;
 import net.ssehub.studentmgmt.sparkyservice_api.ApiException;
 import net.ssehub.studentmgmt.sparkyservice_api.api.AuthControllerApi;
 import net.ssehub.studentmgmt.sparkyservice_api.model.AuthenticationInfoDto;
@@ -40,7 +39,7 @@ public class LoginComponent {
     // User Data
     private String userName;
     private String managementToken;
-    private String userID;
+    private UserDto user;
     
     // Credentials to allow re-login after time out
     private String loginUser;
@@ -78,6 +77,7 @@ public class LoginComponent {
         CredentialsDto credentials = new CredentialsDto();
         credentials.setUsername(userName);
         credentials.setPassword(password);
+        user = null;
         
         // Save credentials for re-login
         loginUser = userName;
@@ -103,12 +103,13 @@ public class LoginComponent {
         }
         
         if (null != tmpToken && null != authInfo) {
-            AuthSystemCredentials tokenAsJson = new AuthSystemCredentials();
-            tokenAsJson.setToken(tmpToken);
             try {
-                AuthTokenDto loginData = mgmtAuthApi.loginWithToken(tokenAsJson);
-                userID = loginData.getUser().getId();
-                this.managementToken = loginData.getAccessToken();
+                mgmtAuthApi.getApiClient().setAccessToken(tmpToken);
+                user = mgmtAuthApi.whoAmI();
+                
+                if (null != user) {
+                    managementToken = tmpToken;
+                }
             } catch (IllegalArgumentException e) {
                 throw new ServerNotFoundException(e.getMessage(), stdMgmtURL);
             } catch (net.ssehub.studentmgmt.backend_api.ApiException e) {
@@ -117,7 +118,7 @@ public class LoginComponent {
             }
         }
         
-        return userID != null;
+        return user != null;
     }
     
     /**
@@ -132,7 +133,7 @@ public class LoginComponent {
         String newToken = null;
         
         // Apply re-login only if user was already successfully logged in
-        if (null != userID) {
+        if (null != user.getId()) {
             String usedPW = null;    
             if (null != loginPasswort) {
                 final StringBuffer pw = new StringBuffer();
@@ -152,14 +153,14 @@ public class LoginComponent {
                 success = login(loginUser, usedPW);
             } catch (UnknownCredentialsException e) {
                 // Avoid automatic re-login before re-throwing the exception
-                userID = null;
+                user = null;
                 throw e;
             }
             if (success) {
                 newToken = managementToken;
             } else {
                 // Avoid automatic re-login
-                userID = null;
+                user = null;
             }
         }
         
@@ -187,6 +188,6 @@ public class LoginComponent {
      * @return the userID.
      */
     public String getUserID() {
-        return userID;
+        return user.getId();
     }
 }

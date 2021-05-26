@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
-import net.ssehub.studentmgmt.backend_api.api.AssessmentsApi;
-import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
+import net.ssehub.studentmgmt.backend_api.api.AssessmentApi;
+import net.ssehub.studentmgmt.backend_api.api.AssignmentApi;
+import net.ssehub.studentmgmt.backend_api.api.CourseApi;
 import net.ssehub.studentmgmt.backend_api.api.CourseParticipantsApi;
-import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
-import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
-import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.api.GroupApi;
+import net.ssehub.studentmgmt.backend_api.api.UserApi;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
@@ -31,7 +31,7 @@ public class ReviewerProtocol extends NetworkProtocol {
     /**
      * The API to get the assessment informations.
      */
-    private AssessmentsApi apiAssessments;
+    private AssessmentApi apiAssessments;
     
     /**
      * The API to get information about participants of a course.
@@ -46,7 +46,7 @@ public class ReviewerProtocol extends NetworkProtocol {
     public ReviewerProtocol(String basePath, String courseName) {
         super(basePath, courseName);
         // Use always getApiClient() to keep same settings (e.g., setting of access token)
-        apiAssessments = new AssessmentsApi(getApiClient());
+        apiAssessments = new AssessmentApi(getApiClient());
         apiParticipants = new CourseParticipantsApi(getApiClient());
     }
     
@@ -61,8 +61,8 @@ public class ReviewerProtocol extends NetworkProtocol {
      * @param apiGroup The API to query <b>group</b> related information.
      */
     //checkstyle: stop parameter number check
-    ReviewerProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
-            AssignmentsApi apiAssignments, AssessmentsApi apiAssessments, GroupsApi apiGroup) {
+    ReviewerProtocol(String basePath, String courseName, UserApi apiUser, CourseApi apiCourse,
+            AssignmentApi apiAssignments, AssessmentApi apiAssessments, GroupApi apiGroup) {
     //checkstyle: start parameter number check
         super(basePath, courseName, apiUser, apiCourse, apiAssignments, apiGroup);
         this.apiAssessments = apiAssessments;
@@ -106,7 +106,7 @@ public class ReviewerProtocol extends NetworkProtocol {
                     roles.add(role.name());
                 }
             }
-            users = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null);            
+            users = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null, null);            
         } catch (Exception e) {
             ApiExceptionHandler.handleException(e, getBasePath());
             throw new DataNotFoundException("User(s) not found", getCourseName(), DataType.USER_NOT_FOUND);
@@ -190,7 +190,7 @@ public class ReviewerProtocol extends NetworkProtocol {
             throws NetworkException {
         boolean success = false;
         try {
-            PartialAssessmentDto result = apiAssessments.addPartialAssessment(body, super.getCourseID(), assignmentId,
+            PartialAssessmentDto result = apiAssessments.setPartialAssessment(body, super.getCourseID(), assignmentId,
                 assessmentId);
             success = result != null;
         } catch (Exception e) {
@@ -275,7 +275,7 @@ public class ReviewerProtocol extends NetworkProtocol {
         ParticipantDto participant = null;
         try {
             List<String> roles = Arrays.asList(ParticipantDto.RoleEnum.STUDENT.getValue());
-            participant = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null).stream()
+            participant = apiParticipants.getUsersOfCourse(getCourseID(), null, null, roles, null, null).stream()
                 .filter(p -> p.getUsername().equals(userName))
                 .findAny()
                 .orElse(null);

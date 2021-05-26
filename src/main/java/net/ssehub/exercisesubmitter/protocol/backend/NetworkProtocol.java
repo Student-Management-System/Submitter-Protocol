@@ -10,11 +10,11 @@ import org.apache.logging.log4j.Logger;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.frontend.Assignment;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
+import net.ssehub.studentmgmt.backend_api.api.AssignmentApi;
 import net.ssehub.studentmgmt.backend_api.api.AssignmentRegistrationApi;
-import net.ssehub.studentmgmt.backend_api.api.AssignmentsApi;
-import net.ssehub.studentmgmt.backend_api.api.CoursesApi;
-import net.ssehub.studentmgmt.backend_api.api.GroupsApi;
-import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.api.CourseApi;
+import net.ssehub.studentmgmt.backend_api.api.GroupApi;
+import net.ssehub.studentmgmt.backend_api.api.UserApi;
 import net.ssehub.studentmgmt.backend_api.auth.Authentication;
 import net.ssehub.studentmgmt.backend_api.auth.OAuth;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
@@ -41,18 +41,18 @@ public class NetworkProtocol {
     /**
      * The API of the user informations.
      */
-    private UsersApi apiUser;
+    private UserApi apiUser;
     
     /**
      * The API to get the course informations.
      */
-    private CoursesApi apiCourse;
+    private CourseApi apiCourse;
     
     
     /**
      * The API to get the assignments informations.
      */
-    private AssignmentsApi apiAssignments;
+    private AssignmentApi apiAssignments;
     
     /**
      * Provides information about group/assignment relations.
@@ -62,7 +62,7 @@ public class NetworkProtocol {
     /**
      * The API to get the group informations.
      */
-    private GroupsApi apiGroups;
+    private GroupApi apiGroups;
     
     
     /**
@@ -94,11 +94,11 @@ public class NetworkProtocol {
     public NetworkProtocol(String basePath, String courseName) {
         apiClient = new ApiClient();
         apiClient.setBasePath(basePath);
-        apiUser = new UsersApi(apiClient);
-        apiCourse = new CoursesApi(apiClient);
-        apiAssignments = new AssignmentsApi(apiClient);
+        apiUser = new UserApi(apiClient);
+        apiCourse = new CourseApi(apiClient);
+        apiAssignments = new AssignmentApi(apiClient);
         apiAssignmentRegistrations = new AssignmentRegistrationApi(apiClient);
-        apiGroups = new GroupsApi(apiClient);
+        apiGroups = new GroupApi(apiClient);
         semester = SemesterUtils.getSemester();
         this.courseName = courseName;
         this.basePath = basePath;
@@ -114,8 +114,8 @@ public class NetworkProtocol {
      * @param apiGroups The API to query <b>group</b> related informations.
      */
     //checkstyle: stop parameter number check
-    NetworkProtocol(String basePath, String courseName, UsersApi apiUser, CoursesApi apiCourse,
-        AssignmentsApi apiAssignments, GroupsApi apiGroups) {
+    NetworkProtocol(String basePath, String courseName, UserApi apiUser, CourseApi apiCourse,
+        AssignmentApi apiAssignments, GroupApi apiGroups) {
     //checkstyle: start parameter number check  
         this.apiUser = apiUser;
         this.apiCourse = apiCourse;
@@ -181,7 +181,7 @@ public class NetworkProtocol {
      * Returns the API to query for groups.
      * @return The API to query for groups.
      */
-    protected GroupsApi getGroupsApi() {
+    protected GroupApi getGroupsApi() {
         return apiGroups;
     }
     
@@ -189,7 +189,7 @@ public class NetworkProtocol {
      * Returns the API to query for users.
      * @return The API to query for users.
      */
-    protected UsersApi getUsersApi() {
+    protected UserApi getUsersApi() {
         return apiUser;
     }
     

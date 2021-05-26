@@ -78,11 +78,13 @@ public class SubmitterProtocolUnitTests {
         Assignment assignment = new Assignment(dto);
         
         // Mock of REST calls
+        LoginComponent loginMock = Mockito.mock(LoginComponent.class);
+        Mockito.when(loginMock.getUserID()).thenReturn("An arbitrary user ID to avoid a NPE");
         NetworkProtocol networkMock = Mockito.mock(NetworkProtocol.class);
         Mockito.when(networkMock.getGroupForAssignment(Mockito.any(), Mockito.anyString()))
             .thenReturn(expectedUserOrGroup);
         SubmitterProtocol protocol = new SubmitterProtocol(null, null, null, "a_url");
-        protocol.setNetworkComponents(null, networkMock);
+        protocol.setNetworkComponents(loginMock, networkMock);
         
         // Test: Correct computation of destination path
         SubmissionTarget dest = protocol.getPathToSubmission(assignment);

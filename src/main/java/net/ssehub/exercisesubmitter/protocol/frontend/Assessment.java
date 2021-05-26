@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
+import net.ssehub.studentmgmt.backend_api.model.MarkerDto;
+import net.ssehub.studentmgmt.backend_api.model.MarkerDto.SeverityEnum;
 import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
-import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto.SeverityEnum;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 
 /**
@@ -139,14 +140,15 @@ public class Assessment implements Iterable<User> {
                 removalList = new HashMap<>();
             }
             
-            for (PartialAssessmentDto partial : assessment.getPartialAssessments()) {
-                // Check that partial exists on server (has an ID assigned by the server)
-                if (partial.getId() != null) {
-                    // Do not add elements twice if this method is called multiple times -> each ID only one time
-                    removalList.put(partial.getId(), partial);
-                }
-            }
-            
+         // TODO SE: Unclear API change
+//            for (PartialAssessmentDto partial : assessment.getPartialAssessments()) {
+//                // Check that partial exists on server (has an ID assigned by the server)
+//                if (partial.getId() != null) {
+//                    // Do not add elements twice if this method is called multiple times -> each ID only one time
+//                    removalList.put(partial.getId(), partial);
+//                }
+//            }
+//            
             assessment.getPartialAssessments().clear();
         }
     }
@@ -186,19 +188,27 @@ public class Assessment implements Iterable<User> {
         PartialAssessmentDto toolReview = new PartialAssessmentDto();
         // Tile must not be null -> We use the tool as type and title
         toolReview.setTitle(tool);
-        toolReview.setType(tool);
-        SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
-        toolReview.setSeverity(severityType);
-        toolReview.setComment(message);
-        toolReview.setPath(file);
-        if (null != line) {
+        toolReview.setKey(tool);
+        if (null != file  && null != line && null != severity) {
+            MarkerDto marker = new MarkerDto();
+            
+            SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
+            marker.setSeverity(severityType);
+            marker.setPath(file);
+            
             BigDecimal number = new BigDecimal(line);
-            toolReview.setLine(number);            
+            marker.setStartLineNumber(number);
+            marker.setEndLineNumber(number);
+            
+            marker.setComment(message);
         }
-        if (null != assessment.getId()) {
-            // Update of an existing assessment -> partial needs to refer this assessment
-            toolReview.setAssessmentId(assessment.getId());
-        }
+        
+        
+        // TODO SE: Unclear API change
+//        if (null != assessment.getId()) {
+//            // Update of an existing assessment -> partial needs to refer this assessment
+//            toolReview.setAssessmentId(assessment.getId());
+//        }
         assessment.addPartialAssessmentsItem(toolReview);
     }
     
@@ -226,7 +236,7 @@ public class Assessment implements Iterable<User> {
         if (partialAsssesmentSize() > 0) {
             assessment.getPartialAssessments().stream()
                 .sorted(Assessment::compare)
-                .map(a -> " - " + a.getType() + " (" + a.getSeverity() + "):\t" + a.getComment() + "\n")
+                .map(a -> " - " + a.getKey() + "\n")
                 .forEach(result::append);
         }
         
@@ -244,11 +254,19 @@ public class Assessment implements Iterable<User> {
      */
     private static int compare(PartialAssessmentDto partial1, PartialAssessmentDto partial2) {
         int result;
-        if (partial1.getType().equals(partial2.getType())) {
+        if (partial1.getKey().equals(partial2.getKey())) {
+            int severity1 = partial1.getMarkers().stream()
+                .mapToInt(m -> m.getSeverity().ordinal())
+                .max()
+                .orElse(0);
+            int severity2 = partial2.getMarkers().stream()
+                .mapToInt(m -> m.getSeverity().ordinal())
+                .max()
+                .orElse(0);
             // Critical first -> Reverse order of ordinal definition
-            result = -1 * partial1.getSeverity().compareTo(partial2.getSeverity());
+            result = -1 * Integer.compare(severity1, severity2);
         } else {
-            result =  partial1.getType().compareTo(partial2.getType());                    
+            result =  partial1.getKey().compareTo(partial2.getKey());                    
         }
         
         return result;

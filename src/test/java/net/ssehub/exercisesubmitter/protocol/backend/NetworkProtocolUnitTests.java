@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import net.ssehub.studentmgmt.backend_api.ApiException;
-import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.api.UserApi;
 
 /**
  * This class declares <b>unit</b> tests for the {@link NetworkProtocol} class.
@@ -26,7 +26,7 @@ public class NetworkProtocolUnitTests {
         String url = "http://www.uni-hildesheim.de";
         
         // Mock used APIs: Throw internally expected exception when API is used with invalid URL
-        UsersApi userApiMock = Mockito.mock(UsersApi.class);
+        UserApi userApiMock = Mockito.mock(UserApi.class);
         Mockito.when(userApiMock.getCoursesOfUser(Mockito.anyString()))
             .thenThrow(new IllegalArgumentException("Some detailed description why the server is not reachable"));
         

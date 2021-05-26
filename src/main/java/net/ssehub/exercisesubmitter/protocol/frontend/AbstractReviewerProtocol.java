@@ -1,7 +1,5 @@
 package net.ssehub.exercisesubmitter.protocol.frontend;
 
-import java.util.Collection;
-
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException;
 import net.ssehub.exercisesubmitter.protocol.backend.DataNotFoundException.DataType;
 import net.ssehub.exercisesubmitter.protocol.backend.NetworkException;
@@ -10,7 +8,6 @@ import net.ssehub.studentmgmt.backend_api.model.AssessmentCreateDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.AssessmentUpdateDto;
 import net.ssehub.studentmgmt.backend_api.model.GroupDto;
-import net.ssehub.studentmgmt.backend_api.model.PartialAssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 import net.ssehub.studentmgmt.backend_api.model.ParticipantDto.RoleEnum;
 import net.ssehub.studentmgmt.backend_api.model.UserDto;
@@ -62,22 +59,23 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             AssessmentUpdateDto updateDto = new AssessmentUpdateDto();
             updateDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
             updateDto.setComment(assessment.getAssessmentDTO().getComment());
-            
-            // Remove obsolete partial assessments
-            Collection<PartialAssessmentDto> partialsToRemove = assessment.getRemovedPartialAssessments();
-            if (null != partialsToRemove) {
-                for (PartialAssessmentDto partialAssessmentDto : partialsToRemove) {
-                    updateDto.addRemovePartialAssignmentsItem(partialAssessmentDto);
-                }
-            }
-            
-            // Add new partial assessments
-            for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
-                // Check that assessment doesn't belong to downloaded partials -> has no ID given by the server
-                if (assessment.getPartialAssessment(i).getId() == null) {
-                    updateDto.addAddPartialAssessmentsItem(assessment.getPartialAssessment(i));
-                }
-            }
+
+         // TODO SE: Unclear API change
+//            // Remove obsolete partial assessments
+//            Collection<PartialAssessmentDto> partialsToRemove = assessment.getRemovedPartialAssessments();
+//            if (null != partialsToRemove) {
+//                for (PartialAssessmentDto partialAssessmentDto : partialsToRemove) {
+//                    updateDto.addRemovePartialAssignmentsItem(partialAssessmentDto);
+//                }
+//            }
+//            
+//            // Add new partial assessments
+//            for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
+//                // Check that assessment doesn't belong to downloaded partials -> has no ID given by the server
+//                if (assessment.getPartialAssessment(i).getId() == null) {
+//                    updateDto.addAddPartialAssessmentsItem(assessment.getPartialAssessment(i));
+//                }
+//            }
 
             success = getProtocol().updateAssessment(updateDto, assignment.getID(), assessment.getAssessmentID());
         } else {

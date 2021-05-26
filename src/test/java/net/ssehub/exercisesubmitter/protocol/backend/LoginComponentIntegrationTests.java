@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import net.ssehub.exercisesubmitter.protocol.TestUtils;
 import net.ssehub.studentmgmt.backend_api.ApiClient;
 import net.ssehub.studentmgmt.backend_api.ApiException;
-import net.ssehub.studentmgmt.backend_api.api.UsersApi;
+import net.ssehub.studentmgmt.backend_api.api.UserApi;
 
 /**
  * This class declares <b>integration</b> tests for the {@link LoginComponent} class.
@@ -115,7 +115,7 @@ public class LoginComponentIntegrationTests {
         // Precondition: Check that tested services requires valid token
         ApiClient client = new ApiClient();
         client.setBasePath(TestUtils.TEST_MANAGEMENT_SERVER);
-        UsersApi userApi = new UsersApi(client);
+        UserApi userApi = new UserApi(client);
         boolean exceptionOccured = false;
         try {
             userApi.getUserById(testUserID);
