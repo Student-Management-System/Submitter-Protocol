@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.ssehub.studentmgmt</groupId>
 	<artifactId>submitter-protocol</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>Submitter-Protocol</name>
 	<description>Java network protocol for the ExerciseSubmitter and
 		ExerciseReviewer tools.
