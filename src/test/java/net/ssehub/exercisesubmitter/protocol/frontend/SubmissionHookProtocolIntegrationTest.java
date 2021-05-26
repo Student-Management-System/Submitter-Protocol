@@ -511,7 +511,7 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssessment(this.assessment, true);
         Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
         Assertions.assertNotNull(this.assessment.getPartialAssessment(0));
-        this.assessment.clearPartialAssessments();
+        this.assessment.clearPartialAssessments("javac");
         String file = "Another_File.java";
         Integer line = 21;
         this.assessment.addAutomaticReview(tool, severity, description, file, line);
@@ -560,11 +560,11 @@ public class SubmissionHookProtocolIntegrationTest {
         
         // Modify assessment
         assessment.setAchievedPoints(10);
-        String tool = "javac";
+        String tool = "Compiler";
         String severity = SeverityEnum.ERROR.name();
         String description = "Classes do not compile";
         assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
-        String tool2 = "checkstyle";
+        String tool2 = "Checkstyle";
         String severity2 = SeverityEnum.ERROR.name();
         String description2 = "Classes are not well structured";
         assessment.addAutomaticReview(tool2, severity2, description2, "File.java", 21);
@@ -578,7 +578,7 @@ public class SubmissionHookProtocolIntegrationTest {
         Assertions.assertEquals(2, this.assessment.partialAsssesmentSize());
         Assertions.assertNotNull(this.assessment.getPartialAssessment(0));
         Assertions.assertNotNull(this.assessment.getPartialAssessment(1));
-        this.assessment.clearPartialAssessments();
+        this.assessment.clearPartialAssessments("Compiler", "Checkstyle");
         
         // Upload modified assessment
         Assertions.assertTrue(hook.submitAssessment(assignment, this.assessment));
@@ -588,34 +588,34 @@ public class SubmissionHookProtocolIntegrationTest {
         assertAssessment(this.assessment, true);
         Assertions.assertEquals(0, this.assessment.partialAsssesmentSize());
     }
-//    
-//    /**
-//     * Tests that <b>Partial</b>Assessments can be created during the submission on the fly.
-//     */
-//    @Order(50)
-//    @Test
-//    public void testCreatePartialDuringSubmission() throws NetworkException {
-//        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
-//        String user = "elshar";
-//        
-//        // Load Assignment data
-//        SubmissionHookProtocol hook = initProtocol();
-//        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
-//        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
-//        // Marks this.assessment for removal via the cleanUp-Method
-//        protocol = hook.getProtocol();
-//        
-//        // Create Assessment data
-//        this.assessment = hook.loadAssessmentByName(assignment, user);
-//        String tool = "Compiler";
-//        String severity = SeverityEnum.ERROR.name();
-//        String description = "Classes do not compile";
-//        assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
-//        
-//        // Upload assessment (during submission to upload partial assessment)
-//        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
-//    }
-//    
+    
+    /**
+     * Tests that <b>Partial</b>Assessments can be created during the submission on the fly.
+     */
+    @Order(50)
+    @Test
+    public void testCreatePartialDuringSubmission() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 06 (Java) Testat In Progress";
+        String user = "elshar";
+        
+        // Load Assignment data
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.SUBMISSION, TestUtils.TEST_DEFAULT_SUBMITABLE_ASSIGNMENT_SINGLE);
+        // Marks this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Create Assessment data
+        this.assessment = hook.loadAssessmentByName(assignment, user);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        String description = "Classes do not compile";
+        assessment.addAutomaticReview(tool, severity, description, "File.java", 42);
+        
+        // Upload assessment (during submission to upload partial assessment)
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+    }
+    
     /**
      * Cleans up temporarily created objects if necessary.
      * Requires that the protocol and the newly created {@link Assessment} was saved during the test.

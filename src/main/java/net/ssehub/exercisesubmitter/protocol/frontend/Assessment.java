@@ -22,13 +22,13 @@ import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
  */
 public class Assessment implements Iterable<User> {
     
-    /**
-     * The list of tools handled by the SubmissionCheck.
-     * Reports by these tools will be automatically cleared before each new submission to remove potentially fixed
-     * issues.
-     */
-    private static final String[] MANAGED_TOOLS = {"checkstyle", "eclipse-configuration", "encoding", "file-size",
-        "javac"};
+//    /**
+//     * The list of tools handled by the SubmissionCheck.
+//     * Reports by these tools will be automatically cleared before each new submission to remove potentially fixed
+//     * issues.
+//     */
+//    private static final String[] MANAGED_TOOLS = {"checkstyle", "eclipse-configuration", "encoding", "file-size",
+//        "javac"};
     
     /**
      * Reference to the assignment (name of the exercise, points, ID for queries, ...).
@@ -134,15 +134,15 @@ public class Assessment implements Iterable<User> {
         assessment.setAchievedPoints(new BigDecimal(points));
     }
     
-    /**
-     * Clears the list of partial assessments.
-     * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
-     * if former assignments shall be deleted when submitting the assessment.
-     * Clears all partial assessment for tools defined inside this class via {@link #MANAGED_TOOLS}.
-     */
-    public void clearPartialAssessments() {
-        clearPartialAssessments(MANAGED_TOOLS);
-    }
+//    /**
+//     * Clears the list of partial assessments.
+//     * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
+//     * if former assignments shall be deleted when submitting the assessment.
+//     * Clears all partial assessment for tools defined inside this class via {@link #MANAGED_TOOLS}.
+//     */
+//    public void clearPartialAssessments() {
+//        clearPartialAssessments(MANAGED_TOOLS);
+//    }
     
     /**
      * Clears the list of partial assessments.
@@ -150,7 +150,7 @@ public class Assessment implements Iterable<User> {
      * if former assignments shall be deleted when submitting the assessment.
      * @param toolsToRemove The list of tool reports to delete.
      */
-    private void clearPartialAssessments(String... toolsToRemove) {
+    public void clearPartialAssessments(String... toolsToRemove) {
         if (null != toolsToRemove && toolsToRemove.length > 0) {
             Set<String> removalList = new HashSet<>(Arrays.asList(toolsToRemove));
             assessment.getPartialAssessments().removeIf(p -> removalList.contains(p.getKey()));
