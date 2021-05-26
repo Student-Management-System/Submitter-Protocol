@@ -185,11 +185,25 @@ public class Assessment implements Iterable<User> {
      * @param line Optional the line inside the file locating the problem of the review (doesn't work currently)
      */
     public void addAutomaticReview(String tool, String severity, String message, String file, Integer line) {
-        PartialAssessmentDto toolReview = new PartialAssessmentDto();
+        PartialAssessmentDto toolReview = null;
+        
+        if (null != assessment.getPartialAssessments()) {
+            assessment.getPartialAssessments().stream()
+                .filter(p -> p.getKey().equals(tool))
+                .findFirst()
+                .orElse(null);
+        }
+        
+        if (null == toolReview) {
+            toolReview = new PartialAssessmentDto();
+            toolReview.setKey(tool);
+            toolReview.setTitle(tool);
+            toolReview.setDraftOnly(true);
+            assessment.addPartialAssessmentsItem(toolReview);
+        }
+        
         // Tile must not be null -> We use the tool as type and title
-        toolReview.setTitle(tool);
-        toolReview.setKey(tool);
-        if (null != file  && null != line && null != severity) {
+        if (null != file && null != line && null != severity) {
             MarkerDto marker = new MarkerDto();
             
             SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
@@ -201,15 +215,9 @@ public class Assessment implements Iterable<User> {
             marker.setEndLineNumber(number);
             
             marker.setComment(message);
+            
+            toolReview.addMarkersItem(marker);
         }
-        
-        
-        // TODO SE: Unclear API change
-//        if (null != assessment.getId()) {
-//            // Update of an existing assessment -> partial needs to refer this assessment
-//            toolReview.setAssessmentId(assessment.getId());
-//        }
-        assessment.addPartialAssessmentsItem(toolReview);
     }
     
     

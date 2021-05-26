@@ -86,7 +86,7 @@ public class ExerciseReviewerProtocol extends AbstractReviewerProtocol {
      * @throws NetworkException when network problems occur.
      */
     public boolean submitAssessment(Assessment assessment) throws NetworkException {
-        return super.submitAssessment(assignment, assessment);
+        return super.submitAssessment(assignment, assessment, false);
     }
     
     /**

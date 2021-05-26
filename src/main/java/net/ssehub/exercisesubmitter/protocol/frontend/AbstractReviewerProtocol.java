@@ -47,10 +47,14 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
      * </ul>
      * @param assignment The assignment (exercise, homework, exam) for which a submission was retrieved and reviewed
      * @param assessment A review to submit.
+     * @param isDraft If this assessment was created by an automatic test system and shall be revised by a
+     *     human reviewer
      * @return <tt>true</tt> if submission was successful, otherwise <tt>false</tt>.
      * @throws NetworkException when network problems occur.
      */
-    protected boolean submitAssessment(Assignment assignment, Assessment assessment) throws NetworkException {
+    protected boolean submitAssessment(Assignment assignment, Assessment assessment, boolean isDraft)
+        throws NetworkException {
+        
         boolean assessmentExists = getProtocol().assessmentExists(assignment.getID(), assessment.getAssessmentID());
         boolean success = false;
         
@@ -69,13 +73,13 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
 //                }
 //            }
 //            
-//            // Add new partial assessments
-//            for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
+            // Add new partial assessments
+            for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
+                updateDto.addPartialAssessmentsItem(assessment.getPartialAssessment(i));
 //                // Check that assessment doesn't belong to downloaded partials -> has no ID given by the server
 //                if (assessment.getPartialAssessment(i).getId() == null) {
-//                    updateDto.addAddPartialAssessmentsItem(assessment.getPartialAssessment(i));
 //                }
-//            }
+            }
 
             success = getProtocol().updateAssessment(updateDto, assignment.getID(), assessment.getAssessmentID());
         } else {
@@ -84,6 +88,7 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             createDto.setAssignmentId(assessment.getAssignmentID());
             createDto.setComment(assessment.getFullReviewComment());
             createDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
+            createDto.setIsDraft(isDraft);
             if (assignment.isGroupWork()) {
                 createDto.setGroupId(assessment.getAssessmentDTO().getGroupId());
             } else {

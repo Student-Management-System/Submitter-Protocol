@@ -97,13 +97,24 @@ public class SubmissionHookProtocol extends AbstractReviewerProtocol {
         return assessment;
     }
     
-    @Override
+    /**
+     * Submits the assessment (update/create) to the student management system.
+     * <ul>
+     *   <li>If the assessment exist on server: Assessment will be updated</li>
+     *   <li>If the assessment exist not on server: Assessment will be created and local instance will be changed
+     *   as side effect to store the ID created by the server</li>
+     * </ul>
+     * @param assignment The assignment (exercise, homework, exam) for which a submission was retrieved and reviewed
+     * @param assessment A review to submit.
+     * @return <tt>true</tt> if submission was successful, otherwise <tt>false</tt>.
+     * @throws NetworkException when network problems occur.
+     */
     public boolean submitAssessment(Assignment assignment, Assessment assessment) throws NetworkException {
         if (null == assessment.getAssessmentDTO().getAchievedPoints() && assignment.getState() == State.SUBMISSION) {
             // Assessments do not have points during submission -> Set to 0 points to avoid exception on server
             assessment.getAssessmentDTO().setAchievedPoints(new BigDecimal(0));
         }
-        return super.submitAssessment(assignment, assessment);
+        return super.submitAssessment(assignment, assessment, true);
     }
 
 }
