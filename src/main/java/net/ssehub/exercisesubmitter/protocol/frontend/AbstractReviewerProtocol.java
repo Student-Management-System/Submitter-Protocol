@@ -63,23 +63,10 @@ abstract class AbstractReviewerProtocol extends SubmitterProtocol {
             AssessmentUpdateDto updateDto = new AssessmentUpdateDto();
             updateDto.setAchievedPoints(assessment.getAssessmentDTO().getAchievedPoints());
             updateDto.setComment(assessment.getAssessmentDTO().getComment());
+            updateDto.setIsDraft(isDraft);
 
-         // TODO SE: Unclear API change
-//            // Remove obsolete partial assessments
-//            Collection<PartialAssessmentDto> partialsToRemove = assessment.getRemovedPartialAssessments();
-//            if (null != partialsToRemove) {
-//                for (PartialAssessmentDto partialAssessmentDto : partialsToRemove) {
-//                    updateDto.addRemovePartialAssignmentsItem(partialAssessmentDto);
-//                }
-//            }
-//            
-            // Add new partial assessments
-            for (int i = 0; i < assessment.partialAsssesmentSize(); i++) {
-                updateDto.addPartialAssessmentsItem(assessment.getPartialAssessment(i));
-//                // Check that assessment doesn't belong to downloaded partials -> has no ID given by the server
-//                if (assessment.getPartialAssessment(i).getId() == null) {
-//                }
-            }
+            // Add new partial assessments (ensure that list isn't null, otherwise list won't be updated)
+            updateDto.setPartialAssessments(assessment.getAssessmentDTO().getPartialAssessments());
 
             success = getProtocol().updateAssessment(updateDto, assignment.getID(), assessment.getAssessmentID());
         } else {

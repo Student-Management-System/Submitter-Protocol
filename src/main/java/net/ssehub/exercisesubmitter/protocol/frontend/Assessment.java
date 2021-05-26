@@ -2,12 +2,12 @@ package net.ssehub.exercisesubmitter.protocol.frontend;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import net.ssehub.studentmgmt.backend_api.model.AssessmentDto;
 import net.ssehub.studentmgmt.backend_api.model.MarkerDto;
@@ -23,6 +23,14 @@ import net.ssehub.studentmgmt.backend_api.model.ParticipantDto;
 public class Assessment implements Iterable<User> {
     
     /**
+     * The list of tools handled by the SubmissionCheck.
+     * Reports by these tools will be automatically cleared before each new submission to remove potentially fixed
+     * issues.
+     */
+    private static final String[] MANAGED_TOOLS = {"checkstyle", "eclipse-configuration", "encoding", "file-size",
+        "javac"};
+    
+    /**
      * Reference to the assignment (name of the exercise, points, ID for queries, ...).
      */
     private Assignment assignment;
@@ -30,8 +38,6 @@ public class Assessment implements Iterable<User> {
     private AssessmentDto assessment;
     
     private List<User> participants;
-    
-    private Map<BigDecimal, PartialAssessmentDto> removalList;
     
     /**
      * Creates a new {@link Assessment} instance storing the review of an assignment for one submission.
@@ -132,39 +138,25 @@ public class Assessment implements Iterable<User> {
      * Clears the list of partial assessments.
      * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
      * if former assignments shall be deleted when submitting the assessment.
+     * Clears all partial assessment for tools defined inside this class via {@link #MANAGED_TOOLS}.
      */
     public void clearPartialAssessments() {
-        if (partialAsssesmentSize() > 0) {
-            // Avoid that list is multiple times cleared and, thus, data gets lost
-            if (null == removalList) {
-                removalList = new HashMap<>();
-            }
-            
-         // TODO SE: Unclear API change
-//            for (PartialAssessmentDto partial : assessment.getPartialAssessments()) {
-//                // Check that partial exists on server (has an ID assigned by the server)
-//                if (partial.getId() != null) {
-//                    // Do not add elements twice if this method is called multiple times -> each ID only one time
-//                    removalList.put(partial.getId(), partial);
-//                }
-//            }
-//            
-            assessment.getPartialAssessments().clear();
-        }
+        clearPartialAssessments(MANAGED_TOOLS);
     }
     
     /**
-     * Returns the list of {@link PartialAssessmentDto}s that shall be deleted.
-     * @return The list of {@link PartialAssessmentDto}s that shall be deleted or <tt>null</tt> if there are no
-     * {@link PartialAssessmentDto}s to delete.
+     * Clears the list of partial assessments.
+     * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
+     * if former assignments shall be deleted when submitting the assessment.
+     * @param toolsToRemove The list of tool reports to delete.
      */
-    Collection<PartialAssessmentDto> getRemovedPartialAssessments() {
-        Collection<PartialAssessmentDto> removals = null;
-        if (removalList != null) {
-            removals = removalList.values();
+    private void clearPartialAssessments(String... toolsToRemove) {
+        if (null != toolsToRemove && toolsToRemove.length > 0) {
+            Set<String> removalList = new HashSet<>(Arrays.asList(toolsToRemove));
+            assessment.getPartialAssessments().removeIf(p -> removalList.contains(p.getKey()));
+            
         }
         
-        return removals;
     }
     
     /**
