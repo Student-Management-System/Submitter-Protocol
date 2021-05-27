@@ -473,6 +473,88 @@ public class SubmissionHookProtocolIntegrationTest {
     
     /**
      * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment} with incomplete markers: Only a severity
+     */
+    @Order(41)
+    @Test
+    public void testIncompleteMarkerOfPartials_OnlySeverity() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        String tool = "Compiler";
+        String severity = SeverityEnum.ERROR.name();
+        assessment.addAutomaticReview(tool, severity, null, null, null);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server -> Read from server
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
+        
+        // Test partial assessment
+        PartialAssessmentDto partial = this.assessment.getPartialAssessment(0);
+        Assertions.assertEquals(tool, partial.getKey());
+        Assertions.assertEquals(tool, partial.getTitle());
+        Assertions.assertEquals(severity, partial.getMarkers().get(0).getSeverity().name());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
+     * an {@link Assessment} with incomplete markers: Only a message
+     */
+    @Order(41)
+    @Test
+    public void testIncompleteMarkerOfPartials_OnlyMessage() throws NetworkException {
+        String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
+        String group = "Testgroup 3";
+        
+        SubmissionHookProtocol hook = initProtocol();
+        Assignment assignment = hook.getAssignmentByName(expectedAssignment);
+        assertAssignment(assignment, State.IN_REVIEW, TestUtils.TEST_DEFAULT_REVIEWABLE_ASSIGNMENT_GROUP);
+        // Marks this.this.assessment for removal via the cleanUp-Method
+        protocol = hook.getProtocol();
+        
+        // Test that assessment does not exist on server
+        Assessment assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(assessment, false);
+        
+        // Modify assessment
+        assessment.setAchievedPoints(10);
+        String tool = "Compiler";
+        String description = "Classes do not compile";
+        assessment.addAutomaticReview(tool, null, description, null, null);
+        
+        // Upload assessment
+        Assertions.assertTrue(hook.submitAssessment(assignment, assessment));
+        
+        // Test that assessment does now exist on server -> Read from server
+        this.assessment = hook.loadAssessmentByName(assignment, group);
+        assertAssessment(this.assessment, true);
+        Assertions.assertEquals(1, this.assessment.partialAsssesmentSize());
+        
+        // Test partial assessment
+        PartialAssessmentDto partial = this.assessment.getPartialAssessment(0);
+        Assertions.assertEquals(tool, partial.getKey());
+        Assertions.assertEquals(tool, partial.getTitle());
+        Assertions.assertEquals(description, partial.getComment());
+    }
+    
+    /**
+     * Tests that {@link SubmissionHookProtocol#submitAssessment(Assignment, Assessment)} can submit
      * an {@link Assessment}. Parameters:
      * <ul>
      *   <li>Group assignment</li>
@@ -480,7 +562,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>Modify partial</li>
      * </ul>
      */
-    @Order(41)
+    @Order(42)
     @Test
     public void testSubmitAssessmentModifyPartial() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";
@@ -542,7 +624,7 @@ public class SubmissionHookProtocolIntegrationTest {
      *   <li>Delete all partials (students fixed all problems)</li>
      * </ul>
      */
-    @Order(41)
+    @Order(42)
     @Test
     public void testSubmitAssessmentDeletePartials() throws NetworkException {
         String expectedAssignment = "Test_Assignment 08 (Java) - GROUP - IN_REVIEW";

@@ -126,16 +126,6 @@ public class Assessment implements Iterable<User> {
         assessment.setAchievedPoints(new BigDecimal(points));
     }
     
-//    /**
-//     * Clears the list of partial assessments.
-//     * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
-//     * if former assignments shall be deleted when submitting the assessment.
-//     * Clears all partial assessment for tools defined inside this class via {@link #MANAGED_TOOLS}.
-//     */
-//    public void clearPartialAssessments() {
-//        clearPartialAssessments(MANAGED_TOOLS);
-//    }
-    
     /**
      * Clears the list of partial assessments.
      * Should be done before {@link #addAutomaticReview(String, String, String, String, String)} is called and only
@@ -160,14 +150,26 @@ public class Assessment implements Iterable<User> {
     
     /**
      * Adds an partial assessment created as part of an (automatic) tool review.
+     * An automatic report should at least contain the following information:
+     * <ul>
+     *   <li>The source/tool which created the report. A tool may create multiple reports.</li>
+     *   <li>A message/synopsis explaining the report.</li>
+     *   <li>A severity of the message/report.</li>
+     * </ul>
+     * Optionally, a report may add further details to locate the problematic part of the code:
+     * <ul>
+     *   <li>The file containing the problematic code.</li>
+     *   <li>The line of containing the problematic code.</li>
+     * </ul>
      * @param tool The tool (e.g. compiler, Junit, checkstyle, ...) which created the test
      * @param severity The severity of the review
      * @param message A detailed description of the review
-     * @param file Optional the file locating the problem of the review (doesn't work currently)
-     * @param line Optional the line inside the file locating the problem of the review (doesn't work currently)
+     * @param file <b>Optional:</b> the file locating the problem of the review (doesn't work currently)
+     * @param line <b>Optional:</b> the line inside the file locating the problem of the review (doesn't work currently)
      */
     public void addAutomaticReview(String tool, String severity, String message, String file, Integer line) {
         PartialAssessmentDto toolReview = null;
+        boolean newPartial = false;
         
         if (null != assessment.getPartialAssessments()) {
             assessment.getPartialAssessments().stream()
@@ -182,23 +184,36 @@ public class Assessment implements Iterable<User> {
             toolReview.setTitle(tool);
             toolReview.setDraftOnly(true);
             assessment.addPartialAssessmentsItem(toolReview);
+            newPartial = true;
         }
         
-        // Tile must not be null -> We use the tool as type and title
-        if (null != file && null != line && null != severity) {
+        // Tool must not be null -> We use the tool as type and title
+        if (null != file || null != line || null != severity) {
             MarkerDto marker = new MarkerDto();
             
-            SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
-            marker.setSeverity(severityType);
-            marker.setPath(file);
+            if (null != severity) {
+                SeverityEnum severityType = SeverityEnum.fromValue(severity.toUpperCase());
+                marker.setSeverity(severityType);
+            }
             
-            BigDecimal number = new BigDecimal(line);
-            marker.setStartLineNumber(number);
-            marker.setEndLineNumber(number);
+            if (null != file) {
+                marker.setPath(file);
+            }
             
-            marker.setComment(message);
+            if (null != line) {
+                BigDecimal number = new BigDecimal(line);
+                marker.setStartLineNumber(number);
+                marker.setEndLineNumber(number);
+            }
+
+            if (null != message) {
+                marker.setComment(message);
+            }
             
             toolReview.addMarkersItem(marker);
+        } else if (newPartial && null != message) {
+            // New tool report without any marker -> store message here (dirty!)
+            toolReview.comment(message);
         }
     }
     
