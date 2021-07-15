@@ -256,7 +256,8 @@ public class ExerciseReviewerProtocolIntegrationTests {
         Assertions.assertTrue(participants.contains(new User("Max Mustermann", "mmustermann",
             "max.mustermann@test.com")));
         Assertions.assertTrue(participants.contains(new User("Hans Peter", "hpeter", "hans.peter@test.com")));
-        Assertions.assertTrue(participants.contains(new User("elshar", "elshar", "elshar@test.com")));
+        Assertions.assertTrue(participants.contains(new User("elshar", "elshar", "elshar@test.com")),
+            "This may require a re-build of the backend");
         Assertions.assertTrue(participants.contains(new User("kunold", "kunold", "kunold@test.com")));
         Assertions.assertTrue(participants.get(0).getEMail().equals("elshar@test.com"));
         Assertions.assertNull(participants.get(0).getGroupName());
